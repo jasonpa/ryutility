@@ -167,9 +167,19 @@
       border-color: var(--accent); outline: none;
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
     }
+
+    /* SKIP LINK */
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--accent); color: #fff; padding: 6px 12px;
+      border-radius: 0 0 6px 0; z-index: 100; font-size: 13px;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 0; }
   </style>
 </head>
 <body>
+  <a href="#zone-cards" class="skip-link">Skip to results</a>
   <header>
     <h1>RunPace</h1>
     <p>Training zone calculator</p>
@@ -405,12 +415,6 @@ function readInputs() {
 }
 
 // === RENDER ===
-function fmt(kmStr, miStr, unit) {
-  if (unit === 'km')   return `${kmStr} /km`
-  if (unit === 'mile') return `${miStr} /mi`
-  return `${kmStr} /km`  // summary cards always show km
-}
-
 function renderSummaryCards(zones, dispUnit) {
   const keys = ['zone2', 'tempo', 'threshold', 'vo2max']
   keys.forEach(key => {
@@ -478,6 +482,31 @@ function render() {
 // === EVENT WIRING ===
 document.getElementById('calc-form').addEventListener('input', render)
 render()
+
+// === DARK MODE ===
+const themeBtn = document.getElementById('theme-toggle')
+const html = document.documentElement
+
+function applyTheme(theme) {
+  html.setAttribute('data-theme', theme)
+  themeBtn.textContent = theme === 'dark' ? 'Light' : 'Dark'
+}
+
+// Init from system preference
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+applyTheme(prefersDark ? 'dark' : 'light')
+
+themeBtn.addEventListener('click', () => {
+  applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')
+})
+
+// === PACE UNIT LABEL ===
+document.querySelectorAll('input[name="pace-unit"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.getElementById('pace-unit-label').textContent =
+      radio.value === 'km' ? '/km' : '/mi'
+  })
+})
   </script>
 </body>
 </html>
