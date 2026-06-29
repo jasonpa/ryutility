@@ -176,6 +176,36 @@
       text-decoration: none;
     }
     .skip-link:focus { top: 0; }
+
+    /* SECTION HEADERS inside input panel */
+    .section-header {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--accent); margin-bottom: 8px; margin-top: 4px;
+    }
+    .section-divider {
+      border: none; border-top: 1px solid var(--border); margin: 12px 0;
+    }
+
+    /* INLINE WARNING */
+    .input-warning {
+      font-size: 11px; color: #ef4444; margin-top: 4px; display: none;
+    }
+    .input-warning.visible { display: block; }
+
+    /* TARGET COMPARE ROW */
+    .compare-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-secondary);
+      margin-right: 6px; vertical-align: middle;
+    }
+    .pace-target {
+      font-size: 14px; color: var(--text-secondary); margin-top: 2px;
+      display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+    }
+    .pace-target span { vertical-align: middle; }
+    .delta { font-size: 12px; font-weight: 600; }
+    .delta-faster { color: #22c55e; }
+    .delta-slower { color: #f59e0b; }
   </style>
 </head>
 <body>
@@ -190,67 +220,93 @@
     <aside class="input-panel" aria-label="Calculator inputs">
       <form id="calc-form" autocomplete="off" novalidate>
 
-        <div class="field">
-          <label for="pace-min">Reference Pace</label>
-          <div class="pace-inputs">
-            <input type="number" id="pace-min" min="1" max="30" value="" placeholder="4" aria-label="Minutes">
-            <span>:</span>
-            <input type="number" id="pace-sec" min="0" max="59" value="" placeholder="30" aria-label="Seconds">
-            <span id="pace-unit-label">/km</span>
-          </div>
-        </div>
+  <p class="section-header">Current Fitness</p>
 
-        <div class="field">
-          <fieldset>
-            <legend>Pace Unit</legend>
-            <div class="radio-group">
-              <label><input type="radio" name="pace-unit" value="km" checked><span>min/km</span></label>
-              <label><input type="radio" name="pace-unit" value="mile"><span>min/mi</span></label>
-            </div>
-          </fieldset>
-        </div>
+  <div class="field">
+    <fieldset>
+      <legend>Recent TT Distance</legend>
+      <div class="radio-group">
+        <label><input type="radio" name="cur-dist" value="5k" checked><span>5K</span></label>
+        <label><input type="radio" name="cur-dist" value="10k"><span>10K</span></label>
+      </div>
+    </fieldset>
+  </div>
 
-        <div class="field">
-          <label for="ref-type">Reference Type</label>
-          <select id="ref-type">
-            <option value="threshold">Threshold</option>
-            <option value="tempo">Tempo</option>
-            <option value="10k">10K</option>
-          </select>
-        </div>
+  <div class="field">
+    <label>Recent TT Time</label>
+    <div class="pace-inputs">
+      <input type="number" id="cur-mm" min="0" max="99" placeholder="25" aria-label="Minutes">
+      <span>:</span>
+      <input type="number" id="cur-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+      <span>mm:ss</span>
+    </div>
+    <div id="cur-warning" class="input-warning">Time out of range (VDOT 30–85)</div>
+  </div>
 
-        <div class="field">
-          <label for="hr-max">Max HR <span style="font-weight:400">(bpm)</span></label>
-          <input type="number" id="hr-max" min="100" max="250" placeholder="185">
-        </div>
+  <hr class="section-divider">
+  <p class="section-header">Target Race <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></p>
 
-        <div class="field">
-          <label for="hr-rest">Resting HR <span style="font-weight:400">(bpm)</span></label>
-          <input type="number" id="hr-rest" min="30" max="120" placeholder="50">
-        </div>
+  <div class="field">
+    <fieldset>
+      <legend>Race Distance</legend>
+      <div class="radio-group">
+        <label><input type="radio" name="tgt-dist" value="5k" checked><span>5K</span></label>
+        <label><input type="radio" name="tgt-dist" value="10k"><span>10K</span></label>
+        <label><input type="radio" name="tgt-dist" value="half"><span>Half</span></label>
+        <label><input type="radio" name="tgt-dist" value="full"><span>Full</span></label>
+      </div>
+    </fieldset>
+  </div>
 
-        <div class="field">
-          <fieldset>
-            <legend>Lap Distance</legend>
-            <div class="radio-group">
-              <label><input type="radio" name="lap-dist" value="100"><span>100m</span></label>
-              <label><input type="radio" name="lap-dist" value="200"><span>200m</span></label>
-              <label><input type="radio" name="lap-dist" value="400" checked><span>400m</span></label>
-              <label><input type="radio" name="lap-dist" value="800"><span>800m</span></label>
-            </div>
-          </fieldset>
-        </div>
+  <div class="field">
+    <label>Goal Time</label>
+    <div class="pace-inputs" id="tgt-time-inputs">
+      <span id="tgt-hh-wrap" style="display:none;align-items:center;gap:6px">
+        <input type="number" id="tgt-hh" min="0" max="9" placeholder="1" aria-label="Hours" style="width:52px">
+        <span>:</span>
+      </span>
+      <input type="number" id="tgt-mm" min="0" max="59" placeholder="22" aria-label="Minutes">
+      <span>:</span>
+      <input type="number" id="tgt-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+      <span id="tgt-time-label">mm:ss</span>
+    </div>
+    <div id="tgt-warning" class="input-warning">Time out of range (VDOT 30–85)</div>
+  </div>
 
-        <div class="field">
-          <fieldset>
-            <legend>Display Unit</legend>
-            <div class="radio-group">
-              <label><input type="radio" name="disp-unit" value="km" checked><span>km</span></label>
-              <label><input type="radio" name="disp-unit" value="mile"><span>mile</span></label>
-              <label><input type="radio" name="disp-unit" value="both"><span>both</span></label>
-            </div>
-          </fieldset>
-        </div>
+  <hr class="section-divider">
+
+  <div class="field">
+    <label for="hr-max">Max HR <span style="font-weight:400">(bpm)</span></label>
+    <input type="number" id="hr-max" min="100" max="250" placeholder="185">
+  </div>
+
+  <div class="field">
+    <label for="hr-rest">Resting HR <span style="font-weight:400">(bpm)</span></label>
+    <input type="number" id="hr-rest" min="30" max="120" placeholder="50">
+  </div>
+
+  <div class="field">
+    <fieldset>
+      <legend>Lap Distance</legend>
+      <div class="radio-group">
+        <label><input type="radio" name="lap-dist" value="100"><span>100m</span></label>
+        <label><input type="radio" name="lap-dist" value="200"><span>200m</span></label>
+        <label><input type="radio" name="lap-dist" value="400" checked><span>400m</span></label>
+        <label><input type="radio" name="lap-dist" value="800"><span>800m</span></label>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="field">
+    <fieldset>
+      <legend>Display Unit</legend>
+      <div class="radio-group">
+        <label><input type="radio" name="disp-unit" value="km" checked><span>km</span></label>
+        <label><input type="radio" name="disp-unit" value="mile"><span>mile</span></label>
+        <label><input type="radio" name="disp-unit" value="both"><span>both</span></label>
+      </div>
+    </fieldset>
+  </div>
 
       </form>
     </aside>
