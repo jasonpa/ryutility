@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RunPace — Training Zone Calculator</title>
+  <style>
+    /* THEME VARIABLES */
+    :root {
+      --bg: #f0f0f0; --surface: #ffffff; --border: #e0e0e0;
+      --text-primary: #111111; --text-secondary: #666666;
+      --accent: #2563eb;
+    }
+    [data-theme="dark"] {
+      --bg: #111111; --surface: #1e1e1e; --border: #333333;
+      --text-primary: #f0f0f0; --text-secondary: #999999;
+      --accent: #60a5fa;
+    }
+
+    /* RESET + BASE */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px; background: var(--bg); color: var(--text-primary);
+      min-height: 100vh;
+    }
+    input, select, button { font: inherit; }
+
+    /* HEADER */
+    header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+    header p { font-size: 12px; color: var(--text-secondary); flex: 1; }
+    #theme-toggle {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      padding: 4px 10px; cursor: pointer; color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    /* LAYOUT */
+    main {
+      display: flex; flex-direction: column; gap: 0;
+      max-width: 1200px; margin: 0 auto;
+    }
+    @media (min-width: 768px) {
+      main { flex-direction: row; align-items: flex-start; }
+    }
+
+    /* INPUT PANEL */
+    .input-panel {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px;
+    }
+    @media (min-width: 768px) {
+      .input-panel {
+        width: 280px; flex-shrink: 0;
+        border-bottom: none; border-right: 1px solid var(--border);
+        min-height: calc(100vh - 49px); position: sticky; top: 0;
+      }
+    }
+
+    /* FORM FIELDS */
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 11px; font-weight: 600;
+      color: var(--text-secondary); text-transform: uppercase;
+      letter-spacing: 0.5px; margin-bottom: 4px; }
+    .pace-inputs { display: flex; align-items: center; gap: 6px; }
+    .pace-inputs input {
+      width: 52px; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--bg); color: var(--text-primary);
+      text-align: center; font-size: 16px;
+    }
+    .pace-inputs span { color: var(--text-secondary); }
+    input[type="number"] {
+      width: 80px; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--bg); color: var(--text-primary);
+      font-size: 15px;
+    }
+    select {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--bg); color: var(--text-primary);
+    }
+    fieldset { border: none; }
+    legend { font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .radio-group label {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 13px; font-weight: 400; color: var(--text-primary);
+      text-transform: none; letter-spacing: normal;
+      padding: 4px 10px; border: 1px solid var(--border); border-radius: 20px;
+      cursor: pointer;
+    }
+    .radio-group input[type="radio"] { display: none; }
+    .radio-group input[type="radio"]:checked + span {
+      font-weight: 600; color: var(--accent);
+    }
+    .radio-group label:has(input:checked) {
+      border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+
+    /* OUTPUT PANEL */
+    .output-panel { flex: 1; padding: 16px; }
+
+    /* SUMMARY CARDS */
+    .summary-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 16px;
+    }
+    @media (min-width: 768px) {
+      .summary-cards { grid-template-columns: repeat(4, 1fr); }
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .summary-card .zone-label {
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px; display: block;
+    }
+    .summary-card .pace-range {
+      font-size: 18px; font-weight: 700; display: block; margin-top: 2px;
+    }
+
+    /* ZONE CARDS */
+    .zone-cards { display: grid; gap: 8px; }
+    @media (min-width: 900px) {
+      .zone-cards { grid-template-columns: 1fr 1fr; }
+    }
+    .zone-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px;
+      border-left: 3px solid var(--zone-color, var(--border));
+    }
+    .zone-card[data-zone="jog"]       { --zone-color: #22c55e; }
+    .zone-card[data-zone="zone2"]     { --zone-color: #06b6d4; }
+    .zone-card[data-zone="tempo"]     { --zone-color: #f59e0b; }
+    .zone-card[data-zone="threshold"] { --zone-color: #ef4444; }
+    .zone-card[data-zone="vo2max"]    { --zone-color: #8b5cf6; }
+
+    .zone-header { display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 6px; }
+    .zone-header h2 { font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; }
+    .hr-pct { font-size: 11px; color: var(--text-secondary); }
+
+    .pace-km  { font-size: 20px; font-weight: 700; }
+    .pace-mi  { font-size: 14px; color: var(--text-secondary); margin-top: 1px; }
+    .zone-meta {
+      display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .zone-meta span { white-space: nowrap; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center; padding: 40px 20px;
+      color: var(--text-secondary); font-size: 14px;
+    }
+
+    /* FOCUS */
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    input:focus-visible, select:focus-visible {
+      border-color: var(--accent); outline: none;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>RunPace</h1>
+    <p>Training zone calculator</p>
+    <button id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
+  </header>
+
+  <main>
+    <aside class="input-panel" aria-label="Calculator inputs">
+      <form id="calc-form" autocomplete="off" novalidate>
+
+        <div class="field">
+          <label for="pace-min">Reference Pace</label>
+          <div class="pace-inputs">
+            <input type="number" id="pace-min" min="1" max="30" value="" placeholder="4" aria-label="Minutes">
+            <span>:</span>
+            <input type="number" id="pace-sec" min="0" max="59" value="" placeholder="30" aria-label="Seconds">
+            <span id="pace-unit-label">/km</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <fieldset>
+            <legend>Pace Unit</legend>
+            <div class="radio-group">
+              <label><input type="radio" name="pace-unit" value="km" checked><span>min/km</span></label>
+              <label><input type="radio" name="pace-unit" value="mile"><span>min/mi</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="field">
+          <label for="ref-type">Reference Type</label>
+          <select id="ref-type">
+            <option value="threshold">Threshold</option>
+            <option value="tempo">Tempo</option>
+            <option value="10k">10K</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="hr-max">Max HR <span style="font-weight:400">(bpm)</span></label>
+          <input type="number" id="hr-max" min="100" max="250" placeholder="185">
+        </div>
+
+        <div class="field">
+          <label for="hr-rest">Resting HR <span style="font-weight:400">(bpm)</span></label>
+          <input type="number" id="hr-rest" min="30" max="120" placeholder="50">
+        </div>
+
+        <div class="field">
+          <fieldset>
+            <legend>Lap Distance</legend>
+            <div class="radio-group">
+              <label><input type="radio" name="lap-dist" value="100"><span>100m</span></label>
+              <label><input type="radio" name="lap-dist" value="200"><span>200m</span></label>
+              <label><input type="radio" name="lap-dist" value="400" checked><span>400m</span></label>
+              <label><input type="radio" name="lap-dist" value="800"><span>800m</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="field">
+          <fieldset>
+            <legend>Display Unit</legend>
+            <div class="radio-group">
+              <label><input type="radio" name="disp-unit" value="km" checked><span>km</span></label>
+              <label><input type="radio" name="disp-unit" value="mile"><span>mile</span></label>
+              <label><input type="radio" name="disp-unit" value="both"><span>both</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+      </form>
+    </aside>
+
+    <section class="output-panel" aria-label="Training zones" aria-live="polite">
+
+      <div class="summary-cards">
+        <article class="summary-card" id="sum-zone2">
+          <span class="zone-label">Zone 2</span>
+          <span class="pace-range">–</span>
+        </article>
+        <article class="summary-card" id="sum-tempo">
+          <span class="zone-label">Tempo</span>
+          <span class="pace-range">–</span>
+        </article>
+        <article class="summary-card" id="sum-threshold">
+          <span class="zone-label">Threshold</span>
+          <span class="pace-range">–</span>
+        </article>
+        <article class="summary-card" id="sum-vo2max">
+          <span class="zone-label">VO2max</span>
+          <span class="pace-range">–</span>
+        </article>
+      </div>
+
+      <div class="zone-cards" id="zone-cards">
+        <div class="empty-state">Enter a reference pace above to see training zones.</div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    // JS added in Task 2–5
+  </script>
+</body>
+</html>
