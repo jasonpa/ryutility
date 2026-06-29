@@ -633,6 +633,7 @@ document.querySelectorAll('input[name="tgt-dist"]').forEach(radio => {
     const wrap  = document.getElementById('tgt-hh-wrap')
     const label = document.getElementById('tgt-time-label')
     wrap.style.display  = needsHours ? 'inline-flex' : 'none'
+    if (!needsHours) document.getElementById('tgt-hh').value = ''
     label.textContent   = needsHours ? 'hh:mm:ss' : 'mm:ss'
   })
 })
