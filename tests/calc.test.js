@@ -86,6 +86,7 @@ function calcZones({ refPaceSec, refType, hrMax, hrRest, lapDist }) {
       key,
       label: ZONE_LABELS[key],
       paceKm: { lo: secToPace(paceFastSec), hi: secToPace(paceSlowSec) },
+      paceKmSec: { lo: paceFastSec, hi: paceSlowSec },
       paceMi: { lo: secToPace(kmToMile(paceFastSec)), hi: secToPace(kmToMile(paceSlowSec)) },
       hr,
       hrPct: [Math.round(HR_PCTS[key][0] * 100), Math.round(HR_PCTS[key][1] * 100)],
@@ -103,6 +104,42 @@ function calcZones({ refPaceSec, refType, hrMax, hrRest, lapDist }) {
       },
     }
   })
+}
+
+// === VDOT MATH (Daniels' Running Formula) ===
+const DIST_KM = { '5k': 5.0, '10k': 10.0, half: 21.0975, full: 42.195 }
+
+function calcVDOT(distM, timeSec) {
+  const t = timeSec / 60
+  const v = distM / t
+  const vo2 = -4.60 + 0.182258 * v + 0.000104 * v * v
+  const pct = 0.8 + 0.1894393 * Math.exp(-0.012778 * t) + 0.2989558 * Math.exp(-0.1932605 * t)
+  return vo2 / pct
+}
+
+function thresholdPaceFromVDOT(vdot) {
+  const a = 0.000104
+  const b = 0.182258
+  const c = -(4.60 + 0.88 * vdot)
+  const v = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a)
+  return (1000 / v) * 60  // sec/km
+}
+
+function raceTimeToThresholdPace(distKey, totalSec) {
+  const distKm = DIST_KM[distKey]
+  if (!distKm) return null
+  const vdot = calcVDOT(distKm * 1000, totalSec)
+  if (vdot < 30 || vdot > 85) return null
+  return thresholdPaceFromVDOT(vdot)
+}
+
+function formatDelta(currentZone, targetZone) {
+  const delta = Math.round(currentZone.paceKmSec.hi - targetZone.paceKmSec.hi)
+  if (Math.abs(delta) < 1) return ''
+  const abs = Math.abs(delta)
+  const arrow = delta > 0 ? '▲' : '▼'
+  const word  = delta > 0 ? 'faster' : 'slower'
+  return abs < 60 ? `${arrow} ${abs}s ${word}` : `${arrow} ${secToPace(abs)} ${word}`
 }
 
 // === TESTS ===
@@ -183,6 +220,80 @@ test('calcZones vo2max pace is faster than threshold', () => {
   const vo2 = zones.find(z => z.key === 'vo2max')
   // 270*0.90 = 243s < 270s
   assert.ok(paceToSec(...vo2.paceKm.lo.split(':').map(Number)) < 270)
+})
+
+// === VDOT FUNCTIONS ===
+
+// calcVDOT
+test('calcVDOT 5K 25:00 ≈ 38.3', () => {
+  const result = calcVDOT(5000, 1500)
+  assert.ok(result > 38.0 && result < 38.6, `got ${result}`)
+})
+test('calcVDOT 10K 50:00 ≈ 40.0', () => {
+  const result = calcVDOT(10000, 3000)
+  assert.ok(result > 39.5 && result < 40.5, `got ${result}`)
+})
+
+// thresholdPaceFromVDOT
+test('thresholdPaceFromVDOT(38.3) ≈ 310–325 sec/km', () => {
+  const result = thresholdPaceFromVDOT(38.3)
+  assert.ok(result > 310 && result < 325, `got ${result}`)
+})
+test('thresholdPaceFromVDOT(60) ≈ 215–225 sec/km', () => {
+  const result = thresholdPaceFromVDOT(60)
+  assert.ok(result > 215 && result < 225, `got ${result}`)
+})
+
+// raceTimeToThresholdPace
+test('raceTimeToThresholdPace 5k 25:00 returns 310–330', () => {
+  const result = raceTimeToThresholdPace('5k', 1500)
+  assert.ok(result !== null && result > 310 && result < 330, `got ${result}`)
+})
+test('raceTimeToThresholdPace 10k 50:00 returns 295–315', () => {
+  const result = raceTimeToThresholdPace('10k', 3000)
+  assert.ok(result !== null && result > 295 && result < 315, `got ${result}`)
+})
+test('raceTimeToThresholdPace half 1:45:00 (6300s) returns 270–310', () => {
+  const result = raceTimeToThresholdPace('half', 6300)
+  assert.ok(result !== null && result > 270 && result < 310, `got ${result}`)
+})
+test('raceTimeToThresholdPace out of range returns null', () => {
+  assert.strictEqual(raceTimeToThresholdPace('5k', 600), null)
+  assert.strictEqual(raceTimeToThresholdPace('5k', 5400), null)
+})
+test('raceTimeToThresholdPace unknown distKey returns null', () => {
+  assert.strictEqual(raceTimeToThresholdPace('marathon', 14400), null)
+})
+
+// formatDelta
+test('formatDelta 20s faster', () => {
+  const cur = { paceKmSec: { lo: 310, hi: 316 } }
+  const tgt = { paceKmSec: { lo: 290, hi: 296 } }
+  assert.strictEqual(formatDelta(cur, tgt), '▲ 20s faster')
+})
+test('formatDelta 20s slower', () => {
+  const cur = { paceKmSec: { lo: 290, hi: 296 } }
+  const tgt = { paceKmSec: { lo: 310, hi: 316 } }
+  assert.strictEqual(formatDelta(cur, tgt), '▼ 20s slower')
+})
+test('formatDelta equal = ""', () => {
+  const z = { paceKmSec: { lo: 310, hi: 316 } }
+  assert.strictEqual(formatDelta(z, z), '')
+})
+test('formatDelta 80s faster → "▲ 1:20 faster"', () => {
+  const cur = { paceKmSec: { lo: 370, hi: 380 } }
+  const tgt = { paceKmSec: { lo: 290, hi: 300 } }
+  assert.strictEqual(formatDelta(cur, tgt), '▲ 1:20 faster')
+})
+
+// calcZones now includes paceKmSec
+test('calcZones zone includes paceKmSec', () => {
+  const zones = calcZones({ refPaceSec: 270, refType: 'threshold', hrMax: 185, hrRest: 50, lapDist: 400 })
+  const thresh = zones.find(z => z.key === 'threshold')
+  assert.ok(typeof thresh.paceKmSec.lo === 'number', 'paceKmSec.lo should be a number')
+  assert.ok(typeof thresh.paceKmSec.hi === 'number', 'paceKmSec.hi should be a number')
+  assert.strictEqual(thresh.paceKmSec.lo, 270)
+  assert.strictEqual(thresh.paceKmSec.hi, 270)
 })
 
 console.log(`\n${passed} passed, ${failed} failed`)
