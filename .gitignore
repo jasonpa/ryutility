@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Playwright MCP
+.playwright-mcp/
+
+# Screenshot artifacts
+*.png
+*.jpg
+*.jpeg
+
+# Tool internals
+.superpowers/
+.claude/
+
+# Node
+node_modules/
