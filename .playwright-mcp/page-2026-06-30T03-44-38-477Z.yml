@@ -1,0 +1,77 @@
+- generic [active] [ref=e1]:
+  - link "Skip to results" [ref=e2] [cursor=pointer]:
+    - /url: "#zone-cards"
+  - banner [ref=e3]:
+    - heading "RunPace" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Training zone calculator
+    - button "Toggle dark mode" [ref=e6] [cursor=pointer]: Dark
+  - main [ref=e7]:
+    - complementary "Calculator inputs" [ref=e8]:
+      - generic [ref=e9]:
+        - paragraph [ref=e10]: Current Fitness
+        - group "Recent TT Distance" [ref=e12]:
+          - generic [ref=e13]: Recent TT Distance
+          - generic [ref=e14]:
+            - generic [ref=e16] [cursor=pointer]: 5K
+            - generic [ref=e18] [cursor=pointer]: 10K
+        - generic [ref=e19]:
+          - generic [ref=e20]: Recent TT Time
+          - generic [ref=e21]:
+            - spinbutton "Minutes" [ref=e22]
+            - generic [ref=e23]: ":"
+            - spinbutton "Seconds" [ref=e24]
+            - generic [ref=e25]: mm:ss
+        - separator [ref=e26]
+        - paragraph [ref=e27]: Target Race (optional)
+        - group "Race Distance" [ref=e29]:
+          - generic [ref=e30]: Race Distance
+          - generic [ref=e31]:
+            - generic [ref=e33] [cursor=pointer]: 5K
+            - generic [ref=e35] [cursor=pointer]: 10K
+            - generic [ref=e37] [cursor=pointer]: Half
+            - generic [ref=e39] [cursor=pointer]: Full
+        - generic [ref=e40]:
+          - generic [ref=e41]: Goal Time
+          - generic [ref=e42]:
+            - spinbutton "Minutes" [ref=e43]
+            - generic [ref=e44]: ":"
+            - spinbutton "Seconds" [ref=e45]
+            - generic [ref=e46]: mm:ss
+        - separator [ref=e47]
+        - generic [ref=e48]:
+          - generic [ref=e49]: Max HR (bpm)
+          - spinbutton "Max HR (bpm)" [ref=e50]
+        - generic [ref=e51]:
+          - generic [ref=e52]: Resting HR (bpm)
+          - spinbutton "Resting HR (bpm)" [ref=e53]
+        - group "Lap Distance" [ref=e55]:
+          - generic [ref=e56]: Lap Distance
+          - generic [ref=e57]:
+            - generic [ref=e59] [cursor=pointer]: 100m
+            - generic [ref=e61] [cursor=pointer]: 200m
+            - generic [ref=e63] [cursor=pointer]: 400m
+            - generic [ref=e65] [cursor=pointer]: 800m
+        - group "Display Unit" [ref=e67]:
+          - generic [ref=e68]: Display Unit
+          - generic [ref=e69]:
+            - generic [ref=e71] [cursor=pointer]: km
+            - generic [ref=e73] [cursor=pointer]: mile
+            - generic [ref=e75] [cursor=pointer]: both
+    - region "Training zones" [ref=e76]:
+      - generic [ref=e77]:
+        - article [ref=e78]:
+          - generic [ref=e79]: Zone 2
+          - generic [ref=e80]: –
+        - article [ref=e81]:
+          - generic [ref=e82]: Tempo
+          - generic [ref=e83]: –
+        - article [ref=e84]:
+          - generic [ref=e85]: Threshold
+          - generic [ref=e86]: –
+        - article [ref=e87]:
+          - generic [ref=e88]: VO2max
+          - generic [ref=e89]: –
+      - generic [ref=e91]:
+        - strong [ref=e92]: Enter your recent race time above.
+        - text: "Example: 5K TT in 25:00 → your training zones appear here."
+        - text: Add a Target time to compare goal paces side by side.
