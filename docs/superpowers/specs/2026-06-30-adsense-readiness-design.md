@@ -15,7 +15,7 @@ In scope:
 
 Out of scope (explicitly deferred):
 - Adding new tools (unit converter, percentage calculator, etc.) — to be scoped in a future design once this foundation lands.
-- Setting up the actual domain email forwarding account (contact@ryutility.com → jiman.ryu@gmail.com) — this is a manual action in the domain registrar's dashboard, outside repo scope. The Contact page will reference `contact@ryutility.com`; the user is responsible for configuring forwarding before publishing.
+- Setting up the actual domain email forwarding account (contact@ryutility.com → owner's personal inbox) — this is a manual action in the domain registrar's dashboard, outside repo scope. The Contact page will reference `contact@ryutility.com`; the user is responsible for configuring forwarding before publishing.
 
 ## Architecture: Jekyll Migration
 
@@ -81,5 +81,5 @@ This brings the page's non-tool textual content to roughly 300–600 words, addr
 
 ## Open Items for the User (outside this design's execution)
 
-1. Configure `contact@ryutility.com` → `jiman.ryu@gmail.com` forwarding in the domain registrar before the Contact page goes live.
+1. Configure `contact@ryutility.com` → owner's personal inbox forwarding in the domain registrar before the Contact page goes live.
 2. After AdSense approval, replace the `ads.txt` placeholder with the real publisher line and re-enable the ad slot.
