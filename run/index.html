@@ -1,352 +1,304 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RunPace — Training Zone Calculator</title>
-  <style>
-    /* THEME VARIABLES */
-    :root {
-      --bg: #f0f0f0; --surface: #ffffff; --border: #e0e0e0;
-      --text-primary: #111111; --text-secondary: #666666;
-      --accent: #2563eb;
-    }
-    [data-theme="dark"] {
-      --bg: #111111; --surface: #1e1e1e; --border: #333333;
-      --text-primary: #f0f0f0; --text-secondary: #999999;
-      --accent: #60a5fa;
-    }
+---
+layout: default
+title: RunPace — Training Zone Calculator
+description: Calculate your personalized running training zones from a recent race time using Daniels' VDOT method.
+permalink: /run/
+---
+<style>
+  /* TOOL-SPECIFIC STYLES (theme vars, reset, header, focus, skip-link live in assets/css/site.css) */
 
-    /* RESET + BASE */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { overflow-x: hidden; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 14px; background: var(--bg); color: var(--text-primary);
-      min-height: 100vh; overflow-x: hidden;
-    }
-    input, select, button { font: inherit; }
+  /* TOOL HEADING */
+  .tool-heading { padding: 16px 16px 0; }
+  .tool-heading h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+  .tool-heading p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
-    /* HEADER */
-    header {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 16px; border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
-    header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
-    header p { font-size: 12px; color: var(--text-secondary); flex: 1; }
-    #theme-toggle {
-      background: none; border: 1px solid var(--border); border-radius: 6px;
-      padding: 4px 10px; cursor: pointer; color: var(--text-primary);
-      font-size: 13px;
-    }
+  /* LAYOUT */
+  main {
+    display: flex; flex-direction: column; gap: 0;
+    max-width: 1200px; margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    main { flex-direction: row; align-items: flex-start; }
+  }
 
-    /* LAYOUT */
-    main {
-      display: flex; flex-direction: column; gap: 0;
-      max-width: 1200px; margin: 0 auto;
-    }
-    @media (min-width: 768px) {
-      main { flex-direction: row; align-items: flex-start; }
-    }
-
-    /* INPUT PANEL */
+  /* INPUT PANEL */
+  .input-panel {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 16px;
+  }
+  @media (min-width: 768px) {
     .input-panel {
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      padding: 16px;
+      width: 280px; flex-shrink: 0;
+      border-bottom: none; border-right: 1px solid var(--border);
+      min-height: calc(100vh - 49px); position: sticky; top: 0;
     }
-    @media (min-width: 768px) {
-      .input-panel {
-        width: 280px; flex-shrink: 0;
-        border-bottom: none; border-right: 1px solid var(--border);
-        min-height: calc(100vh - 49px); position: sticky; top: 0;
-      }
-    }
+  }
 
-    /* FORM FIELDS */
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 11px; font-weight: 600;
-      color: var(--text-secondary); text-transform: uppercase;
-      letter-spacing: 0.5px; margin-bottom: 4px; }
-    .pace-inputs { display: flex; align-items: center; gap: 6px; }
-    .pace-inputs input {
-      width: 52px; padding: 6px 8px; border: 1px solid var(--border);
-      border-radius: 6px; background: var(--bg); color: var(--text-primary);
-      text-align: center; font-size: 16px;
-    }
-    .pace-inputs span { color: var(--text-secondary); }
-    input[type="number"] {
-      width: 80px; padding: 6px 8px; border: 1px solid var(--border);
-      border-radius: 6px; background: var(--bg); color: var(--text-primary);
-      font-size: 16px;
-    }
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type="number"] { -moz-appearance: textfield; }
-    select {
-      width: 100%; padding: 6px 8px; border: 1px solid var(--border);
-      border-radius: 6px; background: var(--bg); color: var(--text-primary);
-      font-size: 16px;
-    }
-    fieldset { border: none; }
-    legend { font-size: 11px; font-weight: 600; color: var(--text-secondary);
-      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
-    .radio-group label {
-      display: flex; align-items: center; gap: 4px;
-      font-size: 13px; font-weight: 400; color: var(--text-primary);
-      text-transform: none; letter-spacing: normal;
-      padding: 4px 10px; border: 1px solid var(--border); border-radius: 20px;
-      cursor: pointer;
-    }
-    .radio-group input[type="radio"] { display: none; }
-    .radio-group input[type="radio"]:checked + span {
-      font-weight: 600; color: var(--accent);
-    }
-    .radio-group label:has(input:checked) {
-      border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
-    }
+  /* FORM FIELDS */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11px; font-weight: 600;
+    color: var(--text-secondary); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 4px; }
+  .pace-inputs { display: flex; align-items: center; gap: 6px; }
+  .pace-inputs input {
+    width: 52px; padding: 6px 8px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--bg); color: var(--text-primary);
+    text-align: center; font-size: 16px;
+  }
+  .pace-inputs span { color: var(--text-secondary); }
+  input[type="number"] {
+    width: 80px; padding: 6px 8px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--bg); color: var(--text-primary);
+    font-size: 16px;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+  select {
+    width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--bg); color: var(--text-primary);
+    font-size: 16px;
+  }
+  fieldset { border: none; }
+  legend { font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .radio-group label {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 400; color: var(--text-primary);
+    text-transform: none; letter-spacing: normal;
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 20px;
+    cursor: pointer;
+  }
+  .radio-group input[type="radio"] { display: none; }
+  .radio-group input[type="radio"]:checked + span {
+    font-weight: 600; color: var(--accent);
+  }
+  .radio-group label:has(input:checked) {
+    border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
 
-    /* OUTPUT PANEL */
-    .output-panel { flex: 1; padding: 16px; }
+  /* OUTPUT PANEL */
+  .output-panel { flex: 1; padding: 16px; }
 
-    /* SUMMARY CARDS */
-    .summary-cards {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 8px; margin-bottom: 16px;
-    }
-    @media (min-width: 768px) {
-      .summary-cards { grid-template-columns: repeat(4, 1fr); }
-    }
-    .summary-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 12px;
-    }
-    .summary-card .zone-label {
-      font-size: 11px; font-weight: 600; color: var(--text-secondary);
-      text-transform: uppercase; letter-spacing: 0.5px; display: block;
-    }
-    .summary-card .pace-range {
-      font-size: clamp(13px, 3.5vw, 18px); font-weight: 700; display: block; margin-top: 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+  /* SUMMARY CARDS */
+  .summary-cards {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 16px;
+  }
+  @media (min-width: 768px) {
+    .summary-cards { grid-template-columns: repeat(4, 1fr); }
+  }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .summary-card .zone-label {
+    font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px; display: block;
+  }
+  .summary-card .pace-range {
+    font-size: clamp(13px, 3.5vw, 18px); font-weight: 700; display: block; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
 
-    /* ZONE CARDS */
-    .zone-cards { display: grid; gap: 8px; }
-    @media (min-width: 900px) {
-      .zone-cards { grid-template-columns: 1fr 1fr; }
-    }
-    .zone-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 12px 14px;
-      border-left: 3px solid var(--zone-color, var(--border));
-      min-width: 0; overflow: hidden;
-    }
-    .zone-card[data-zone="jog"]       { --zone-color: #22c55e; }
-    .zone-card[data-zone="zone2"]     { --zone-color: #06b6d4; }
-    .zone-card[data-zone="tempo"]     { --zone-color: #f59e0b; }
-    .zone-card[data-zone="threshold"] { --zone-color: #ef4444; }
-    .zone-card[data-zone="vo2max"]    { --zone-color: #8b5cf6; }
+  /* ZONE CARDS */
+  .zone-cards { display: grid; gap: 8px; }
+  @media (min-width: 900px) {
+    .zone-cards { grid-template-columns: 1fr 1fr; }
+  }
+  .zone-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px;
+    border-left: 3px solid var(--zone-color, var(--border));
+    min-width: 0; overflow: hidden;
+  }
+  .zone-card[data-zone="jog"]       { --zone-color: #22c55e; }
+  .zone-card[data-zone="zone2"]     { --zone-color: #06b6d4; }
+  .zone-card[data-zone="tempo"]     { --zone-color: #f59e0b; }
+  .zone-card[data-zone="threshold"] { --zone-color: #ef4444; }
+  .zone-card[data-zone="vo2max"]    { --zone-color: #8b5cf6; }
 
-    .zone-header { display: flex; justify-content: space-between;
-      align-items: baseline; margin-bottom: 6px; }
-    .zone-header h2 { font-size: 13px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.5px; }
-    .hr-pct { font-size: 11px; color: var(--text-secondary); }
+  .zone-header { display: flex; justify-content: space-between;
+    align-items: baseline; margin-bottom: 6px; }
+  .zone-header h2 { font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; }
+  .hr-pct { font-size: 11px; color: var(--text-secondary); }
 
-    .pace-km  { font-size: 20px; font-weight: 700; }
-    .pace-mi  { font-size: 14px; color: var(--text-secondary); margin-top: 1px; }
-    .zone-meta {
-      display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;
-      font-size: 12px; color: var(--text-secondary);
-    }
-    .zone-meta span { word-break: break-word; min-width: 0; }
+  .pace-km  { font-size: 20px; font-weight: 700; }
+  .pace-mi  { font-size: 14px; color: var(--text-secondary); margin-top: 1px; }
+  .zone-meta {
+    display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .zone-meta span { word-break: break-word; min-width: 0; }
 
-    /* EMPTY STATE */
-    .empty-state {
-      text-align: center; padding: 40px 20px;
-      color: var(--text-secondary); font-size: 14px;
-    }
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-secondary); font-size: 14px;
+  }
 
-    /* FOCUS */
-    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    input:focus-visible, select:focus-visible {
-      border-color: var(--accent); outline: none;
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
-    }
+  /* SECTION HEADERS inside input panel */
+  .section-header {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--accent); margin-bottom: 8px; margin-top: 4px;
+  }
+  .section-divider {
+    border: none; border-top: 1px solid var(--border); margin: 12px 0;
+  }
 
-    /* SKIP LINK */
-    .skip-link {
-      position: absolute; top: -40px; left: 0;
-      background: var(--accent); color: #fff; padding: 6px 12px;
-      border-radius: 0 0 6px 0; z-index: 100; font-size: 13px;
-      text-decoration: none;
-    }
-    .skip-link:focus { top: 0; }
+  /* INLINE WARNING */
+  .input-warning {
+    font-size: 11px; color: #ef4444; margin-top: 4px; display: none;
+  }
+  .input-warning.visible { display: block; }
 
-    /* SECTION HEADERS inside input panel */
-    .section-header {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 1px; color: var(--accent); margin-bottom: 8px; margin-top: 4px;
-    }
-    .section-divider {
-      border: none; border-top: 1px solid var(--border); margin: 12px 0;
-    }
+  /* TARGET COMPARE ROW */
+  .compare-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-secondary);
+    margin-right: 6px; vertical-align: middle;
+  }
+  .pace-target {
+    font-size: 14px; color: var(--text-secondary); margin-top: 2px;
+    display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+  }
+  .pace-target span { vertical-align: middle; }
+  .delta { font-size: 12px; font-weight: 600; }
+  .delta-faster { color: #22c55e; }
+  .delta-slower { color: #f59e0b; }
+</style>
+<a href="#zone-cards" class="skip-link">Skip to results</a>
+<div class="tool-heading">
+  <h1>RunPace</h1>
+  <p>Training zone calculator</p>
+</div>
 
-    /* INLINE WARNING */
-    .input-warning {
-      font-size: 11px; color: #ef4444; margin-top: 4px; display: none;
-    }
-    .input-warning.visible { display: block; }
+<main>
+  <aside class="input-panel" aria-label="Calculator inputs">
+    <form id="calc-form" autocomplete="off" novalidate>
 
-    /* TARGET COMPARE ROW */
-    .compare-label {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.5px; color: var(--text-secondary);
-      margin-right: 6px; vertical-align: middle;
-    }
-    .pace-target {
-      font-size: 14px; color: var(--text-secondary); margin-top: 2px;
-      display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
-    }
-    .pace-target span { vertical-align: middle; }
-    .delta { font-size: 12px; font-weight: 600; }
-    .delta-faster { color: #22c55e; }
-    .delta-slower { color: #f59e0b; }
-  </style>
-</head>
-<body>
-  <a href="#zone-cards" class="skip-link">Skip to results</a>
-  <header>
-    <h1>RunPace</h1>
-    <p>Training zone calculator</p>
-    <button id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
-  </header>
+<p class="section-header">Current Fitness</p>
 
-  <main>
-    <aside class="input-panel" aria-label="Calculator inputs">
-      <form id="calc-form" autocomplete="off" novalidate>
-
-  <p class="section-header">Current Fitness</p>
-
-  <div class="field">
-    <fieldset>
-      <legend>Recent TT Distance</legend>
-      <div class="radio-group">
-        <label><input type="radio" name="cur-dist" value="5k" checked><span>5K</span></label>
-        <label><input type="radio" name="cur-dist" value="10k"><span>10K</span></label>
-      </div>
-    </fieldset>
-  </div>
-
-  <div class="field">
-    <label>Recent TT Time</label>
-    <div class="pace-inputs">
-      <input type="number" id="cur-mm" min="0" max="99" placeholder="25" aria-label="Minutes">
-      <span>:</span>
-      <input type="number" id="cur-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
-      <span>mm:ss</span>
+<div class="field">
+  <fieldset>
+    <legend>Recent TT Distance</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="cur-dist" value="5k" checked><span>5K</span></label>
+      <label><input type="radio" name="cur-dist" value="10k"><span>10K</span></label>
     </div>
-    <div id="cur-warning" class="input-warning">Time out of range (VDOT 30–85)</div>
+  </fieldset>
+</div>
+
+<div class="field">
+  <label>Recent TT Time</label>
+  <div class="pace-inputs">
+    <input type="number" id="cur-mm" min="0" max="99" placeholder="25" aria-label="Minutes">
+    <span>:</span>
+    <input type="number" id="cur-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+    <span>mm:ss</span>
   </div>
+  <div id="cur-warning" class="input-warning">Time out of range (VDOT 30–85)</div>
+</div>
 
-  <hr class="section-divider">
-  <p class="section-header">Target Race <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></p>
+<hr class="section-divider">
+<p class="section-header">Target Race <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></p>
 
-  <div class="field">
-    <fieldset>
-      <legend>Race Distance</legend>
-      <div class="radio-group">
-        <label><input type="radio" name="tgt-dist" value="5k" checked><span>5K</span></label>
-        <label><input type="radio" name="tgt-dist" value="10k"><span>10K</span></label>
-        <label><input type="radio" name="tgt-dist" value="half"><span>Half</span></label>
-        <label><input type="radio" name="tgt-dist" value="full"><span>Full</span></label>
-      </div>
-    </fieldset>
-  </div>
-
-  <div class="field">
-    <label>Goal Time</label>
-    <div class="pace-inputs" id="tgt-time-inputs">
-      <span id="tgt-hh-wrap" style="display:none;align-items:center;gap:6px">
-        <input type="number" id="tgt-hh" min="0" max="9" placeholder="1" aria-label="Hours" style="width:52px">
-        <span>:</span>
-      </span>
-      <input type="number" id="tgt-mm" min="0" max="59" placeholder="22" aria-label="Minutes">
-      <span>:</span>
-      <input type="number" id="tgt-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
-      <span id="tgt-time-label">mm:ss</span>
+<div class="field">
+  <fieldset>
+    <legend>Race Distance</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="tgt-dist" value="5k" checked><span>5K</span></label>
+      <label><input type="radio" name="tgt-dist" value="10k"><span>10K</span></label>
+      <label><input type="radio" name="tgt-dist" value="half"><span>Half</span></label>
+      <label><input type="radio" name="tgt-dist" value="full"><span>Full</span></label>
     </div>
-    <div id="tgt-warning" class="input-warning">Time out of range (VDOT 30–85)</div>
+  </fieldset>
+</div>
+
+<div class="field">
+  <label>Goal Time</label>
+  <div class="pace-inputs" id="tgt-time-inputs">
+    <span id="tgt-hh-wrap" style="display:none;align-items:center;gap:6px">
+      <input type="number" id="tgt-hh" min="0" max="9" placeholder="1" aria-label="Hours" style="width:52px">
+      <span>:</span>
+    </span>
+    <input type="number" id="tgt-mm" min="0" max="59" placeholder="22" aria-label="Minutes">
+    <span>:</span>
+    <input type="number" id="tgt-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+    <span id="tgt-time-label">mm:ss</span>
   </div>
+  <div id="tgt-warning" class="input-warning">Time out of range (VDOT 30–85)</div>
+</div>
 
-  <hr class="section-divider">
+<hr class="section-divider">
 
-  <div class="field">
-    <label for="hr-max">Max HR <span style="font-weight:400">(bpm)</span></label>
-    <input type="number" id="hr-max" min="100" max="250" placeholder="185">
-  </div>
+<div class="field">
+  <label for="hr-max">Max HR <span style="font-weight:400">(bpm)</span></label>
+  <input type="number" id="hr-max" min="100" max="250" placeholder="185">
+</div>
 
-  <div class="field">
-    <label for="hr-rest">Resting HR <span style="font-weight:400">(bpm)</span></label>
-    <input type="number" id="hr-rest" min="30" max="120" placeholder="50">
-  </div>
+<div class="field">
+  <label for="hr-rest">Resting HR <span style="font-weight:400">(bpm)</span></label>
+  <input type="number" id="hr-rest" min="30" max="120" placeholder="50">
+</div>
 
-  <div class="field">
-    <fieldset>
-      <legend>Lap Distance</legend>
-      <div class="radio-group">
-        <label><input type="radio" name="lap-dist" value="100"><span>100m</span></label>
-        <label><input type="radio" name="lap-dist" value="200"><span>200m</span></label>
-        <label><input type="radio" name="lap-dist" value="400" checked><span>400m</span></label>
-        <label><input type="radio" name="lap-dist" value="800"><span>800m</span></label>
-      </div>
-    </fieldset>
-  </div>
+<div class="field">
+  <fieldset>
+    <legend>Lap Distance</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="lap-dist" value="100"><span>100m</span></label>
+      <label><input type="radio" name="lap-dist" value="200"><span>200m</span></label>
+      <label><input type="radio" name="lap-dist" value="400" checked><span>400m</span></label>
+      <label><input type="radio" name="lap-dist" value="800"><span>800m</span></label>
+    </div>
+  </fieldset>
+</div>
 
-  <div class="field">
-    <fieldset>
-      <legend>Display Unit</legend>
-      <div class="radio-group">
-        <label><input type="radio" name="disp-unit" value="km" checked><span>km</span></label>
-        <label><input type="radio" name="disp-unit" value="mile"><span>mile</span></label>
-        <label><input type="radio" name="disp-unit" value="both"><span>both</span></label>
-      </div>
-    </fieldset>
-  </div>
+<div class="field">
+  <fieldset>
+    <legend>Display Unit</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="disp-unit" value="km" checked><span>km</span></label>
+      <label><input type="radio" name="disp-unit" value="mile"><span>mile</span></label>
+      <label><input type="radio" name="disp-unit" value="both"><span>both</span></label>
+    </div>
+  </fieldset>
+</div>
 
-      </form>
-    </aside>
+    </form>
+  </aside>
 
-    <section class="output-panel" aria-label="Training zones" aria-live="polite">
+  <section class="output-panel" aria-label="Training zones" aria-live="polite">
 
-      <div class="summary-cards">
-        <article class="summary-card" id="sum-zone2">
-          <span class="zone-label">Zone 2</span>
-          <span class="pace-range">–</span>
-        </article>
-        <article class="summary-card" id="sum-tempo">
-          <span class="zone-label">Tempo</span>
-          <span class="pace-range">–</span>
-        </article>
-        <article class="summary-card" id="sum-threshold">
-          <span class="zone-label">Threshold</span>
-          <span class="pace-range">–</span>
-        </article>
-        <article class="summary-card" id="sum-vo2max">
-          <span class="zone-label">VO2max</span>
-          <span class="pace-range">–</span>
-        </article>
-      </div>
+    <div class="summary-cards">
+      <article class="summary-card" id="sum-zone2">
+        <span class="zone-label">Zone 2</span>
+        <span class="pace-range">–</span>
+      </article>
+      <article class="summary-card" id="sum-tempo">
+        <span class="zone-label">Tempo</span>
+        <span class="pace-range">–</span>
+      </article>
+      <article class="summary-card" id="sum-threshold">
+        <span class="zone-label">Threshold</span>
+        <span class="pace-range">–</span>
+      </article>
+      <article class="summary-card" id="sum-vo2max">
+        <span class="zone-label">VO2max</span>
+        <span class="pace-range">–</span>
+      </article>
+    </div>
 
-      <div class="zone-cards" id="zone-cards">
-        <div class="empty-state">Enter a reference pace above to see training zones.</div>
-      </div>
+    <div class="zone-cards" id="zone-cards">
+      <div class="empty-state">Enter a reference pace above to see training zones.</div>
+    </div>
 
-    </section>
-  </main>
+  </section>
+</main>
 
-  <script>
+<script>
 // === CONVERSION ===
 function paceToSec(min, sec) {
   return min * 60 + sec
@@ -616,23 +568,6 @@ function render() {
 document.getElementById('calc-form').addEventListener('input', render)
 render()
 
-// === DARK MODE ===
-const themeBtn = document.getElementById('theme-toggle')
-const html = document.documentElement
-
-function applyTheme(theme) {
-  html.setAttribute('data-theme', theme)
-  themeBtn.textContent = theme === 'dark' ? 'Light' : 'Dark'
-}
-
-// Init from system preference
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-applyTheme(prefersDark ? 'dark' : 'light')
-
-themeBtn.addEventListener('click', () => {
-  applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')
-})
-
 // === TARGET DISTANCE HOURS TOGGLE ===
 document.querySelectorAll('input[name="tgt-dist"]').forEach(radio => {
   radio.addEventListener('change', () => {
@@ -644,6 +579,4 @@ document.querySelectorAll('input[name="tgt-dist"]').forEach(radio => {
     label.textContent   = needsHours ? 'hh:mm:ss' : 'mm:ss'
   })
 })
-  </script>
-</body>
-</html>
+</script>
