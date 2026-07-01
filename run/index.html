@@ -168,6 +168,25 @@ permalink: /run/
   .delta { font-size: 12px; font-weight: 600; }
   .delta-faster { color: #22c55e; }
   .delta-slower { color: #f59e0b; }
+
+  /* TOOL CONTENT (how it works / FAQ) */
+  .tool-content {
+    max-width: 720px; margin: 24px auto; padding: 0 16px 40px;
+  }
+  .tool-content h2 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
+  .tool-content h2:first-child { margin-top: 0; }
+  .tool-content p, .tool-content li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .tool-content ul { padding-left: 18px; margin-bottom: 8px; }
+  .tool-content li { margin-bottom: 4px; }
+  .faq details {
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 8px; background: var(--surface);
+  }
+  .faq summary {
+    font-size: 13px; font-weight: 600; color: var(--text-primary);
+    cursor: pointer;
+  }
+  .faq details p { margin-top: 8px; }
 </style>
 <a href="#zone-cards" class="skip-link">Skip to results</a>
 <div class="tool-heading">
@@ -297,6 +316,45 @@ permalink: /run/
 
   </section>
 </main>
+
+<section class="tool-content">
+  <h2>How VDOT training zones work</h2>
+  <p>This calculator uses Jack Daniels' VDOT formula, a widely used method in exercise science for estimating running fitness from a single race or time-trial result. Enter a recent 5K or 10K time, and the calculator estimates your VDOT score, then derives five training zones (Jog/Easy, Zone 2, Tempo, Threshold, VO2max) as pace ranges, heart-rate ranges, and lap splits.</p>
+  <p>Training zones exist because different paces stress your body differently. Running everything at one pace — usually too fast — is one of the most common mistakes recreational runners make. Structuring training across zones, with mostly easy running and a few focused hard sessions, builds aerobic fitness while limiting injury risk.</p>
+
+  <h2>How to use your training zones</h2>
+  <ul>
+    <li><strong>Jog / Easy</strong> — most of your weekly mileage should be here. It should feel conversational.</li>
+    <li><strong>Zone 2</strong> — steady aerobic effort, slightly firmer than easy but still sustainable for long periods.</li>
+    <li><strong>Tempo</strong> — "comfortably hard" effort used for tempo runs and progression workouts.</li>
+    <li><strong>Threshold</strong> — the pace you could sustain for about an hour in a race; used for threshold or cruise-interval workouts.</li>
+    <li><strong>VO2max</strong> — hard interval pace, typically 3–5 minute repeats with recovery, used to raise your aerobic ceiling.</li>
+  </ul>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq">
+    <details>
+      <summary>What is VDOT?</summary>
+      <p>VDOT is a fitness metric developed by exercise physiologist Jack Daniels. It converts a race performance into a single number that predicts equivalent performances at other distances and prescribes training paces.</p>
+    </details>
+    <details>
+      <summary>How accurate are the training zones?</summary>
+      <p>The zones are estimates based on a validated formula, not a lab test. They're accurate enough to guide day-to-day training, but factors like heat, terrain, and fatigue will shift your actual effort on any given run.</p>
+    </details>
+    <details>
+      <summary>Do I need a recent race time?</summary>
+      <p>Yes — the calculator needs a real, honest effort (a 5K or 10K time trial or race result from the last few weeks) to estimate your current fitness accurately. Old or non-maximal efforts will skew your zones.</p>
+    </details>
+    <details>
+      <summary>What if I don't know my max heart rate?</summary>
+      <p>Heart-rate ranges are optional. Leave Max HR and Resting HR blank and the calculator will still show pace-based and lap-split zones.</p>
+    </details>
+    <details>
+      <summary>Can I compare a goal race pace to my current fitness?</summary>
+      <p>Yes — fill in the optional Target Race section with a goal distance and time to see your target zones compared side-by-side with your current zones, including how much faster or slower the goal pace is.</p>
+    </details>
+  </div>
+</section>
 
 <script>
 // === CONVERSION ===
