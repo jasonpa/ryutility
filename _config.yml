@@ -1,0 +1,14 @@
+title: Ryutility
+description: A collection of free, no-nonsense web tools.
+url: "https://ryutility.com"
+plugins:
+  - jekyll-sitemap
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - docs
+  - tests
+  - .superpowers
+  - .playwright-mcp
+  - "*.png"
+  - README.md
