@@ -1,0 +1,13 @@
+<section class="related-tools" aria-label="Related tools">
+  <h2>Related tools</h2>
+  <div class="related-grid">
+    {% for tool in site.data.tools %}
+    {% unless tool.url == page.permalink %}
+    <a href="{{ tool.url | relative_url }}" class="related-card">
+      <strong>{{ tool.name }}</strong>
+      <span>{{ tool.short }}</span>
+    </a>
+    {% endunless %}
+    {% endfor %}
+  </div>
+</section>

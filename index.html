@@ -28,10 +28,12 @@ permalink: /
   <h1>Useful, free web tools</h1>
   <p class="tagline">A small, growing collection of tools with no sign-up and no clutter.</p>
   <div class="tool-grid">
-    <a href="{{ '/run/' | relative_url }}" class="tool-card">
-      <span class="tool-badge">Running</span>
-      <h2>Training Zone Calculator</h2>
-      <p>Calculate your personalized training zones from a recent race time using Daniels' VDOT method.</p>
+    {% for tool in site.data.tools %}
+    <a href="{{ tool.url | relative_url }}" class="tool-card">
+      <span class="tool-badge">{{ tool.badge }}</span>
+      <h2>{{ tool.name }}</h2>
+      <p>{{ tool.description }}</p>
     </a>
+    {% endfor %}
   </div>
 </main>

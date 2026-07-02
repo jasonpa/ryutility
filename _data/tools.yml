@@ -1,0 +1,5 @@
+- name: Training Zone Calculator
+  url: /run/
+  badge: Running
+  short: VDOT training zones from a recent race
+  description: Calculate your personalized training zones from a recent race time using Daniels' VDOT method.
