@@ -13,3 +13,8 @@
   badge: Running
   short: Predict 5K to marathon finish times
   description: Predict your finish time for 5K, 10K, half, and full marathon from one recent race result using the Riegel formula.
+- name: Heart Rate Zone Calculator
+  url: /hr-zones/
+  badge: Fitness
+  short: Karvonen training zones in bpm
+  description: Calculate your five heart rate training zones with the Karvonen method, from your max and resting heart rate or your age.

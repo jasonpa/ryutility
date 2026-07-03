@@ -175,6 +175,25 @@ function riegelPredict(t1Sec, d1Km, d2Km) {
   return t1Sec * Math.pow(d2Km / d1Km, RIEGEL_EXPONENT)
 }
 
+// === HEART RATE ZONES ===
+function estimateMaxHr(age) {
+  return Math.round(208 - 0.7 * age)  // Tanaka et al., 2001
+}
+
+function hrZones(hrMax, hrRest) {
+  return ['jog', 'zone2', 'tempo', 'threshold', 'vo2max'].map(key => {
+    const [lo, hi] = HR_PCTS[key]
+    const range = calcKarvonen(hrMax, hrRest, lo, hi)
+    return {
+      key,
+      label: ZONE_LABELS[key],
+      pct: [Math.round(lo * 100), Math.round(hi * 100)],
+      low: range.low,
+      high: range.high,
+    }
+  })
+}
+
 // === NODE EXPORT (no-op in browser) ===
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -183,6 +202,6 @@ if (typeof module !== 'undefined' && module.exports) {
     calcKarvonen, calcVDOT, thresholdPaceFromVDOT, raceTimeToThresholdPace,
     formatDelta, calcZones,
     paceFromTimeDistance, timeFromPaceDistance, distanceFromTimePace, secToHms,
-    riegelPredict,
+    riegelPredict, estimateMaxHr, hrZones,
   }
 }
