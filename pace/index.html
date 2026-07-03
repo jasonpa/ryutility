@@ -1,0 +1,196 @@
+---
+layout: default
+title: Running Pace Calculator — Pace, Time & Distance
+description: Free running pace calculator. Enter any two of pace, time, and distance to get the third — with km, mile, and treadmill speed conversions.
+permalink: /pace/
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>Running Pace Calculator</h1>
+    <p>Enter any two of time, distance, and pace — the third is calculated instantly.</p>
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>Solve for</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="solve" value="pace" checked><span>Pace</span></label>
+          <label><input type="radio" name="solve" value="time"><span>Time</span></label>
+          <label><input type="radio" name="solve" value="distance"><span>Distance</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="field" id="field-time">
+      <label>Time</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="99" placeholder="0" aria-label="Hours">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" placeholder="50" aria-label="Minutes">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+        <span>h:mm:ss</span>
+      </div>
+    </div>
+
+    <div class="field" id="field-dist">
+      <label for="dist">Distance</label>
+      <div class="time-inputs">
+        <input type="number" id="dist" min="0" step="0.01" placeholder="10" style="width:80px" aria-label="Distance">
+        <select id="dist-unit" aria-label="Distance unit">
+          <option value="km" selected>km</option>
+          <option value="mi">miles</option>
+        </select>
+      </div>
+      <div class="quick-buttons">
+        <button type="button" data-km="5">5K</button>
+        <button type="button" data-km="10">10K</button>
+        <button type="button" data-km="21.0975">Half</button>
+        <button type="button" data-km="42.195">Marathon</button>
+      </div>
+    </div>
+
+    <div class="field" id="field-pace">
+      <label>Pace</label>
+      <div class="time-inputs">
+        <input type="number" id="pace-mm" min="0" max="59" placeholder="5" aria-label="Pace minutes">
+        <span>:</span>
+        <input type="number" id="pace-ss" min="0" max="59" placeholder="00" aria-label="Pace seconds">
+        <select id="pace-unit" aria-label="Pace unit">
+          <option value="km" selected>per km</option>
+          <option value="mi">per mile</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <section id="results" class="result-cards" aria-live="polite" hidden>
+    <div class="result-card"><span class="label">Pace / km</span><span class="value" id="out-pace-km">–</span></div>
+    <div class="result-card"><span class="label">Pace / mile</span><span class="value" id="out-pace-mi">–</span></div>
+    <div class="result-card"><span class="label">Time</span><span class="value" id="out-time">–</span></div>
+    <div class="result-card"><span class="label">Distance</span><span class="value" id="out-dist">–</span><span class="sub" id="out-dist-mi"></span></div>
+    <div class="result-card"><span class="label">Speed</span><span class="value" id="out-kmh">–</span><span class="sub" id="out-mph"></span></div>
+  </section>
+
+  <section class="tool-content">
+    <h2>How the pace calculator works</h2>
+    <p>Running pace is simply time divided by distance. This calculator solves the pace–time–distance triangle: pick which value you want to solve for, fill in the other two, and the answer appears instantly. Results are always shown in both minutes per kilometer and minutes per mile, along with the equivalent treadmill speed in km/h and mph, so you never need a separate conversion step.</p>
+    <p>For example, if you ran 10 km in 50 minutes, your pace is 50:00 ÷ 10 = 5:00 per kilometer, which is 8:03 per mile, or 12.0 km/h (7.5 mph) on a treadmill display. Going the other way, if you want to finish a half marathon (21.0975 km) at 5:30 per kilometer, your finish time will be 5:30 × 21.0975 ≈ 1:56:02.</p>
+    <p>Use the quick-select buttons for the four standard race distances — 5K, 10K, half marathon, and marathon — or type any custom distance in kilometers or miles.</p>
+
+    <h2>Common race pace reference points</h2>
+    <ul>
+      <li><strong>5:00/km (8:03/mi)</strong> — a 25:00 5K, 50:00 10K, or ~3:31 marathon.</li>
+      <li><strong>5:41/km (9:09/mi)</strong> — the pace for a 4:00 marathon.</li>
+      <li><strong>6:00/km (9:39/mi)</strong> — a 30:00 5K or ~1:00 10K; a common easy-run pace for recreational runners.</li>
+      <li><strong>7:07/km (11:27/mi)</strong> — the pace for a 5:00 marathon.</li>
+    </ul>
+
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details>
+        <summary>What is a good running pace?</summary>
+        <p>It depends entirely on experience, age, and distance. For recreational runners, 5:30–7:00 per kilometer (roughly 9–11 minutes per mile) is a common training range. Race pace is faster than easy pace: most runners race a 5K 30–60 seconds per kilometer faster than their everyday run.</p>
+      </details>
+      <details>
+        <summary>How do I convert pace per km to pace per mile?</summary>
+        <p>Multiply the pace in seconds per kilometer by 1.60934. For example, 5:00/km (300 seconds) × 1.60934 ≈ 483 seconds ≈ 8:03 per mile. This calculator does the conversion automatically and shows both.</p>
+      </details>
+      <details>
+        <summary>What pace do I need for a 4-hour marathon?</summary>
+        <p>A 4:00:00 marathon over 42.195 km works out to 5:41 per kilometer, or 9:09 per mile. In practice, plan a few seconds per kilometer faster to leave a buffer for aid stations and late-race slowdown.</p>
+      </details>
+      <details>
+        <summary>Does this work for walking or cycling?</summary>
+        <p>Yes — the math is identical for any steady-speed activity. Enter your time and distance and the calculator returns pace and speed regardless of sport.</p>
+      </details>
+      <details>
+        <summary>How is pace different from speed?</summary>
+        <p>Pace is time per unit of distance (minutes per km or mile); speed is distance per unit of time (km/h or mph). They're reciprocals: 5:00/km equals 12 km/h. Runners usually think in pace, treadmills usually display speed — this tool shows both.</p>
+      </details>
+    </div>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+
+function readTime() {
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const total = h * 3600 + m * 60 + s
+  return total > 0 ? total : null
+}
+
+function readDistKm() {
+  const v = parseFloat($('dist').value)
+  if (isNaN(v) || v <= 0) return null
+  return $('dist-unit').value === 'mi' ? v * 1.60934 : v
+}
+
+function readPaceSecPerKm() {
+  const m = parseInt($('pace-mm').value, 10) || 0
+  const s = parseInt($('pace-ss').value, 10) || 0
+  const perUnit = m * 60 + s
+  if (perUnit <= 0) return null
+  return $('pace-unit').value === 'mi' ? perUnit / 1.60934 : perUnit
+}
+
+function render() {
+  const solve = document.querySelector('input[name="solve"]:checked').value
+  let t = readTime(), d = readDistKm(), p = readPaceSecPerKm()
+
+  if (solve === 'pace' && t && d) p = paceFromTimeDistance(t, d)
+  else if (solve === 'time' && p && d) t = timeFromPaceDistance(p, d)
+  else if (solve === 'distance' && t && p) d = distanceFromTimePace(t, p)
+  else { $('results').hidden = true; return }
+
+  $('out-pace-km').textContent = `${secToPace(p)} /km`
+  $('out-pace-mi').textContent = `${secToPace(kmToMile(p))} /mi`
+  $('out-time').textContent = secToHms(t)
+  $('out-dist').textContent = `${d.toFixed(2)} km`
+  $('out-dist-mi').textContent = `${(d / 1.60934).toFixed(2)} mi`
+  $('out-kmh').textContent = `${toKmh(p).toFixed(1)} km/h`
+  $('out-mph').textContent = `${toMph(p).toFixed(1)} mph`
+  $('results').hidden = false
+}
+
+function markSolvedField() {
+  const solve = document.querySelector('input[name="solve"]:checked').value
+  const map = { pace: 'field-pace', time: 'field-time', distance: 'field-dist' }
+  ;['field-pace', 'field-time', 'field-dist'].forEach(id => {
+    $(id).style.opacity = id === map[solve] ? '0.45' : '1'
+  })
+}
+
+document.querySelectorAll('.quick-buttons button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('dist-unit').value = 'km'
+    $('dist').value = btn.dataset.km
+    render()
+  })
+})
+
+$('calc-form').addEventListener('input', () => { markSolvedField(); render() })
+markSolvedField()
+render()
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What is a good running pace?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on experience, age, and distance. For recreational runners, 5:30–7:00 per kilometer (roughly 9–11 minutes per mile) is a common training range. Race pace is typically 30–60 seconds per kilometer faster than easy pace."}},
+    {"@type": "Question", "name": "How do I convert pace per km to pace per mile?", "acceptedAnswer": {"@type": "Answer", "text": "Multiply the pace in seconds per kilometer by 1.60934. For example, 5:00/km is about 8:03 per mile."}},
+    {"@type": "Question", "name": "What pace do I need for a 4-hour marathon?", "acceptedAnswer": {"@type": "Answer", "text": "A 4:00:00 marathon over 42.195 km requires 5:41 per kilometer, or 9:09 per mile."}},
+    {"@type": "Question", "name": "Does this work for walking or cycling?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — the math is identical for any steady-speed activity. Enter time and distance to get pace and speed for any sport."}},
+    {"@type": "Question", "name": "How is pace different from speed?", "acceptedAnswer": {"@type": "Answer", "text": "Pace is time per distance (min/km or min/mile); speed is distance per time (km/h or mph). They are reciprocals: 5:00/km equals 12 km/h."}}
+  ]
+}
+</script>

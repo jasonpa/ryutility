@@ -145,6 +145,29 @@ function calcZones({ refPaceSec, refType, hrMax, hrRest, lapDist }) {
   })
 }
 
+// === PACE / TIME / DISTANCE SOLVER ===
+function paceFromTimeDistance(timeSec, distKm) {
+  return timeSec / distKm
+}
+
+function timeFromPaceDistance(paceSecPerKm, distKm) {
+  return paceSecPerKm * distKm
+}
+
+function distanceFromTimePace(timeSec, paceSecPerKm) {
+  return timeSec / paceSecPerKm
+}
+
+function secToHms(totalSec) {
+  const s = Math.round(totalSec)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = s % 60
+  return h > 0
+    ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+    : `${m}:${String(sec).padStart(2, '0')}`
+}
+
 // === NODE EXPORT (no-op in browser) ===
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -152,5 +175,6 @@ if (typeof module !== 'undefined' && module.exports) {
     MULTIPLIERS, HR_PCTS, ZONE_LABELS, DIST_KM,
     calcKarvonen, calcVDOT, thresholdPaceFromVDOT, raceTimeToThresholdPace,
     formatDelta, calcZones,
+    paceFromTimeDistance, timeFromPaceDistance, distanceFromTimePace, secToHms,
   }
 }

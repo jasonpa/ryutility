@@ -3,3 +3,8 @@
   badge: Running
   short: VDOT training zones from a recent race
   description: Calculate your personalized training zones from a recent race time using Daniels' VDOT method.
+- name: Running Pace Calculator
+  url: /pace/
+  badge: Running
+  short: Solve pace, time, or distance
+  description: Calculate your running pace, finish time, or distance — enter any two and get the third, in km and miles.
