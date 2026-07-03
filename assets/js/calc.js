@@ -194,6 +194,31 @@ function hrZones(hrMax, hrRest) {
   })
 }
 
+// === SPLIT PLANNER ===
+// strategyPct 0 = even splits; positive = negative split (start slower, finish
+// faster), linearly graded by segment midpoint, normalized to the exact total.
+function splitPlan(totalSec, distKm, splitKm, strategyPct) {
+  const basePace = totalSec / distKm
+  const d = (strategyPct || 0) / 100
+  const segments = []
+  for (let start = 0; start < distKm - 1e-9; start += splitKm) {
+    const len = Math.min(splitKm, distKm - start)
+    const mid = start + len / 2
+    const factor = 1 + d * (1 - 2 * mid / distKm)
+    segments.push({ len, sec: basePace * factor * len })
+  }
+  const rawTotal = segments.reduce((sum, seg) => sum + seg.sec, 0)
+  const scale = totalSec / rawTotal
+  let cum = 0
+  let dist = 0
+  return segments.map((seg, i) => {
+    const splitSec = seg.sec * scale
+    cum += splitSec
+    dist += seg.len
+    return { n: i + 1, dist: Math.round(dist * 1000) / 1000, splitSec, cumSec: cum }
+  })
+}
+
 // === NODE EXPORT (no-op in browser) ===
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -202,6 +227,6 @@ if (typeof module !== 'undefined' && module.exports) {
     calcKarvonen, calcVDOT, thresholdPaceFromVDOT, raceTimeToThresholdPace,
     formatDelta, calcZones,
     paceFromTimeDistance, timeFromPaceDistance, distanceFromTimePace, secToHms,
-    riegelPredict, estimateMaxHr, hrZones,
+    riegelPredict, estimateMaxHr, hrZones, splitPlan,
   }
 }

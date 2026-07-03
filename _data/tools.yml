@@ -18,3 +18,8 @@
   badge: Fitness
   short: Karvonen training zones in bpm
   description: Calculate your five heart rate training zones with the Karvonen method, from your max and resting heart rate or your age.
+- name: Splits Calculator
+  url: /splits/
+  badge: Running
+  short: Even & negative split tables
+  description: Build a printable split table for any race — even or negative splits per km or mile for 5K to marathon.
