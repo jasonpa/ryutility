@@ -168,6 +168,13 @@ function secToHms(totalSec) {
     : `${m}:${String(sec).padStart(2, '0')}`
 }
 
+// === RACE PREDICTION (Riegel, 1981) ===
+const RIEGEL_EXPONENT = 1.06
+
+function riegelPredict(t1Sec, d1Km, d2Km) {
+  return t1Sec * Math.pow(d2Km / d1Km, RIEGEL_EXPONENT)
+}
+
 // === NODE EXPORT (no-op in browser) ===
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -176,5 +183,6 @@ if (typeof module !== 'undefined' && module.exports) {
     calcKarvonen, calcVDOT, thresholdPaceFromVDOT, raceTimeToThresholdPace,
     formatDelta, calcZones,
     paceFromTimeDistance, timeFromPaceDistance, distanceFromTimePace, secToHms,
+    riegelPredict,
   }
 }

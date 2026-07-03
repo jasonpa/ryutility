@@ -8,3 +8,8 @@
   badge: Running
   short: Solve pace, time, or distance
   description: Calculate your running pace, finish time, or distance — enter any two and get the third, in km and miles.
+- name: Race Time Predictor
+  url: /predict/
+  badge: Running
+  short: Predict 5K to marathon finish times
+  description: Predict your finish time for 5K, 10K, half, and full marathon from one recent race result using the Riegel formula.

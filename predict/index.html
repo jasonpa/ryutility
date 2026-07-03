@@ -1,0 +1,137 @@
+---
+layout: default
+title: Race Time Predictor — 5K, 10K, Half & Marathon
+description: Predict your race finish times from one recent result. Free race time predictor using the proven Riegel formula, with pace per km and mile.
+permalink: /predict/
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>Race Time Predictor</h1>
+    <p>Enter one recent race result to predict your times at other distances.</p>
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>Recent race distance</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="race-dist" value="5k" checked><span>5K</span></label>
+          <label><input type="radio" name="race-dist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="race-dist" value="half"><span>Half</span></label>
+          <label><input type="radio" name="race-dist" value="full"><span>Marathon</span></label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="field">
+      <label>Finish time</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="9" placeholder="0" aria-label="Hours">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" placeholder="25" aria-label="Minutes">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+        <span>h:mm:ss</span>
+      </div>
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <table class="result-table" id="predict-table" hidden>
+      <thead>
+        <tr><th>Distance</th><th>Predicted time</th><th>Pace /km</th><th>Pace /mi</th></tr>
+      </thead>
+      <tbody id="predict-body"></tbody>
+    </table>
+    <p class="tool-content" id="empty-msg" style="color:var(--text-secondary);font-size:13px">Enter a recent finish time above to see predictions.</p>
+  </section>
+
+  <section class="tool-content">
+    <h2>How race time prediction works</h2>
+    <p>This predictor uses the Riegel formula, published by engineer Pete Riegel in 1981 and still the most widely used race prediction model: <em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>. The exponent 1.06 captures how much runners slow down as the distance grows — roughly 6% more time per doubling of distance beyond simple proportionality. It has held up remarkably well across four decades of race data for distances from 1500 m to the marathon.</p>
+    <p>For example, a 25:00 5K predicts a 52:07 10K — not 50:00, because nobody holds their 5K pace for twice the distance. The same 25:00 5K predicts roughly a 1:55 half marathon and a 4:00 marathon.</p>
+
+    <h2>How to get an accurate prediction</h2>
+    <ul>
+      <li><strong>Use a recent, all-out result.</strong> A race or honest time trial from the last 6–8 weeks reflects your current fitness. A PR from two years ago does not.</li>
+      <li><strong>Predict adjacent distances.</strong> A 5K predicts a 10K very well, a half marathon reasonably well, and a marathon only if you've done the training volume. Marathon predictions assume marathon-appropriate endurance.</li>
+      <li><strong>Adjust for conditions.</strong> Heat, hills, and wind all slow real races. Treat the prediction as your ceiling on a fair day, not a guarantee.</li>
+    </ul>
+
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details>
+        <summary>How accurate is the Riegel formula?</summary>
+        <p>For well-trained runners predicting adjacent distances (5K→10K, 10K→half), it's usually within 1–2%. Marathon predictions are less reliable because they depend heavily on endurance training — many runners run 10–20 minutes slower than their 5K-predicted marathon time if their weekly mileage is low.</p>
+      </details>
+      <details>
+        <summary>Why is my predicted marathon time so fast?</summary>
+        <p>The formula assumes your endurance scales with your speed. If you haven't built marathon-specific mileage (long runs of 28 km+ and consistent 50 km+ weeks), expect to be slower than predicted. Use the prediction as a training target, not a race-day pace plan.</p>
+      </details>
+      <details>
+        <summary>What race result should I use as input?</summary>
+        <p>Your most recent all-out effort at a shorter distance — ideally an official race, or a solo time trial where you genuinely emptied the tank. The fresher and more honest the input, the better the prediction.</p>
+      </details>
+      <details>
+        <summary>Can I use this to plan my race pace?</summary>
+        <p>Yes — divide the predicted time by the distance to get target pace (shown in the table). Many runners aim for the predicted pace through 80% of the race and speed up at the end if they feel strong.</p>
+      </details>
+      <details>
+        <summary>Is there a better model than Riegel?</summary>
+        <p>VDOT (Jack Daniels) and Cameron's model give similar results for most runners. Riegel is the simplest and most transparent. For training zones rather than race predictions, use our VDOT-based Training Zone Calculator.</p>
+      </details>
+    </div>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+const LABELS = { '5k': '5K', '10k': '10K', half: 'Half marathon', full: 'Marathon' }
+
+function render() {
+  const distKey = document.querySelector('input[name="race-dist"]:checked').value
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const t1 = h * 3600 + m * 60 + s
+  const table = $('predict-table')
+  const empty = $('empty-msg')
+
+  if (t1 <= 0) { table.hidden = true; empty.hidden = false; return }
+
+  const d1 = DIST_KM[distKey]
+  $('predict-body').innerHTML = Object.keys(DIST_KM).map(key => {
+    const d2 = DIST_KM[key]
+    const t2 = riegelPredict(t1, d1, d2)
+    const pace = t2 / d2
+    const isInput = key === distKey
+    return `<tr${isInput ? ' style="font-weight:700"' : ''}>
+      <td>${LABELS[key]}${isInput ? ' (your result)' : ''}</td>
+      <td>${secToHms(t2)}</td>
+      <td>${secToPace(pace)}</td>
+      <td>${secToPace(kmToMile(pace))}</td>
+    </tr>`
+  }).join('')
+  table.hidden = false
+  empty.hidden = true
+}
+
+$('calc-form').addEventListener('input', render)
+render()
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "How accurate is the Riegel formula?", "acceptedAnswer": {"@type": "Answer", "text": "For well-trained runners predicting adjacent distances (5K to 10K, 10K to half marathon), it is usually within 1–2%. Marathon predictions are less reliable and depend heavily on endurance training volume."}},
+    {"@type": "Question", "name": "Why is my predicted marathon time so fast?", "acceptedAnswer": {"@type": "Answer", "text": "The formula assumes endurance scales with speed. Without marathon-specific mileage, expect to run slower than predicted. Use it as a training target, not a race-day pace plan."}},
+    {"@type": "Question", "name": "What race result should I use as input?", "acceptedAnswer": {"@type": "Answer", "text": "Your most recent all-out effort at a shorter distance — an official race or an honest solo time trial from the last 6–8 weeks."}},
+    {"@type": "Question", "name": "Can I use this to plan my race pace?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — the table shows the target pace per km and per mile for each predicted time."}},
+    {"@type": "Question", "name": "Is there a better model than Riegel?", "acceptedAnswer": {"@type": "Answer", "text": "VDOT and Cameron's model give similar results. Riegel is the simplest and most transparent for race prediction."}}
+  ]
+}
+</script>
