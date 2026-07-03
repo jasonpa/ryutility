@@ -219,6 +219,21 @@ function splitPlan(totalSec, distKm, splitKm, strategyPct) {
   })
 }
 
+// === TREADMILL CONVERSION ===
+function kmhToSecPerKm(kmh) {
+  return 3600 / kmh
+}
+
+function mphToKmh(mph) {
+  return mph * 1.60934
+}
+
+// Equivalent flat-ground speed with the same oxygen cost, from the ACSM
+// running equation (VO2 = 3.5 + 0.2·v + 0.9·v·grade, v in m/min).
+function equivalentFlatKmh(kmh, gradePct) {
+  return kmh * (1 + 4.5 * gradePct / 100)
+}
+
 // === NODE EXPORT (no-op in browser) ===
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -228,5 +243,6 @@ if (typeof module !== 'undefined' && module.exports) {
     formatDelta, calcZones,
     paceFromTimeDistance, timeFromPaceDistance, distanceFromTimePace, secToHms,
     riegelPredict, estimateMaxHr, hrZones, splitPlan,
+    kmhToSecPerKm, mphToKmh, equivalentFlatKmh,
   }
 }

@@ -23,3 +23,8 @@
   badge: Running
   short: Even & negative split tables
   description: Build a printable split table for any race — even or negative splits per km or mile for 5K to marathon.
+- name: Treadmill Pace Converter
+  url: /treadmill/
+  badge: Running
+  short: mph / km/h to pace, with incline
+  description: Convert treadmill speed (mph or km/h) to running pace, and see the equivalent outdoor pace for any incline setting.

@@ -1,0 +1,137 @@
+---
+layout: default
+title: Treadmill Pace Converter — Speed to Pace with Incline
+description: Convert treadmill speed in mph or km/h to running pace per mile and km, and find the equivalent flat-ground pace for any incline. Free conversion chart.
+permalink: /treadmill/
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>Treadmill Pace Converter</h1>
+    <p>Turn a treadmill speed into running pace — and see what the incline is really worth.</p>
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <label for="speed">Treadmill speed</label>
+      <div class="time-inputs">
+        <input type="number" id="speed" min="0" step="0.1" placeholder="10.0" aria-label="Speed">
+        <span class="radio-group">
+          <label><input type="radio" name="speed-unit" value="kmh" checked><span>km/h</span></label>
+          <label><input type="radio" name="speed-unit" value="mph"><span>mph</span></label>
+        </span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="incline">Incline (%)</label>
+      <input type="number" id="incline" min="0" max="15" step="0.5" value="1">
+    </div>
+  </form>
+
+  <section id="results" class="result-cards" aria-live="polite" hidden>
+    <div class="result-card"><span class="label">Belt pace / km</span><span class="value" id="out-pace-km">–</span></div>
+    <div class="result-card"><span class="label">Belt pace / mile</span><span class="value" id="out-pace-mi">–</span></div>
+    <div class="result-card"><span class="label">Equivalent flat pace / km</span><span class="value" id="out-flat-km">–</span><span class="sub" id="out-flat-mi"></span></div>
+  </section>
+
+  <section aria-live="polite">
+    <h2 style="font-size:14px;font-weight:700;margin:8px 0">Conversion chart at your incline</h2>
+    <table class="result-table">
+      <thead><tr><th>km/h</th><th>mph</th><th>Pace /km</th><th>Pace /mi</th><th>Flat-equivalent /km</th></tr></thead>
+      <tbody id="chart-body"></tbody>
+    </table>
+  </section>
+
+  <section class="tool-content">
+    <h2>How treadmill conversion works</h2>
+    <p>Treadmills display speed (km/h or mph), but runners think in pace (minutes per km or mile). The conversion is a simple reciprocal: pace per km = 3600 ÷ speed in km/h. So 12.0 km/h is 5:00/km, and 6.0 mph is 10:00 per mile. The cards above convert your exact belt speed; the chart shows the full range so you can plan interval settings before stepping on.</p>
+    <p>Incline changes the effort, not the belt speed. This converter uses the ACSM running-economy equation to compute the <em>flat-ground equivalent</em>: the outdoor pace that costs the same oxygen as your belt speed at your incline. At 1% incline the equivalent is about 4.5% faster than the belt pace — which is why the common advice is to set 1% to mimic outdoor running: it compensates for the missing air resistance and the belt assisting your leg turnover.</p>
+
+    <h2>Common treadmill settings</h2>
+    <ul>
+      <li><strong>8.0 km/h (5.0 mph)</strong> — 7:30/km, brisk jog or recovery pace for most runners.</li>
+      <li><strong>10.0 km/h (6.2 mph)</strong> — 6:00/km, a typical easy-run pace.</li>
+      <li><strong>12.0 km/h (7.5 mph)</strong> — 5:00/km, a common tempo setting.</li>
+      <li><strong>14.5 km/h (9.0 mph)</strong> — 4:08/km, interval territory for trained runners.</li>
+    </ul>
+
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details>
+        <summary>Should I always run at 1% incline?</summary>
+        <p>The 1% convention comes from a 1996 study showing it best matches the energy cost of outdoor running at paces faster than about 5:00/km. At easy paces the difference is negligible, so 0–1% is fine. Use higher inclines as deliberate hill training, not as a default.</p>
+      </details>
+      <details>
+        <summary>What is 7.0 mph in minutes per mile?</summary>
+        <p>60 ÷ 7.0 ≈ 8:34 per mile (about 5:20 per km). The chart above covers the full range of common belt speeds.</p>
+      </details>
+      <details>
+        <summary>Why does treadmill running feel easier (or harder) than outside?</summary>
+        <p>Easier: no wind resistance, perfectly even surface, and the belt helps leg turnover. Harder: heat builds up indoors, and the fixed pace removes natural micro-variations. On balance most runners find a given pace slightly easier on the treadmill — the 1% incline roughly evens it out.</p>
+      </details>
+      <details>
+        <summary>How accurate is the flat-ground equivalent?</summary>
+        <p>It's based on the ACSM metabolic equation, a population average. Individual running economy varies, so treat it as a good estimate (within a few percent) rather than an exact match.</p>
+      </details>
+      <details>
+        <summary>Is treadmill distance accurate?</summary>
+        <p>Belt speed is usually calibrated within a few percent, but worn belts and user weight can affect it. If your treadmill and GPS watch disagree, the truth is typically in between — trust effort and heart rate over either display.</p>
+      </details>
+    </div>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+const CHART_KMH = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+function renderChart(incline) {
+  $('chart-body').innerHTML = CHART_KMH.map(kmh => {
+    const pace = kmhToSecPerKm(kmh)
+    const flat = kmhToSecPerKm(equivalentFlatKmh(kmh, incline))
+    return `<tr>
+      <td>${kmh.toFixed(1)}</td>
+      <td>${(kmh / 1.60934).toFixed(1)}</td>
+      <td>${secToPace(pace)}</td>
+      <td>${secToPace(kmToMile(pace))}</td>
+      <td>${secToPace(flat)}</td>
+    </tr>`
+  }).join('')
+}
+
+function render() {
+  const raw = parseFloat($('speed').value)
+  const unit = document.querySelector('input[name="speed-unit"]:checked').value
+  const incline = parseFloat($('incline').value) || 0
+  renderChart(incline)
+
+  if (isNaN(raw) || raw <= 0) { $('results').hidden = true; return }
+  const kmh = unit === 'mph' ? mphToKmh(raw) : raw
+  const pace = kmhToSecPerKm(kmh)
+  const flatPace = kmhToSecPerKm(equivalentFlatKmh(kmh, incline))
+  $('out-pace-km').textContent = `${secToPace(pace)} /km`
+  $('out-pace-mi').textContent = `${secToPace(kmToMile(pace))} /mi`
+  $('out-flat-km').textContent = `${secToPace(flatPace)} /km`
+  $('out-flat-mi').textContent = `${secToPace(kmToMile(flatPace))} /mi`
+  $('results').hidden = false
+}
+
+$('calc-form').addEventListener('input', render)
+render()
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Should I always run at 1% incline?", "acceptedAnswer": {"@type": "Answer", "text": "The 1% convention best matches outdoor energy cost at paces faster than about 5:00/km. At easy paces 0–1% is fine. Use higher inclines as deliberate hill training."}},
+    {"@type": "Question", "name": "What is 7.0 mph in minutes per mile?", "acceptedAnswer": {"@type": "Answer", "text": "60 ÷ 7.0 ≈ 8:34 per mile, or about 5:20 per kilometer."}},
+    {"@type": "Question", "name": "Why does treadmill running feel easier or harder than outside?", "acceptedAnswer": {"@type": "Answer", "text": "No wind resistance and an even surface make it easier; indoor heat and fixed pacing can make it feel harder. A 1% incline roughly evens it out."}},
+    {"@type": "Question", "name": "How accurate is the flat-ground equivalent?", "acceptedAnswer": {"@type": "Answer", "text": "It uses the ACSM metabolic equation, a population average — a good estimate within a few percent, not an exact individual match."}},
+    {"@type": "Question", "name": "Is treadmill distance accurate?", "acceptedAnswer": {"@type": "Answer", "text": "Usually within a few percent, but belt wear and user weight affect it. Trust effort and heart rate over either display."}}
+  ]
+}
+</script>
