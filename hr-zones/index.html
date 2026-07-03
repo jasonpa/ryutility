@@ -1,0 +1,120 @@
+---
+layout: default
+title: Heart Rate Zone Calculator — Karvonen Method
+description: Free heart rate zone calculator. Get your five training zones in bpm using the Karvonen (heart rate reserve) method, from max/resting HR or age.
+permalink: /hr-zones/
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>Heart Rate Zone Calculator</h1>
+    <p>Five training zones in bpm, using the Karvonen (heart-rate-reserve) method.</p>
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <label for="hr-max">Max heart rate (bpm)</label>
+      <input type="number" id="hr-max" min="120" max="230" placeholder="185">
+      <div class="quick-buttons" style="align-items:center">
+        <span style="font-size:12px;color:var(--text-secondary)">or estimate from age:</span>
+        <input type="number" id="age" min="10" max="99" placeholder="40" style="width:60px" aria-label="Age">
+      </div>
+    </div>
+    <div class="field">
+      <label for="hr-rest">Resting heart rate (bpm, optional)</label>
+      <input type="number" id="hr-rest" min="30" max="110" placeholder="60">
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <table class="result-table" id="zones-table" hidden>
+      <thead><tr><th>Zone</th><th>Intensity</th><th>Heart rate</th></tr></thead>
+      <tbody id="zones-body"></tbody>
+    </table>
+    <p id="empty-msg" style="color:var(--text-secondary);font-size:13px">Enter your max heart rate (or age) to see your zones.</p>
+  </section>
+
+  <section class="tool-content">
+    <h2>How heart rate zones are calculated</h2>
+    <p>This calculator uses the Karvonen method, which bases zones on your heart rate <em>reserve</em> — the gap between resting and maximum heart rate — rather than a simple percentage of max. The formula is: <em>target HR = resting HR + (max HR − resting HR) × intensity%</em>. Because it accounts for your resting heart rate, it personalizes zones better than %max alone: two runners with the same max HR but different fitness levels get different (and more accurate) zones.</p>
+    <p>If you leave resting HR blank, the calculator falls back to a straight percentage of max HR — less precise but still useful. If you don't know your max HR, enter your age and the calculator estimates it with the Tanaka formula (208 − 0.7 × age), which research shows is more accurate than the traditional "220 minus age".</p>
+
+    <h2>What each zone is for</h2>
+    <ul>
+      <li><strong>Jog / Easy (50–60%)</strong> — recovery runs and warm-ups. Builds the aerobic base with minimal stress.</li>
+      <li><strong>Zone 2 (60–70%)</strong> — the foundation of endurance training. Most weekly volume belongs here; you should be able to hold a conversation.</li>
+      <li><strong>Tempo (75–85%)</strong> — "comfortably hard" sustained efforts that improve your lactate clearance.</li>
+      <li><strong>Threshold (83–90%)</strong> — roughly one-hour race effort; cruise intervals and threshold runs live here.</li>
+      <li><strong>VO2max (90–100%)</strong> — short hard intervals (3–5 minutes) that raise your aerobic ceiling.</li>
+    </ul>
+
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details>
+        <summary>How do I find my real max heart rate?</summary>
+        <p>Age formulas are estimates with a standard deviation of about ±10 bpm. For a real number, look at the highest value your HR monitor has recorded at the end of a hard race or all-out hill repeats. A field test: after a thorough warm-up, run 3 × 2 minutes uphill at maximal effort — the peak reading is close to your true max.</p>
+      </details>
+      <details>
+        <summary>How do I measure resting heart rate?</summary>
+        <p>Check your heart rate first thing in the morning before getting out of bed, for several days, and take the average. Most watches with sleep tracking report it automatically.</p>
+      </details>
+      <details>
+        <summary>Why is Zone 2 training so popular?</summary>
+        <p>Zone 2 builds mitochondrial density and fat-burning capacity with low injury risk, so you can accumulate a lot of it. Most successful endurance programs put roughly 80% of training time at or below Zone 2 intensity.</p>
+      </details>
+      <details>
+        <summary>Karvonen vs. percentage of max — which should I use?</summary>
+        <p>Karvonen (enter both max and resting HR) is more personalized because it accounts for fitness via resting heart rate. Use %max only if you don't know your resting HR. The zones from the two methods can differ by 5–15 bpm at the low end.</p>
+      </details>
+      <details>
+        <summary>My watch shows different zones. Which is right?</summary>
+        <p>Watch vendors use different zone models (some use 5 zones of %max, some use lactate-threshold anchored zones). None is "wrong" — what matters is using one model consistently. This calculator's zones map to common running training language (easy/tempo/threshold/VO2max).</p>
+      </details>
+    </div>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+const ZONE_COLORS = { jog: '#22c55e', zone2: '#06b6d4', tempo: '#f59e0b', threshold: '#ef4444', vo2max: '#8b5cf6' }
+
+function render() {
+  const explicitMax = parseInt($('hr-max').value, 10)
+  const age = parseInt($('age').value, 10)
+  const hrMax = !isNaN(explicitMax) ? explicitMax : (!isNaN(age) ? estimateMaxHr(age) : null)
+  const rest = parseInt($('hr-rest').value, 10)
+  const hrRest = isNaN(rest) ? 0 : rest
+  const table = $('zones-table')
+  const empty = $('empty-msg')
+
+  if (!hrMax || hrMax <= hrRest) { table.hidden = true; empty.hidden = false; return }
+
+  $('zones-body').innerHTML = hrZones(hrMax, hrRest).map(z => `
+    <tr>
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${ZONE_COLORS[z.key]};margin-right:6px"></span>${z.label}</td>
+      <td>${z.pct[0]}–${z.pct[1]}%</td>
+      <td><strong>${z.low}–${z.high} bpm</strong></td>
+    </tr>`).join('')
+  table.hidden = false
+  empty.hidden = true
+}
+
+$('calc-form').addEventListener('input', render)
+render()
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "How do I find my real max heart rate?", "acceptedAnswer": {"@type": "Answer", "text": "Age formulas are estimates (±10 bpm). Check the highest value your HR monitor recorded at the end of a hard race, or do a field test: after warming up, run 3 × 2 minutes uphill all-out and note the peak reading."}},
+    {"@type": "Question", "name": "How do I measure resting heart rate?", "acceptedAnswer": {"@type": "Answer", "text": "Measure first thing in the morning before getting up, over several days, and average the readings. Watches with sleep tracking report it automatically."}},
+    {"@type": "Question", "name": "Why is Zone 2 training so popular?", "acceptedAnswer": {"@type": "Answer", "text": "Zone 2 builds mitochondrial density and fat-burning capacity with low injury risk. Most endurance programs put about 80% of training time at or below Zone 2."}},
+    {"@type": "Question", "name": "Karvonen vs. percentage of max — which should I use?", "acceptedAnswer": {"@type": "Answer", "text": "Karvonen is more personalized because it accounts for resting heart rate. Use percent-of-max only if you don't know your resting HR."}},
+    {"@type": "Question", "name": "My watch shows different zones. Which is right?", "acceptedAnswer": {"@type": "Answer", "text": "Vendors use different zone models. None is wrong — consistency matters. This calculator's zones map to common running training language."}}
+  ]
+}
+</script>

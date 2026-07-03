@@ -1,0 +1,160 @@
+---
+layout: default
+title: Running Splits Calculator — Even & Negative Splits
+description: Free running splits calculator. Get km or mile split times for your goal race time — even pacing or negative splits — with a printable pace table.
+permalink: /splits/
+---
+<style>
+  @media print {
+    header, footer, .tool-form, .tool-content, .related-tools,
+    .cookie-banner, #print-btn { display: none !important; }
+    .tool-wrap { padding: 0; }
+  }
+</style>
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>Running Splits Calculator</h1>
+    <p>Split times for your goal race — even or negative pacing, printable.</p>
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>Race distance</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="race-dist" value="5k" checked><span>5K</span></label>
+          <label><input type="radio" name="race-dist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="race-dist" value="half"><span>Half</span></label>
+          <label><input type="radio" name="race-dist" value="full"><span>Marathon</span></label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="field">
+      <label>Goal time</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="9" placeholder="0" aria-label="Hours">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" placeholder="50" aria-label="Minutes">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+        <span>h:mm:ss</span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="split-unit">Split every</label>
+      <select id="split-unit">
+        <option value="1" selected>1 km</option>
+        <option value="1.60934">1 mile</option>
+        <option value="5">5 km</option>
+      </select>
+    </div>
+    <div class="field">
+      <fieldset>
+        <legend>Pacing strategy</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="strategy" value="0" checked><span>Even</span></label>
+          <label><input type="radio" name="strategy" value="3"><span>Negative 3%</span></label>
+          <label><input type="radio" name="strategy" value="6"><span>Negative 6%</span></label>
+        </div>
+      </fieldset>
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <table class="result-table" id="splits-table" hidden>
+      <thead><tr><th>#</th><th>At distance</th><th>Split</th><th>Cumulative</th></tr></thead>
+      <tbody id="splits-body"></tbody>
+    </table>
+    <button type="button" id="print-btn" class="tool-form" style="cursor:pointer;padding:8px 16px;font-size:13px" hidden>Print pace table</button>
+    <p id="empty-msg" style="color:var(--text-secondary);font-size:13px">Enter a goal time above to build your split table.</p>
+  </section>
+
+  <section class="tool-content">
+    <h2>How to use a split table</h2>
+    <p>A split table tells you what your watch should read at each kilometer or mile marker if you're on target. Racing to a plan beats racing on feel: the most common race mistake at every level is starting too fast, banking "free" seconds early, and paying them back double in the final third. Write your splits on your arm, tape them to your bottle, or print this table as a classic pace band.</p>
+    <p>Choose <strong>even splits</strong> for flat courses and shorter races. Choose a <strong>negative split</strong> — starting slightly slower than average and finishing faster — for longer races: it keeps early effort honest and consistently produces better times. A 3% gradient means your first kilometer is about 3% slower than average pace and your last about 3% faster; 6% is a more aggressive progression best suited to experienced racers or training runs.</p>
+
+    <h2>Why negative splits work</h2>
+    <ul>
+      <li><strong>Physiology:</strong> starting hard burns carbohydrate faster and accumulates fatigue you cannot recover mid-race. A conservative start preserves glycogen for the finish.</li>
+      <li><strong>Evidence:</strong> most world records from 1500 m to the marathon were set with even or negative splits — almost never with a fast start.</li>
+      <li><strong>Psychology:</strong> passing people in the final kilometers is worth more mentally than being passed while fading.</li>
+    </ul>
+
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details>
+        <summary>What are splits in running?</summary>
+        <p>Splits are your times for each segment of a race — typically each kilometer or mile. "Even splits" means running every segment at the same pace; a "negative split" means running the second half faster than the first.</p>
+      </details>
+      <details>
+        <summary>Should I run even or negative splits?</summary>
+        <p>For 5K and 10K on flat courses, even splits work well. For half and full marathons, a slight negative split (2–4%) is the strategy most coaches recommend — start controlled, finish strong.</p>
+      </details>
+      <details>
+        <summary>How do I make a pace band?</summary>
+        <p>Generate your split table, press "Print pace table", cut out the cumulative column, and tape it around your wrist (clear packing tape makes it sweat-proof). At each marker, compare your watch to the band.</p>
+      </details>
+      <details>
+        <summary>Why doesn't the last marathon split match the others?</summary>
+        <p>A marathon is 42.195 km, so with 1 km splits the final row covers only 0.195 km. The table shows the correct shorter time for that partial segment, and the cumulative column still ends exactly at your goal time.</p>
+      </details>
+      <details>
+        <summary>Do course hills change my splits?</summary>
+        <p>Yes — a fixed table assumes a flat course. On hilly courses, run by effort on the climbs and let the splits average out; expect to give back 2–4 seconds per kilometer of net climbing.</p>
+      </details>
+    </div>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+
+function render() {
+  const distKey = document.querySelector('input[name="race-dist"]:checked').value
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const total = h * 3600 + m * 60 + s
+  const splitKm = parseFloat($('split-unit').value)
+  const strategy = parseInt(document.querySelector('input[name="strategy"]:checked').value, 10)
+  const table = $('splits-table')
+  const empty = $('empty-msg')
+  const printBtn = $('print-btn')
+
+  if (total <= 0) { table.hidden = true; printBtn.hidden = true; empty.hidden = false; return }
+
+  const isMile = splitKm > 1.6 && splitKm < 1.62
+  const plan = splitPlan(total, DIST_KM[distKey], splitKm, strategy)
+  $('splits-body').innerHTML = plan.map(row => {
+    const distLabel = isMile
+      ? `${(row.dist / 1.60934).toFixed(row.dist % 1.60934 < 0.01 ? 0 : 2)} mi`
+      : `${row.dist} km`
+    return `<tr><td>${row.n}</td><td>${distLabel}</td><td>${secToPace(row.splitSec)}</td><td><strong>${secToHms(row.cumSec)}</strong></td></tr>`
+  }).join('')
+  table.hidden = false
+  printBtn.hidden = false
+  empty.hidden = true
+}
+
+$('print-btn').addEventListener('click', () => window.print())
+$('calc-form').addEventListener('input', render)
+render()
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What are splits in running?", "acceptedAnswer": {"@type": "Answer", "text": "Splits are your times for each segment of a race, typically each kilometer or mile. Even splits means the same pace throughout; a negative split means running the second half faster."}},
+    {"@type": "Question", "name": "Should I run even or negative splits?", "acceptedAnswer": {"@type": "Answer", "text": "For 5K and 10K on flat courses, even splits work well. For half and full marathons, a slight negative split of 2–4% is what most coaches recommend."}},
+    {"@type": "Question", "name": "How do I make a pace band?", "acceptedAnswer": {"@type": "Answer", "text": "Generate the split table, print it, cut out the cumulative column, and tape it around your wrist with clear tape."}},
+    {"@type": "Question", "name": "Why doesn't the last marathon split match the others?", "acceptedAnswer": {"@type": "Answer", "text": "A marathon is 42.195 km, so with 1 km splits the final row covers only 0.195 km and takes proportionally less time."}},
+    {"@type": "Question", "name": "Do course hills change my splits?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — a fixed table assumes a flat course. On hills, run by effort and expect to give back 2–4 seconds per kilometer of net climbing."}}
+  ]
+}
+</script>

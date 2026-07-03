@@ -1,0 +1,30 @@
+- name: Training Zone Calculator
+  url: /run/
+  badge: Running
+  short: VDOT training zones from a recent race
+  description: Calculate your personalized training zones from a recent race time using Daniels' VDOT method.
+- name: Running Pace Calculator
+  url: /pace/
+  badge: Running
+  short: Solve pace, time, or distance
+  description: Calculate your running pace, finish time, or distance — enter any two and get the third, in km and miles.
+- name: Race Time Predictor
+  url: /predict/
+  badge: Running
+  short: Predict 5K to marathon finish times
+  description: Predict your finish time for 5K, 10K, half, and full marathon from one recent race result using the Riegel formula.
+- name: Heart Rate Zone Calculator
+  url: /hr-zones/
+  badge: Fitness
+  short: Karvonen training zones in bpm
+  description: Calculate your five heart rate training zones with the Karvonen method, from your max and resting heart rate or your age.
+- name: Splits Calculator
+  url: /splits/
+  badge: Running
+  short: Even & negative split tables
+  description: Build a printable split table for any race — even or negative splits per km or mile for 5K to marathon.
+- name: Treadmill Pace Converter
+  url: /treadmill/
+  badge: Running
+  short: mph / km/h to pace, with incline
+  description: Convert treadmill speed (mph or km/h) to running pace, and see the equivalent outdoor pace for any incline setting.

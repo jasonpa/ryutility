@@ -94,3 +94,107 @@ input:focus-visible, select:focus-visible {
 .content-page li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; }
 .content-page a { color: var(--accent); }
 .contact-email { font-size: 16px; font-weight: 600; }
+
+/* === SHARED TOOL PAGE STYLES === */
+.tool-wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+.tool-heading h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+.tool-heading p { font-size: 12px; color: var(--text-secondary); margin: 2px 0 16px; }
+
+.tool-form {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin-bottom: 16px;
+}
+.tool-form .field { margin-bottom: 14px; }
+.tool-form .field:last-child { margin-bottom: 0; }
+.tool-form label, .tool-form legend {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--text-secondary); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.tool-form fieldset { border: none; }
+.tool-form input[type="number"] {
+  width: 80px; padding: 6px 8px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--bg); color: var(--text-primary);
+  font-size: 16px;
+}
+.tool-form input[type="number"]::-webkit-inner-spin-button,
+.tool-form input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.tool-form input[type="number"] { -moz-appearance: textfield; }
+.tool-form select {
+  padding: 6px 8px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--bg); color: var(--text-primary);
+  font-size: 16px;
+}
+.time-inputs { display: flex; align-items: center; gap: 6px; }
+.time-inputs input { width: 52px; text-align: center; }
+.time-inputs span { color: var(--text-secondary); }
+.radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.radio-group label {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 400; color: var(--text-primary);
+  text-transform: none; letter-spacing: normal;
+  padding: 4px 10px; border: 1px solid var(--border); border-radius: 20px;
+  cursor: pointer; margin-bottom: 0;
+}
+.radio-group input[type="radio"] { display: none; }
+.radio-group input[type="radio"]:checked + span { font-weight: 600; color: var(--accent); }
+.radio-group label:has(input:checked) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.quick-buttons { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.quick-buttons button {
+  font-size: 12px; padding: 3px 10px; border: 1px solid var(--border);
+  border-radius: 20px; background: var(--bg); color: var(--text-primary); cursor: pointer;
+}
+.quick-buttons button:hover { border-color: var(--accent); }
+
+.result-cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+}
+@media (min-width: 600px) { .result-cards { grid-template-columns: repeat(3, 1fr); } }
+.result-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+}
+.result-card .label {
+  font-size: 11px; font-weight: 600; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px; display: block;
+}
+.result-card .value { font-size: 20px; font-weight: 700; display: block; margin-top: 2px; }
+.result-card .sub { font-size: 12px; color: var(--text-secondary); }
+
+.result-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+.result-table th, .result-table td {
+  text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border);
+}
+.result-table th {
+  font-size: 11px; font-weight: 600; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.tool-content { margin-top: 24px; }
+.tool-content h2 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
+.tool-content p, .tool-content li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.tool-content ul, .tool-content ol { padding-left: 18px; margin-bottom: 8px; }
+.tool-content li { margin-bottom: 4px; }
+.faq details {
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 8px; background: var(--surface);
+}
+.faq summary { font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer; }
+.faq details p { margin-top: 8px; }
+
+.related-tools { margin: 32px 0 40px; }
+.related-tools h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+.related-grid { display: grid; gap: 8px; }
+@media (min-width: 600px) { .related-grid { grid-template-columns: 1fr 1fr; } }
+.related-card {
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; text-decoration: none; color: inherit;
+  transition: border-color 0.15s;
+}
+.related-card:hover { border-color: var(--accent); }
+.related-card strong { font-size: 13px; }
+.related-card span { font-size: 12px; color: var(--text-secondary); }
