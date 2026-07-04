@@ -1,3 +1,1 @@
-# Placeholder ads.txt — replace this line with the real publisher line
-# issued by Google AdSense once the account is approved.
-# Example format: google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-3204531557601883, DIRECT, f08c47fec0942fa0
