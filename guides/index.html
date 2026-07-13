@@ -1,0 +1,19 @@
+---
+layout: default
+title: Guides — Ryutility
+description: In-depth, no-nonsense guides on training zones, pacing, and race strategy.
+permalink: /guides/
+---
+<main class="guide-hub">
+  <h1>Guides</h1>
+  <p class="tagline">In-depth guides on training zones, pacing, and race strategy — no fluff, no filler.</p>
+  <div class="guide-grid">
+    {% assign sorted_guides = site.guides | sort: "date" | reverse %}
+    {% for guide in sorted_guides %}
+    <a href="{{ guide.url | relative_url }}" class="guide-card">
+      <h2>{{ guide.title }}</h2>
+      <p>{{ guide.description }}</p>
+    </a>
+    {% endfor %}
+  </div>
+</main>

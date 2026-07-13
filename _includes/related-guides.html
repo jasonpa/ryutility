@@ -1,0 +1,14 @@
+{% assign matching_guides = site.guides | where_exp: "guide", "guide.related_tools contains page.permalink" %}
+{% if matching_guides.size > 0 %}
+<section class="related-tools" aria-label="Related guides">
+  <h2>Related reading</h2>
+  <div class="related-grid">
+    {% for guide in matching_guides %}
+    <a href="{{ guide.url | relative_url }}" class="related-card">
+      <strong>{{ guide.title }}</strong>
+      <span>{{ guide.description }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

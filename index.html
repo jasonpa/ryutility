@@ -23,10 +23,13 @@ permalink: /
     color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
     border-radius: 4px; padding: 2px 6px; margin-bottom: 8px;
   }
+  .home-intro { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 32px; }
+  .home-intro a { color: var(--accent); }
 </style>
 <main>
   <h1>Useful, free web tools</h1>
   <p class="tagline">A small, growing collection of tools with no sign-up and no clutter.</p>
+  <p class="home-intro">Ryutility builds calculators for runners who train by numbers — VDOT training zones, heart-rate zones, race pace, race prediction, split strategy, and treadmill conversion, all using established, published methods rather than guesswork. Every calculator is paired with a <a href="{{ '/guides/' | relative_url }}">guide</a> that explains the reasoning behind the numbers, not just the numbers themselves.</p>
   <div class="tool-grid">
     {% for tool in site.data.tools %}
     <a href="{{ tool.url | relative_url }}" class="tool-card">
@@ -36,4 +39,19 @@ permalink: /
     </a>
     {% endfor %}
   </div>
+
+  {% assign latest_guides = site.guides | sort: "date" | reverse | slice: 0, 3 %}
+  {% if latest_guides.size > 0 %}
+  <section class="guides-teaser" aria-label="Latest guides">
+    <h2>Latest guides</h2>
+    <div class="related-grid">
+      {% for guide in latest_guides %}
+      <a href="{{ guide.url | relative_url }}" class="related-card">
+        <strong>{{ guide.title }}</strong>
+        <span>{{ guide.description }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 </main>

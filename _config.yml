@@ -3,6 +3,16 @@ description: A collection of free, no-nonsense web tools.
 url: "https://ryutility.com"
 plugins:
   - jekyll-sitemap
+collections:
+  guides:
+    output: true
+    permalink: /guides/:slug/
+defaults:
+  - scope:
+      path: ""
+      type: "guides"
+    values:
+      layout: "guide"
 exclude:
   - Gemfile
   - Gemfile.lock

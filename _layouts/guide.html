@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  {% include head-meta.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body>
+  {% include header.html %}
+  <main class="guide-page">
+    <p class="guide-meta">{{ page.date | date: "%B %-d, %Y" }}</p>
+    <h1>{{ page.title }}</h1>
+    {{ content }}
+    {% if page.related_tools %}
+    {% include tool-links.html %}
+    {% endif %}
+  </main>
+  {% include footer.html %}
+  {% include cookie-banner.html %}
+  <script src="{{ '/assets/js/site.js' | relative_url }}"></script>
+</body>
+</html>

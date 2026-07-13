@@ -1,0 +1,14 @@
+<section class="related-tools" aria-label="Related calculators">
+  <h2>Try the calculators</h2>
+  <div class="related-grid">
+    {% for tool_url in page.related_tools %}
+    {% assign tool = site.data.tools | where: "url", tool_url | first %}
+    {% if tool %}
+    <a href="{{ tool.url | relative_url }}" class="related-card">
+      <strong>{{ tool.name }}</strong>
+      <span>{{ tool.short }}</span>
+    </a>
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>
