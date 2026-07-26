@@ -11,9 +11,7 @@ function initThemeToggle() {
 // === COOKIE CONSENT ===
 const CONSENT_KEY = 'ryutility-consent'
 
-// Placeholder GA4 ID — replace after creating the real GA4 property
-// (see Open Items in docs/superpowers/specs/2026-06-30-adsense-readiness-design.md).
-const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'
+const GA_MEASUREMENT_ID = 'G-9P67N4HK4F'
 
 function shouldShowBanner(storedValue) {
   return storedValue !== 'accepted' && storedValue !== 'declined'
