@@ -510,3 +510,30 @@ document.querySelectorAll('input[name="tgt-dist"]').forEach(radio => {
   })
 })
 </script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What is VDOT?", "acceptedAnswer": {"@type": "Answer", "text": "VDOT is a fitness metric developed by exercise physiologist Jack Daniels. It converts a race performance into a single number that predicts equivalent performances at other distances and prescribes training paces."}},
+    {"@type": "Question", "name": "How accurate are the training zones?", "acceptedAnswer": {"@type": "Answer", "text": "The zones are estimates based on a validated formula, not a lab test. They're accurate enough to guide day-to-day training, but factors like heat, terrain, and fatigue will shift your actual effort on any given run."}},
+    {"@type": "Question", "name": "Do I need a recent race time?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — the calculator needs a real, honest effort (a 5K or 10K time trial or race result from the last few weeks) to estimate your current fitness accurately. Old or non-maximal efforts will skew your zones."}},
+    {"@type": "Question", "name": "What if I don't know my max heart rate?", "acceptedAnswer": {"@type": "Answer", "text": "Heart-rate ranges are optional. Leave Max HR and Resting HR blank and the calculator will still show pace-based and lap-split zones."}},
+    {"@type": "Question", "name": "Can I compare a goal race pace to my current fitness?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — fill in the optional Target Race section with a goal distance and time to see your target zones compared side-by-side with your current zones, including how much faster or slower the goal pace is."}}
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Training Zone Calculator",
+  "url": "https://ryutility.com/run/",
+  "description": "Calculate your personalized training zones from a recent race time using Daniels' VDOT method.",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+}
+</script>
