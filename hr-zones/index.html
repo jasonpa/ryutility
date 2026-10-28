@@ -3,11 +3,14 @@ layout: default
 title: Heart Rate Zone Calculator — Karvonen Method
 description: Free heart rate zone calculator. Get your five training zones in bpm using the Karvonen (heart rate reserve) method, from max/resting HR or age.
 permalink: /hr-zones/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <div class="tool-wrap">
   <div class="tool-heading">
     <h1>Heart Rate Zone Calculator</h1>
     <p>Five training zones in bpm, using the Karvonen (heart-rate-reserve) method.</p>
+    {% include page-updated.html %}
   </div>
 
   <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
@@ -37,6 +40,32 @@ permalink: /hr-zones/
     <h2>How heart rate zones are calculated</h2>
     <p>This calculator uses the Karvonen method, which bases zones on your heart rate <em>reserve</em> — the gap between resting and maximum heart rate — rather than a simple percentage of max. The formula is: <em>target HR = resting HR + (max HR − resting HR) × intensity%</em>. Because it accounts for your resting heart rate, it personalizes zones better than %max alone: two runners with the same max HR but different fitness levels get different (and more accurate) zones.</p>
     <p>If you leave resting HR blank, the calculator falls back to a straight percentage of max HR — less precise but still useful. If you don't know your max HR, enter your age and the calculator estimates it with the Tanaka formula (208 − 0.7 × age), which research shows is more accurate than the traditional "220 minus age".</p>
+
+    <h2>Formula and sources</h2>
+    <ul>
+      <li><strong>Karvonen</strong> (Karvonen, Kentala, and Mustala, 1957): target HR = resting HR + (max HR − resting HR) × intensity. Leave resting heart rate blank and the same formula reduces to a percentage of max, because there is no reserve to apply.</li>
+      <li><strong>Tanaka, Monahan, and Seals</strong>, "Age-predicted maximal heart rate revisited," <em>Journal of the American College of Cardiology</em> 37 (2001): max HR = 208 − 0.7 × age, rounded to the nearest beat. Age 40 is 180. "220 − age" is not used.</li>
+      <li><strong>Intensities on this page</strong> — easy 50–60%, Zone 2 60–70%, tempo 75–85%, threshold 83–90%, VO2max 90–100% of heart-rate reserve. Those cut points match the training-zone language on the <a href="{{ '/run/' | relative_url }}">Training Zone Calculator</a>. They are not a universal five-zone standard, and a watch that slices max heart rate into equal fifths will disagree.</li>
+    </ul>
+
+    <h2>A worked example</h2>
+    <p>Age 40 and a resting heart rate of 60 bpm. Tanaka gives a max of 180. Heart-rate reserve is 120. The zones this page returns:</p>
+    <ul>
+      <li>Easy — 120–132 bpm</li>
+      <li>Zone 2 — 132–144 bpm</li>
+      <li>Tempo — 150–162 bpm</li>
+      <li>Threshold — 160–168 bpm</li>
+      <li>VO2max — 168–180 bpm</li>
+    </ul>
+    <p>Tempo and threshold overlap because the intensity bands overlap (75–85% and 83–90%). That is the table, not a rounding error. The guide on <a href="{{ '/guides/estimate-max-heart-rate/' | relative_url }}">estimating max heart rate</a> explains why an age formula is only a starting point, and the guide on <a href="{{ '/guides/heart-rate-zones-karvonen-vs-max-hr/' | relative_url }}">Karvonen versus percent of max</a> shows what changes when resting heart rate is left out.</p>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>An age-based max is a population average. Individual max heart rates at the same age commonly differ by enough to move a zone boundary.</li>
+      <li>Resting heart rate moves with sleep, caffeine, and illness. One morning reading is usable; a several-day average is stabler.</li>
+      <li>Wrist optical sensors lag during hard efforts and often miss a true peak. A chest strap at the end of a race is a better max than the formula.</li>
+      <li>These zones are not a medical clearance to do a max-heart-rate test.</li>
+    </ul>
 
     <h2>What each zone is for</h2>
     <ul>

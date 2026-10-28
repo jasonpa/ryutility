@@ -3,6 +3,8 @@ layout: default
 title: Free Running Calculators — Pace, VDOT, Heart Rate Zones & Race Predictor
 description: Free running calculators for pace, VDOT training zones, heart rate zones, race prediction, splits, and treadmill conversion — no sign-up, no clutter.
 permalink: /
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <style>
   main { max-width: 600px; margin: 40px auto; padding: 0 16px; }
@@ -27,8 +29,9 @@ permalink: /
   .home-intro a { color: var(--accent); }
 </style>
 <main>
-  <h1>Useful, free web tools</h1>
-  <p class="tagline">A small, growing collection of tools with no sign-up and no clutter.</p>
+  <h1>Free running calculators</h1>
+  {% include page-updated.html %}
+  <p class="tagline">Pace, training zones, heart rate, race prediction, splits, and treadmill conversion — no account.</p>
   <p class="home-intro">Ryutility builds calculators for runners who train by numbers — VDOT training zones, heart-rate zones, race pace, race prediction, split strategy, and treadmill conversion, all using established, published methods rather than guesswork. Every calculator is paired with a <a href="{{ '/guides/' | relative_url }}">guide</a> that explains the reasoning behind the numbers, not just the numbers themselves.</p>
   <div class="tool-grid">
     {% for tool in site.data.tools %}
@@ -39,6 +42,11 @@ permalink: /
     </a>
     {% endfor %}
   </div>
+
+  <section class="home-method">
+    <h2>How the numbers are produced</h2>
+    <p class="home-intro">Each calculator runs in your browser and prints the formula it uses underneath the inputs. Training zones start from Jack Daniels' VDOT. Race times use Pete Riegel's 1981 equation with exponent 1.06. Heart-rate zones use the Karvonen reserve method, and an age is turned into max heart rate with the Tanaka, Monahan, and Seals (2001) estimate rather than "220 minus age." Treadmill incline uses the ACSM running equation. Pace, time, distance, and split tables are arithmetic on the official distances: 5 km, 10 km, 21.0975 km, and 42.195 km. The <a href="{{ '/about/' | relative_url }}">About</a> page lists those sources and what the estimates are not. A result that disagrees with the worked example on a tool page is a bug — send the inputs from <a href="{{ '/contact/' | relative_url }}">Contact</a>.</p>
+  </section>
 
   {% assign latest_guides = site.guides | sort: "date" | reverse | slice: 0, 3 %}
   {% if latest_guides.size > 0 %}

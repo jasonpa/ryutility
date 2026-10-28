@@ -3,11 +3,14 @@ layout: default
 title: Race Time Predictor — 5K, 10K, Half & Marathon
 description: Predict your race finish times from one recent result. Free race time predictor using the proven Riegel formula, with pace per km and mile.
 permalink: /predict/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <div class="tool-wrap">
   <div class="tool-heading">
     <h1>Race Time Predictor</h1>
     <p>Enter one recent race result to predict your times at other distances.</p>
+    {% include page-updated.html %}
   </div>
 
   <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
@@ -48,7 +51,25 @@ permalink: /predict/
   <section class="tool-content">
     <h2>How race time prediction works</h2>
     <p>This predictor uses the Riegel formula, published by engineer Pete Riegel in 1981 and still the most widely used race prediction model: <em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>. The exponent 1.06 captures how much runners slow down as the distance grows — roughly 6% more time per doubling of distance beyond simple proportionality. It has held up remarkably well across four decades of race data for distances from 1500 m to the marathon.</p>
-    <p>For example, a 25:00 5K predicts a 52:07 10K — not 50:00, because nobody holds their 5K pace for twice the distance. The same 25:00 5K predicts roughly a 1:55 half marathon and a 4:00 marathon.</p>
+
+    <h2>Formula and sources</h2>
+    <p>The page implements that equation and no other adjustment for age, sex, or mileage. Distances are the standard road lengths: 5 km, 10 km, 21.0975 km, and 42.195 km. The source is Pete Riegel, "Athletic Records and Human Endurance," <em>American Scientist</em> 69 (1981). The same exponent is used for every distance pair, including a 5K-to-marathon jump — the formula does not steepen itself when the gap gets large.</p>
+
+    <h2>A worked example</h2>
+    <p>A 25:00 5K is 1,500 seconds. The function on this page returns:</p>
+    <ul>
+      <li><strong>10K</strong> — 52:07 (5:13/km), not 50:00. Doubling the distance does not double the time.</li>
+      <li><strong>Half marathon</strong> — 1:55:00 (5:27/km).</li>
+      <li><strong>Marathon</strong> — 3:59:47 (5:41/km).</li>
+    </ul>
+    <p>The marathon figure is what the exponent produces from a 5K. It is not a promise that a 25:00 5K runner is ready to run 3:59. The guide on the <a href="{{ '/guides/riegel-formula-race-prediction/' | relative_url }}">limits of the Riegel formula</a> is the longer version of that warning.</p>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>Adjacent distances (5K to 10K, 10K to half) are where the exponent was meant to be used. A 5K does not measure marathon fueling or long-run durability, so the marathon line is a ceiling for a fair day, not a race plan.</li>
+      <li>The input has to be a recent all-out effort. A stale personal best or a workout where you held back is fed into the same equation and looks just as precise.</li>
+      <li>Heat, hills, and wind are not in the formula. Neither is a different exponent. Some coaches use something steeper than 1.06 for the half-to-marathon jump; this page does not.</li>
+    </ul>
 
     <h2>How to get an accurate prediction</h2>
     <ul>

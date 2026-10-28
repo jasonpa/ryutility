@@ -3,11 +3,14 @@ layout: default
 title: Running Pace Calculator — Pace, Time & Distance
 description: Free running pace calculator. Enter any two of pace, time, and distance to get the third — with km, mile, and treadmill speed conversions.
 permalink: /pace/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <div class="tool-wrap">
   <div class="tool-heading">
     <h1>Running Pace Calculator</h1>
     <p>Enter any two of time, distance, and pace — the third is calculated instantly.</p>
+    {% include page-updated.html %}
   </div>
 
   <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
@@ -78,6 +81,24 @@ permalink: /pace/
     <p>Running pace is simply time divided by distance. This calculator solves the pace–time–distance triangle: pick which value you want to solve for, fill in the other two, and the answer appears instantly. Results are always shown in both minutes per kilometer and minutes per mile, along with the equivalent treadmill speed in km/h and mph, so you never need a separate conversion step.</p>
     <p>For example, if you ran 10 km in 50 minutes, your pace is 50:00 ÷ 10 = 5:00 per kilometer, which is 8:03 per mile, or 12.0 km/h (7.5 mph) on a treadmill display. Going the other way, if you want to finish a half marathon (21.0975 km) at 5:30 per kilometer, your finish time will be 5:30 × 21.0975 ≈ 1:56:02.</p>
     <p>Use the quick-select buttons for the four standard race distances — 5K, 10K, half marathon, and marathon — or type any custom distance in kilometers or miles.</p>
+
+    <h2>Formula and sources</h2>
+    <p>The page solves the constant-speed relations and nothing more sophisticated:</p>
+    <ul>
+      <li>pace (seconds per km) = time (seconds) / distance (km)</li>
+      <li>time = pace × distance</li>
+      <li>distance = time / pace</li>
+      <li>seconds per mile = seconds per km × 1.60934</li>
+      <li>speed in km/h = 3600 / seconds per km</li>
+    </ul>
+    <p>The quick-select distances are the standard road lengths: 5 km, 10 km, 21.0975 km (half marathon), and 42.195 km (marathon). A 10 km run in 50:00 is 5:00/km, 8:03/mi, and 12.0 km/h. A half marathon at 5:30/km is 1:56:02. A 4:00:00 marathon is 5:41/km (9:09/mi) only when the distance is 42.195 km, not 42.</p>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>The math assumes one steady speed. It does not model fatigue, hills, or a slowdown in the last kilometers. For that, use the <a href="{{ '/predict/' | relative_url }}">Race Time Predictor</a> and read where Riegel's formula stops applying.</li>
+      <li>A training-run pace is not a race pace. The calculator will dutifully multiply whatever you type.</li>
+      <li>GPS distance and a measured course can disagree by more than the rounding on this page. For a goal time, use the official distance.</li>
+    </ul>
 
     <h2>Common race pace reference points</h2>
     <ul>

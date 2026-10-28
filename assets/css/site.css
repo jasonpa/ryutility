@@ -23,7 +23,7 @@ a { color: inherit; }
 
 /* HEADER */
 header {
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
   padding: 12px 16px; border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
@@ -31,7 +31,7 @@ header {
   font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
   flex: 1; text-decoration: none; color: var(--text-primary);
 }
-.site-nav { display: flex; gap: 12px; }
+.site-nav { display: flex; flex-wrap: wrap; gap: 12px; }
 .site-nav a { font-size: 13px; text-decoration: none; color: var(--text-secondary); }
 .site-nav a:hover { color: var(--accent); }
 #theme-toggle {
@@ -94,6 +94,21 @@ input:focus-visible, select:focus-visible {
 .content-page li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 6px; }
 .content-page a { color: var(--accent); }
 .contact-email { font-size: 16px; font-weight: 600; }
+
+.content-page p.page-updated,
+.tool-heading p.page-updated,
+.guide-hub p.page-updated,
+main p.page-updated {
+  font-size: 12px; color: var(--text-secondary); margin: 0 0 14px;
+}
+.owner-todo {
+  background: color-mix(in srgb, #f59e0b 14%, var(--surface));
+  border: 1px solid #f59e0b; border-radius: 8px;
+  padding: 12px 14px; margin: 0 0 16px;
+}
+.content-page .owner-todo p {
+  color: var(--text-primary); margin-bottom: 0; font-size: 13px; line-height: 1.6;
+}
 
 /* === SHARED TOOL PAGE STYLES === */
 .tool-wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
@@ -176,6 +191,7 @@ input:focus-visible, select:focus-visible {
 .tool-content { margin-top: 24px; }
 .tool-content h2 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
 .tool-content p, .tool-content li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.tool-content a { color: var(--accent); }
 .tool-content ul, .tool-content ol { padding-left: 18px; margin-bottom: 8px; }
 .tool-content li { margin-bottom: 4px; }
 .faq details {
@@ -219,7 +235,8 @@ input:focus-visible, select:focus-visible {
 
 .guide-hub { max-width: 720px; margin: 40px auto; padding: 0 16px 60px; }
 .guide-hub h1 { font-size: 22px; margin-bottom: 6px; }
-.guide-hub .tagline { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
+.guide-hub .tagline { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+.guide-hub .hub-intro { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 28px; }
 .guide-grid { display: grid; gap: 12px; }
 .guide-card {
   display: block; background: var(--surface);
@@ -229,7 +246,10 @@ input:focus-visible, select:focus-visible {
 }
 .guide-card:hover { border-color: var(--accent); }
 .guide-card h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.guide-card .guide-card-meta { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; }
 .guide-card p { font-size: 13px; color: var(--text-secondary); }
 
 .guides-teaser { margin: 32px 0 40px; }
 .guides-teaser h2 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+.home-method { margin: 28px 0 8px; }
+.home-method h2 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
