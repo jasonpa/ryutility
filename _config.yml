@@ -1,5 +1,5 @@
 title: Ryutility
-description: A collection of free, no-nonsense web tools.
+description: Free running calculators for pace, VDOT training zones, heart-rate zones, race prediction, splits, and treadmill conversion.
 url: "https://ryutility.com"
 plugins:
   - jekyll-sitemap
@@ -22,3 +22,6 @@ exclude:
   - .playwright-mcp
   - "*.png"
   - README.md
+  - CLAUDE.md
+  - vendor
+  - .bundle

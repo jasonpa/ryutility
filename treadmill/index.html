@@ -3,11 +3,14 @@ layout: default
 title: Treadmill Pace Converter — Speed to Pace with Incline
 description: Convert treadmill speed in mph or km/h to running pace per mile and km, and find the equivalent flat-ground pace for any incline. Free conversion chart.
 permalink: /treadmill/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <div class="tool-wrap">
   <div class="tool-heading">
     <h1>Treadmill Pace Converter</h1>
     <p>Turn a treadmill speed into running pace — and see what the incline is really worth.</p>
+    {% include page-updated.html %}
   </div>
 
   <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
@@ -44,7 +47,24 @@ permalink: /treadmill/
   <section class="tool-content">
     <h2>How treadmill conversion works</h2>
     <p>Treadmills display speed (km/h or mph), but runners think in pace (minutes per km or mile). The conversion is a simple reciprocal: pace per km = 3600 ÷ speed in km/h. So 12.0 km/h is 5:00/km, and 6.0 mph is 10:00 per mile. The cards above convert your exact belt speed; the chart shows the full range so you can plan interval settings before stepping on.</p>
-    <p>Incline changes the effort, not the belt speed. This converter uses the ACSM running-economy equation to compute the <em>flat-ground equivalent</em>: the outdoor pace that costs the same oxygen as your belt speed at your incline. At 1% incline the equivalent is about 4.5% faster than the belt pace — which is why the common advice is to set 1% to mimic outdoor running: it compensates for the missing air resistance and the belt assisting your leg turnover.</p>
+    <p>Incline changes the effort, not the belt speed. This converter uses the ACSM running equation to compute the <em>flat-ground equivalent</em>: the outdoor pace that costs the same oxygen as your belt speed at your incline. At 1% incline the equivalent is 4.5% faster than the belt speed — which is why the common advice is to set 1% to mimic outdoor running: it compensates for the missing air resistance and the belt assisting your leg turnover.</p>
+
+    <h2>Formula and sources</h2>
+    <ul>
+      <li>Belt pace (seconds per km) = 3600 / speed in km/h. Miles per hour are converted at 1.60934 km per mile.</li>
+      <li>Flat-ground speed = belt speed × (1 + 4.5 × grade% / 100). That is the simplification of the American College of Sports Medicine running equation, VO2 = 3.5 + 0.2·v + 0.9·v·grade, with <em>v</em> in meters per minute, when the flat and inclined efforts are set to the same oxygen cost.</li>
+      <li>The separate "use 1% incline" habit comes from Jones and Doust, "A 1% treadmill grade most accurately reflects the energetic cost of outdoor running," <em>Journal of Sports Sciences</em> 14 (1996). This page does not assume you are at 1%. It uses whatever incline you enter. The guide on <a href="{{ '/guides/treadmill-incline-pace/' | relative_url }}">treadmill incline and pace</a> goes further into where that 1% rule holds.</li>
+    </ul>
+
+    <h2>A worked example</h2>
+    <p>A belt at 12.0 km/h is 5:00/km (8:03/mi), because 3600 / 12 = 300 seconds. At 1% incline the flat-ground equivalent speed is 12 × (1 + 4.5 × 0.01) = 12.54 km/h, which is 4:47/km. Train to that equivalent when the session is supposed to match an outdoor pace. The chart under the form recalculates the same way for every listed speed when you change the incline.</p>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>The ACSM equation is a population average. Two runners at the same belt speed and grade do not have the same oxygen cost.</li>
+      <li>It does not include indoor heat, a worn belt, or holding the handrails, all of which change the effort the display never shows.</li>
+      <li>Above a few percent grade the linear simplification is a rougher match to outdoor hills. Use it to set the treadmill, then check heart rate.</li>
+    </ul>
 
     <h2>Common mistakes</h2>
     <ul>

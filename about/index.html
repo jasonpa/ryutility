@@ -1,13 +1,43 @@
 ---
 layout: default
 title: About Ryutility
-description: Ryutility builds small, free, no-nonsense running tools and guides, made by a longtime recreational distance runner.
+description: Who maintains Ryutility, why the running calculators exist, and which published formulas they implement — Daniels VDOT, Riegel, Karvonen, Tanaka, and the ACSM running equation.
 permalink: /about/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <main class="content-page">
   <h1>About Ryutility</h1>
+  {% include page-updated.html %}
+
+  <h2>What this site is</h2>
   <p>Ryutility is a small, independent collection of free web tools. The goal is simple: solve one specific, everyday problem per tool, load fast, work on any device, and get out of your way — no account required, no unnecessary clutter.</p>
   <p>Ryutility grew out of more than a decade of recreational distance running — enough marathons, half marathons, and disappointing training blocks to get tired of pace calculators that were paywalled, cluttered with ads that broke on mobile, or just quietly wrong. The <a href="{{ '/run/' | relative_url }}">Training Zone Calculator</a> was built first, using Jack Daniels' VDOT method, because after years of training against different systems, it's the one that held up best against what actually happened on race day — not the one that sounded the most sophisticated on paper.</p>
   <p>Since then, Ryutility has grown into six calculators covering pace, race prediction, heart-rate zones, split strategy, and treadmill conversion, plus a growing set of <a href="{{ '/guides/' | relative_url }}">Guides</a> that go deeper into the reasoning behind the numbers: when to trust pace over heart rate, how to choose a pacing strategy for race day, and where formulas like Riegel's start to break down. The formulas aren't original — VDOT, Karvonen, and Riegel are all established, published methods — but the goal is to explain them the way a training partner would, not the way a textbook does.</p>
-  <p>Ryutility is built and maintained independently. If something is broken or you have a suggestion, see the <a href="{{ '/contact/' | relative_url }}">Contact</a> page.</p>
+
+  <h2>Who runs it</h2>
+  <aside class="owner-todo">
+    <p><strong>TODO (site owner):</strong> Replace this note with your name, a short bio, and any credentials you want public (coaching certification, clinical background, or similar). Do not leave this placeholder in place when you resubmit the site for review.</p>
+  </aside>
+  <p>There is no user account and no saved history. Corrections and broken results go to the <a href="{{ '/contact/' | relative_url }}">Contact</a> page.</p>
+
+  <h2>Methodology</h2>
+  <p>Every calculator runs in the browser. Race times, heart rates, and treadmill speeds you type in are processed on your device. They are not uploaded, and this site has no database of results. The same math library produces the numbers on the page and the checks that lock those numbers in, so a worked example under a tool is the output of that tool, not a rounded illustration.</p>
+  <p>Each tool page states the formula it actually runs, one numeric example, the published source, and where the estimate stops being reliable. The <a href="{{ '/guides/' | relative_url }}">Guides</a> are longer notes on those same methods. They are written for this site. They are not copies of other calculators' help text.</p>
+
+  <h2>Sources the calculators implement</h2>
+  <ul>
+    <li><strong>Training zones</strong> — Jack Daniels' VDOT, from <em>Daniels' Running Formula</em>. A race time becomes an oxygen-cost estimate (VDOT). Threshold pace is the speed at 88% of that value. The five pace bands are multipliers of threshold pace used on this site (easy 1.25–1.35× through VO2max 0.90–0.95×), not a reproduction of Daniels' full E/M/T/I/R tables. Times that fall outside VDOT 30–85 are rejected. See the <a href="{{ '/run/' | relative_url }}">Training Zone Calculator</a>.</li>
+    <li><strong>Race prediction</strong> — Pete Riegel, "Athletic Records and Human Endurance," <em>American Scientist</em> 69 (1981): T2 = T1 × (D2 / D1)<sup>1.06</sup>. See the <a href="{{ '/predict/' | relative_url }}">Race Time Predictor</a>.</li>
+    <li><strong>Heart-rate zones</strong> — the Karvonen reserve method (Karvonen, Kentala, and Mustala, 1957): target = resting + (max − resting) × intensity. If you enter an age instead of a measured max, max is estimated with Tanaka, Monahan, and Seals, "Age-predicted maximal heart rate revisited," <em>Journal of the American College of Cardiology</em> 37 (2001): 208 − 0.7 × age. The "220 − age" shortcut is not used. See the <a href="{{ '/hr-zones/' | relative_url }}">Heart Rate Zone Calculator</a>.</li>
+    <li><strong>Pace, time, and distance</strong> — direct arithmetic. A mile is treated as 1.60934 km. Road distances are 5 km, 10 km, 21.0975 km, and 42.195 km. See the <a href="{{ '/pace/' | relative_url }}">Running Pace Calculator</a>.</li>
+    <li><strong>Splits</strong> — the goal time is spread across that official distance. A negative-split percent starts slower and finishes faster, graded linearly through the race, then scaled so the segments still add up to the exact goal. The percent itself is a planning choice on this site, not a laboratory constant. See the <a href="{{ '/splits/' | relative_url }}">Splits Calculator</a>.</li>
+    <li><strong>Treadmill incline</strong> — belt pace is 3600 ÷ speed in km/h. The flat-ground equivalent comes from the American College of Sports Medicine running equation (VO2 = 3.5 + 0.2·v + 0.9·v·grade, v in m/min), which simplifies to speed × (1 + 4.5 × grade% / 100). See the <a href="{{ '/treadmill/' | relative_url }}">Treadmill Pace Converter</a>.</li>
+  </ul>
+
+  <h2>What the numbers are not</h2>
+  <p>These are training estimates. They are not a laboratory test, a coaching plan, or medical advice. Heat, hills, fatigue, and whether you have trained for the distance all move the result you actually run. The <a href="{{ '/terms/' | relative_url }}">Terms of Use</a> state that limit, and each calculator repeats the specific way its own formula fails.</p>
+
+  <h2>How the site stays current</h2>
+  <p>Pages that explain a calculator show a last-updated date when that explanation changes. The guide index shows when each guide was published. If a result on the page disagrees with the formula printed under it, that is a bug: send the inputs and the output from the <a href="{{ '/contact/' | relative_url }}">Contact</a> page.</p>
 </main>

@@ -3,6 +3,8 @@ layout: default
 title: RunPace — Training Zone Calculator
 description: Calculate your personalized running training zones from a recent race time using Daniels' VDOT method.
 permalink: /run/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <style>
   /* TOOL-SPECIFIC STYLES (theme vars, reset, header, focus, skip-link live in assets/css/site.css) */
@@ -192,6 +194,7 @@ permalink: /run/
 <div class="tool-heading">
   <h1>RunPace</h1>
   <p>Training zone calculator</p>
+  {% include page-updated.html %}
 </div>
 
 <main>
@@ -332,7 +335,32 @@ permalink: /run/
   </ul>
 
   <h2>A worked example</h2>
-  <p>Say your most recent effort was a 5K in 25:00. That works out to roughly VDOT 38, which puts your easy pace band around 6:15–6:45/km, tempo around 5:35/km, and threshold around 5:20/km. If your max heart rate is 185 bpm and resting is 50 bpm, easy effort should sit around 130–145 bpm — if your watch shows a higher number while you're holding that pace, the pace is probably too fast for the day's conditions, not your fitness. Our guide on <a href="{{ '/guides/vdot-vs-heart-rate-zones/' | relative_url }}">pace vs. heart rate</a> covers when to trust which number.</p>
+  <p>A 5K in 25:00 is VDOT 38.3 on this page. Threshold pace, solved at 88% of that VDOT, is 5:16/km (8:29/mi). Applying the multipliers below:</p>
+  <ul>
+    <li><strong>Easy (1.25–1.35×)</strong> — 6:35–7:07/km. With max heart rate 185 and resting 50, Karvonen puts that band at 118–131 bpm.</li>
+    <li><strong>Zone 2 (1.15–1.25×)</strong> — 6:04–6:35/km, and 131–145 bpm at those same heart rates.</li>
+    <li><strong>Tempo (1.05–1.10×)</strong> — 5:32–5:48/km (151–165 bpm).</li>
+    <li><strong>Threshold</strong> — 5:16/km (162–172 bpm).</li>
+    <li><strong>VO2max (0.90–0.95×)</strong> — 4:45–5:01/km (172–185 bpm).</li>
+  </ul>
+  <p>If your watch reads above the easy heart-rate band while you are holding the easy pace, the pace is too fast for the day. The guide on <a href="{{ '/guides/vdot-vs-heart-rate-zones/' | relative_url }}">pace vs. heart rate</a> covers when to follow which number. These figures are the calculator's own output for those inputs, not a rounded sketch.</p>
+
+  <h2>Formula and sources</h2>
+  <p>VDOT uses the oxygen-cost equations published with Jack Daniels' method (<em>Daniels' Running Formula</em>). For a race of distance <em>d</em> meters in <em>t</em> minutes, velocity <em>v</em> is <em>d / t</em> in meters per minute:</p>
+  <ul>
+    <li>VO2 = −4.60 + 0.182258·v + 0.000104·v²</li>
+    <li>fraction = 0.8 + 0.1894393·e^(−0.012778·t) + 0.2989558·e^(−0.1932605·t)</li>
+    <li>VDOT = VO2 / fraction</li>
+  </ul>
+  <p>Threshold pace is the velocity whose oxygen cost equals 0.88 × VDOT. A result outside VDOT 30–85 is rejected rather than shown. Heart-rate ranges, when you enter max and resting heart rate, use the Karvonen reserve method at 50–60% (easy), 60–70% (Zone 2), 75–85% (tempo), 83–90% (threshold), and 90–100% (VO2max).</p>
+  <p>The pace bands are this site's multipliers of that threshold pace. They are not a copy of Daniels' full easy / marathon / threshold / interval / repetition tables, which use their own intensities. Read the guide on <a href="{{ '/guides/vdot-vs-heart-rate-zones/' | relative_url }}">VDOT and heart-rate zones</a> before treating either number as a lab result.</p>
+
+  <h2>Limitations</h2>
+  <ul>
+    <li>One recent race does not know the weather, the hills, or how tired you are today. The pace bands assume flat ground and moderate temperature.</li>
+    <li>The heart-rate bands are only as good as the max and resting values you type. Leave them blank and the page still shows pace.</li>
+    <li>A 5K or 10K time does not measure marathon-specific endurance. Use the zones to train, and use the <a href="{{ '/predict/' | relative_url }}">Race Time Predictor</a> only with the limits printed on that page.</li>
+  </ul>
 
   <h2>Common mistakes</h2>
   <ul>

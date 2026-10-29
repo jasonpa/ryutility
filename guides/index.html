@@ -3,15 +3,20 @@ layout: default
 title: Guides — Ryutility
 description: In-depth, no-nonsense guides on training zones, pacing, and race strategy.
 permalink: /guides/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <main class="guide-hub">
   <h1>Guides</h1>
+  {% include page-updated.html %}
   <p class="tagline">In-depth guides on training zones, pacing, and race strategy — no fluff, no filler.</p>
+  <p class="hub-intro">Each guide explains one formula the calculators use, with a worked number and the point where that formula stops being trustworthy. They are written for this site. The date on a card is when that guide was published.</p>
   <div class="guide-grid">
     {% assign sorted_guides = site.guides | sort: "date" | reverse %}
     {% for guide in sorted_guides %}
     <a href="{{ guide.url | relative_url }}" class="guide-card">
       <h2>{{ guide.title }}</h2>
+      <p class="guide-card-meta">{{ guide.date | date: "%B %-d, %Y" }}</p>
       <p>{{ guide.description }}</p>
     </a>
     {% endfor %}

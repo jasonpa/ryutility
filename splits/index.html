@@ -3,11 +3,13 @@ layout: default
 title: Running Splits Calculator — Even & Negative Splits
 description: Free running splits calculator. Get km or mile split times for your goal race time — even pacing or negative splits — with a printable pace table.
 permalink: /splits/
+updated: 2026-10-28
+last_modified_at: 2026-10-28
 ---
 <style>
   @media print {
     header, footer, .tool-form, .tool-content, .related-tools,
-    .cookie-banner, #print-btn { display: none !important; }
+    .cookie-banner, #print-btn, .page-updated { display: none !important; }
     .tool-wrap { padding: 0; }
   }
 </style>
@@ -15,6 +17,7 @@ permalink: /splits/
   <div class="tool-heading">
     <h1>Running Splits Calculator</h1>
     <p>Split times for your goal race — even or negative pacing, printable.</p>
+    {% include page-updated.html %}
   </div>
 
   <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
@@ -72,7 +75,25 @@ permalink: /splits/
   <section class="tool-content">
     <h2>How to use a split table</h2>
     <p>A split table tells you what your watch should read at each kilometer or mile marker if you're on target. Racing to a plan beats racing on feel: the most common race mistake at every level is starting too fast, banking "free" seconds early, and paying them back double in the final third. Write your splits on your arm, tape them to your bottle, or print this table as a classic pace band.</p>
-    <p>Choose <strong>even splits</strong> for flat courses and shorter races. Choose a <strong>negative split</strong> — starting slightly slower than average and finishing faster — for longer races: it keeps early effort honest and consistently produces better times. A 3% gradient means your first kilometer is about 3% slower than average pace and your last about 3% faster; 6% is a more aggressive progression best suited to experienced racers or training runs.</p>
+    <p>Choose <strong>even splits</strong> for flat courses and shorter races. Choose a <strong>negative split</strong> — starting slightly slower than average and finishing faster — for longer races: it keeps early effort honest and consistently produces better times. A 3% setting means the first full kilometer is slower than average pace and the last full kilometer is faster by the same kind of margin; 6% is a more aggressive progression best suited to experienced racers or training runs.</p>
+
+    <h2>Formula and sources</h2>
+    <p>Even splits divide the goal time by the official distance. A marathon is 42.195 km, a half marathon 21.0975 km, a 10K is 10 km, and a 5K is 5 km. For a negative split of <em>p</em> percent, each segment is weighted by where its midpoint sits in the race: factor = 1 + (p/100) × (1 − 2 × midpoint / distance). The segments are then scaled so they still add up to the exact goal time, including a short final segment when the distance is not a whole number of kilometers.</p>
+    <p>The percentage is a planning choice on this site, not a measured physiological constant. The case for starting slightly conservative is the practical one covered in the guide on <a href="{{ '/guides/even-vs-negative-splits/' | relative_url }}">even versus negative splits</a>.</p>
+
+    <h2>A worked example</h2>
+    <ul>
+      <li><strong>10K in 50:00, even, 1 km splits</strong> — every kilometer is 5:00. The cumulative column reads 5:00, 10:00, 15:00, and so on through 50:00.</li>
+      <li><strong>10K in 50:00, negative 3%</strong> — kilometer 1 is 5:08 and kilometer 10 is 4:52. The ten splits still sum to 50:00.</li>
+      <li><strong>Marathon in 4:00:00, even, 1 km splits</strong> — each full kilometer is 5:41. The last row is only 0.195 km and takes 1:07, and the cumulative time is still 4:00:00.</li>
+    </ul>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>The table has no elevation. A hill that costs you 15 seconds is not given back by the next row.</li>
+      <li>A goal the <a href="{{ '/predict/' | relative_url }}">Race Time Predictor</a> would call optimistic still produces a neat table. The arithmetic does not check whether the goal is realistic.</li>
+      <li>Negative 3% and 6% are options for building a plan. They are not a finding that 3% is the optimal fade for your race.</li>
+    </ul>
 
     <h2>Why negative splits work</h2>
     <ul>
