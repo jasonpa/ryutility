@@ -7,7 +7,7 @@ related_tools:
   - /run/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) Almost every patient who's ever quoted me a "max heart rate" has quoted "220 minus my age" — it's the number that's been printed on gym walls for 50 years, and it's also been known to be a rough approximation for most of that time.
+Almost every patient who's ever quoted me a "max heart rate" has quoted "220 minus my age" — it's the number that's been printed on gym walls for 50 years, and it's also been known to be a rough approximation for most of that time.
 
 Every heart rate zone calculation is built on a max heart rate number, and if that number is off, every zone derived from it is off by the same amount. Getting a better estimate — without a treadmill lab test — is worth the two minutes it takes.
 
@@ -48,5 +48,3 @@ Both formulas estimate a *population average* for a given age — they say nothi
 ## Using it in practice
 
 If you don't have a recent max-effort test result, use age-based estimation as a starting point — the [Heart Rate Zone Calculator](/hr-zones/) accepts either your measured max HR directly, or your age to estimate it with the Tanaka formula above. If your zones consistently feel too easy or too hard relative to how a given pace actually feels, that's a signal your estimated max HR may be off for your individual physiology, and it's worth cross-checking against your [training pace zones](/run/), which are derived from an actual race result rather than an age-based estimate.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

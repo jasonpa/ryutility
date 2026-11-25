@@ -7,7 +7,7 @@ related_tools:
   - /predict/
 ---
 
-I'm a Korean medicine doctor in Vancouver — 14 years in clinic, treating a steady stream of runners — and a software engineer the rest of the time, which is the odd combination behind Ryutility, a small side project under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) My own first marathon went out too fast because I trusted "how I felt" over a plan, and I've watched the same thing happen to more patients than I can count.
+My own first marathon went out too fast because I trusted "how I felt" over a plan, and I've watched the same thing happen to more patients than I can count.
 
 Marathon pacing advice almost always lands on the same recommendation: negative split, run the second half faster than the first. It's good advice — but it's not universal advice, and treating it as a rule rather than a tool has cost plenty of runners a good race. Here's the actual case for each strategy, and how to figure out which one fits you.
 
@@ -46,5 +46,3 @@ Course profile matters too. On a net-downhill or point-to-point course, gravity 
 ## Building your plan
 
 Start with a realistic goal time — if you're not sure yours is realistic, sanity-check it against a recent race result with the [Race Time Predictor](/predict/) before locking anything in. Then use the [Splits Calculator](/splits/) to generate a full per-km or per-mile table for either an even or a negative split strategy, so you have exact target times to check against at every mile marker on race day.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

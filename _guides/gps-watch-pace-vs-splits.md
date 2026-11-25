@@ -7,7 +7,7 @@ related_tools:
   - /splits/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) Stanley Park's seawall has enough tree cover and seaside terrain to make my watch's instant pace jump around by 30+ seconds per km on a dead-steady effort — long enough ago that I stopped trusting the number on my wrist mid-run and started trusting my actual lap splits instead.
+Stanley Park's seawall has enough tree cover and seaside terrain to make my watch's instant pace jump around by 30+ seconds per km on a dead-steady effort — long enough ago that I stopped trusting the number on my wrist mid-run and started trusting my actual lap splits instead.
 
 If you've ever glanced down mid-run and seen your pace swing wildly for no reason you can feel in your legs, that's not a fitness inconsistency — it's two fundamentally different measurements disagreeing with each other, and one of them is far more reliable than the other.
 
@@ -40,5 +40,3 @@ Say you run a genuinely steady 5:00/km effort for a full kilometer. Your watch's
 ## Using it in practice
 
 Plan your target paces with the [Running Pace Calculator](/pace/) before you run, then generate the actual per-km or per-mile split table you're targeting with the [Splits Calculator](/splits/) — that table is the number to check yourself against at each lap, not your watch's live pace display. If your watch consistently reports lap splits that don't match your GPS-measured route distance (common on tree-covered trails), trust a known-accurate course distance over the watch's own distance tracking when calculating true pace after the fact.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

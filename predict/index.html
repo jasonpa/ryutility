@@ -28,11 +28,11 @@ last_modified_at: 2026-10-28
     <div class="field">
       <label>Finish time</label>
       <div class="time-inputs">
-        <input type="number" id="time-hh" min="0" max="9" placeholder="0" aria-label="Hours">
+        <input type="number" id="time-hh" min="0" max="9" value="0" placeholder="0" aria-label="Hours">
         <span>:</span>
-        <input type="number" id="time-mm" min="0" max="59" placeholder="25" aria-label="Minutes">
+        <input type="number" id="time-mm" min="0" max="59" value="25" placeholder="25" aria-label="Minutes">
         <span>:</span>
-        <input type="number" id="time-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="Seconds">
         <span>h:mm:ss</span>
       </div>
     </div>
@@ -45,6 +45,10 @@ last_modified_at: 2026-10-28
       </thead>
       <tbody id="predict-body"></tbody>
     </table>
+    <div class="share-row" id="share-row" hidden>
+      <button type="button" id="copy-link" class="share-btn">Copy share link</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
     <p class="tool-content" id="empty-msg" style="color:var(--text-secondary);font-size:13px">Enter a recent finish time above to see predictions.</p>
   </section>
 
@@ -128,7 +132,7 @@ function render() {
   const table = $('predict-table')
   const empty = $('empty-msg')
 
-  if (t1 <= 0) { table.hidden = true; empty.hidden = false; return }
+  if (t1 <= 0) { table.hidden = true; $('share-row').hidden = true; empty.hidden = false; return }
 
   const d1 = DIST_KM[distKey]
   $('predict-body').innerHTML = Object.keys(DIST_KM).map(key => {
@@ -144,10 +148,41 @@ function render() {
     </tr>`
   }).join('')
   table.hidden = false
+  $('share-row').hidden = false
   empty.hidden = true
 }
 
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const dist = params.get('dist')
+  if (dist && DIST_KM[dist]) {
+    const radio = document.querySelector(`input[name="race-dist"][value="${dist}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('hh')) $('time-hh').value = params.get('hh')
+  if (params.has('mm')) $('time-mm').value = params.get('mm')
+  if (params.has('ss')) $('time-ss').value = params.get('ss')
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    dist: document.querySelector('input[name="race-dist"]:checked').value,
+    hh: $('time-hh').value,
+    mm: $('time-mm').value,
+    ss: $('time-ss').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = 'Copied!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
 $('calc-form').addEventListener('input', render)
+loadFromUrl()
 render()
 </script>
 

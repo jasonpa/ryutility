@@ -216,9 +216,9 @@ last_modified_at: 2026-10-28
 <div class="field">
   <label>Recent TT Time</label>
   <div class="pace-inputs">
-    <input type="number" id="cur-mm" min="0" max="99" placeholder="25" aria-label="Minutes">
+    <input type="number" id="cur-mm" min="0" max="99" value="25" placeholder="25" aria-label="Minutes">
     <span>:</span>
-    <input type="number" id="cur-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+    <input type="number" id="cur-ss" min="0" max="59" value="00" placeholder="00" aria-label="Seconds">
     <span>mm:ss</span>
   </div>
   <div id="cur-warning" class="input-warning">Time out of range (VDOT 30–85)</div>
@@ -258,12 +258,12 @@ last_modified_at: 2026-10-28
 
 <div class="field">
   <label for="hr-max">Max HR <span style="font-weight:400">(bpm)</span></label>
-  <input type="number" id="hr-max" min="100" max="250" placeholder="185">
+  <input type="number" id="hr-max" min="100" max="250" value="185" placeholder="185">
 </div>
 
 <div class="field">
   <label for="hr-rest">Resting HR <span style="font-weight:400">(bpm)</span></label>
-  <input type="number" id="hr-rest" min="30" max="120" placeholder="50">
+  <input type="number" id="hr-rest" min="30" max="120" value="50" placeholder="50">
 </div>
 
 <div class="field">
@@ -315,6 +315,11 @@ last_modified_at: 2026-10-28
 
     <div class="zone-cards" id="zone-cards">
       <div class="empty-state">Enter a reference pace above to see training zones.</div>
+    </div>
+
+    <div class="share-row" id="share-row" style="margin-top:16px" hidden>
+      <button type="button" id="copy-link" class="share-btn">Copy share link</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
     </div>
 
   </section>
@@ -503,6 +508,7 @@ function render() {
       const el = document.querySelector(`#sum-${k} .pace-range`)
       if (el) el.textContent = '–'
     })
+    document.getElementById('share-row').hidden = true
     return
   }
 
@@ -520,22 +526,91 @@ function render() {
 
   renderSummaryCards(currentZones, input.dispUnit)
   renderZoneCards(currentZones, targetZones, input.lapDist, input.dispUnit, hasHr)
+  document.getElementById('share-row').hidden = false
 }
+
+function updateTargetHoursToggle(val) {
+  const needsHours = val === 'half' || val === 'full'
+  const wrap  = document.getElementById('tgt-hh-wrap')
+  const label = document.getElementById('tgt-time-label')
+  wrap.style.display  = needsHours ? 'inline-flex' : 'none'
+  if (!needsHours) document.getElementById('tgt-hh').value = ''
+  label.textContent   = needsHours ? 'hh:mm:ss' : 'mm:ss'
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const cdist = params.get('cdist')
+  if (cdist === '5k' || cdist === '10k') {
+    const r = document.querySelector(`input[name="cur-dist"][value="${cdist}"]`)
+    if (r) r.checked = true
+  }
+  if (params.has('cmm')) document.getElementById('cur-mm').value = params.get('cmm')
+  if (params.has('css')) document.getElementById('cur-ss').value = params.get('css')
+
+  const tdist = params.get('tdist')
+  if (tdist === '5k' || tdist === '10k' || tdist === 'half' || tdist === 'full') {
+    const r = document.querySelector(`input[name="tgt-dist"][value="${tdist}"]`)
+    if (r) r.checked = true
+    updateTargetHoursToggle(tdist)
+  }
+  if (params.has('thh')) document.getElementById('tgt-hh').value = params.get('thh')
+  if (params.has('tmm')) document.getElementById('tgt-mm').value = params.get('tmm')
+  if (params.has('tss')) document.getElementById('tgt-ss').value = params.get('tss')
+
+  if (params.has('hrmax')) document.getElementById('hr-max').value = params.get('hrmax')
+  if (params.has('hrrest')) document.getElementById('hr-rest').value = params.get('hrrest')
+
+  const lap = params.get('lap')
+  if (lap === '100' || lap === '200' || lap === '400' || lap === '800') {
+    const r = document.querySelector(`input[name="lap-dist"][value="${lap}"]`)
+    if (r) r.checked = true
+  }
+  const unit = params.get('unit')
+  if (unit === 'km' || unit === 'mile' || unit === 'both') {
+    const r = document.querySelector(`input[name="disp-unit"][value="${unit}"]`)
+    if (r) r.checked = true
+  }
+}
+
+document.getElementById('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    cdist: document.querySelector('input[name="cur-dist"]:checked').value,
+    cmm: document.getElementById('cur-mm').value,
+    css: document.getElementById('cur-ss').value,
+    hrmax: document.getElementById('hr-max').value,
+    hrrest: document.getElementById('hr-rest').value,
+    lap: document.querySelector('input[name="lap-dist"]:checked').value,
+    unit: document.querySelector('input[name="disp-unit"]:checked').value,
+  })
+  const tmm = document.getElementById('tgt-mm').value
+  const tss = document.getElementById('tgt-ss').value
+  const thh = document.getElementById('tgt-hh').value
+  if (tmm !== '' || tss !== '' || thh !== '') {
+    params.set('tdist', document.querySelector('input[name="tgt-dist"]:checked').value)
+    if (thh !== '') params.set('thh', thh)
+    if (tmm !== '') params.set('tmm', tmm)
+    if (tss !== '') params.set('tss', tss)
+  }
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  const status = document.getElementById('copy-status')
+  try {
+    await navigator.clipboard.writeText(url)
+    status.textContent = 'Copied!'
+  } catch {
+    status.textContent = url
+  }
+  setTimeout(() => { status.textContent = '' }, 3000)
+})
 
 // === EVENT WIRING ===
 document.getElementById('calc-form').addEventListener('input', render)
+loadFromUrl()
 render()
 
 // === TARGET DISTANCE HOURS TOGGLE ===
 document.querySelectorAll('input[name="tgt-dist"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    const needsHours = radio.value === 'half' || radio.value === 'full'
-    const wrap  = document.getElementById('tgt-hh-wrap')
-    const label = document.getElementById('tgt-time-label')
-    wrap.style.display  = needsHours ? 'inline-flex' : 'none'
-    if (!needsHours) document.getElementById('tgt-hh').value = ''
-    label.textContent   = needsHours ? 'hh:mm:ss' : 'mm:ss'
-  })
+  radio.addEventListener('change', () => updateTargetHoursToggle(radio.value))
 })
 </script>
 

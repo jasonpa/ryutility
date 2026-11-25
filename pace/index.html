@@ -28,11 +28,11 @@ last_modified_at: 2026-10-28
     <div class="field" id="field-time">
       <label>Time</label>
       <div class="time-inputs">
-        <input type="number" id="time-hh" min="0" max="99" placeholder="0" aria-label="Hours">
+        <input type="number" id="time-hh" min="0" max="99" value="0" placeholder="0" aria-label="Hours">
         <span>:</span>
-        <input type="number" id="time-mm" min="0" max="59" placeholder="50" aria-label="Minutes">
+        <input type="number" id="time-mm" min="0" max="59" value="50" placeholder="50" aria-label="Minutes">
         <span>:</span>
-        <input type="number" id="time-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="Seconds">
         <span>h:mm:ss</span>
       </div>
     </div>
@@ -40,7 +40,7 @@ last_modified_at: 2026-10-28
     <div class="field" id="field-dist">
       <label for="dist">Distance</label>
       <div class="time-inputs">
-        <input type="number" id="dist" min="0" step="0.01" placeholder="10" style="width:80px" aria-label="Distance">
+        <input type="number" id="dist" min="0" step="0.01" value="10" placeholder="10" style="width:80px" aria-label="Distance">
         <select id="dist-unit" aria-label="Distance unit">
           <option value="km" selected>km</option>
           <option value="mi">miles</option>
@@ -57,9 +57,9 @@ last_modified_at: 2026-10-28
     <div class="field" id="field-pace">
       <label>Pace</label>
       <div class="time-inputs">
-        <input type="number" id="pace-mm" min="0" max="59" placeholder="5" aria-label="Pace minutes">
+        <input type="number" id="pace-mm" min="0" max="59" value="5" placeholder="5" aria-label="Pace minutes">
         <span>:</span>
-        <input type="number" id="pace-ss" min="0" max="59" placeholder="00" aria-label="Pace seconds">
+        <input type="number" id="pace-ss" min="0" max="59" value="00" placeholder="00" aria-label="Pace seconds">
         <select id="pace-unit" aria-label="Pace unit">
           <option value="km" selected>per km</option>
           <option value="mi">per mile</option>
@@ -75,6 +75,11 @@ last_modified_at: 2026-10-28
     <div class="result-card"><span class="label">Distance</span><span class="value" id="out-dist">–</span><span class="sub" id="out-dist-mi"></span></div>
     <div class="result-card"><span class="label">Speed</span><span class="value" id="out-kmh">–</span><span class="sub" id="out-mph"></span></div>
   </section>
+
+  <div class="share-row" id="share-row" hidden>
+    <button type="button" id="copy-link" class="share-btn">Copy share link</button>
+    <span id="copy-status" class="share-status" aria-live="polite"></span>
+  </div>
 
   <section class="tool-content">
     <h2>How the pace calculator works</h2>
@@ -177,7 +182,7 @@ function render() {
   if (solve === 'pace' && t && d) p = paceFromTimeDistance(t, d)
   else if (solve === 'time' && p && d) t = timeFromPaceDistance(p, d)
   else if (solve === 'distance' && t && p) d = distanceFromTimePace(t, p)
-  else { $('results').hidden = true; return }
+  else { $('results').hidden = true; $('share-row').hidden = true; return }
 
   $('out-pace-km').textContent = `${secToPace(p)} /km`
   $('out-pace-mi').textContent = `${secToPace(kmToMile(p))} /mi`
@@ -187,6 +192,7 @@ function render() {
   $('out-kmh').textContent = `${toKmh(p).toFixed(1)} km/h`
   $('out-mph').textContent = `${toMph(p).toFixed(1)} mph`
   $('results').hidden = false
+  $('share-row').hidden = false
 }
 
 function markSolvedField() {
@@ -205,7 +211,47 @@ document.querySelectorAll('.quick-buttons button').forEach(btn => {
   })
 })
 
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const solve = params.get('solve')
+  if (solve === 'pace' || solve === 'time' || solve === 'distance') {
+    const radio = document.querySelector(`input[name="solve"][value="${solve}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('hh')) $('time-hh').value = params.get('hh')
+  if (params.has('mm')) $('time-mm').value = params.get('mm')
+  if (params.has('ss')) $('time-ss').value = params.get('ss')
+  if (params.has('dist')) $('dist').value = params.get('dist')
+  if (params.get('dunit') === 'km' || params.get('dunit') === 'mi') $('dist-unit').value = params.get('dunit')
+  if (params.has('pmm')) $('pace-mm').value = params.get('pmm')
+  if (params.has('pss')) $('pace-ss').value = params.get('pss')
+  if (params.get('punit') === 'km' || params.get('punit') === 'mi') $('pace-unit').value = params.get('punit')
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    solve: document.querySelector('input[name="solve"]:checked').value,
+    hh: $('time-hh').value,
+    mm: $('time-mm').value,
+    ss: $('time-ss').value,
+    dist: $('dist').value,
+    dunit: $('dist-unit').value,
+    pmm: $('pace-mm').value,
+    pss: $('pace-ss').value,
+    punit: $('pace-unit').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = 'Copied!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
 $('calc-form').addEventListener('input', () => { markSolvedField(); render() })
+loadFromUrl()
 markSolvedField()
 render()
 </script>

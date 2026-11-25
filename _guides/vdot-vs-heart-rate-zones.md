@@ -7,8 +7,6 @@ related_tools:
   - /hr-zones/
 ---
 
-I've spent the last 14 years running a Korean medicine clinic in Vancouver, and a good chunk of my patients are runners — half of them showing up with an overuse injury that started as "I was just following my training plan." The other half of my working life is spent writing software, which is how a running-pace calculator turned into an actual side project. Ryutility is something I build in my spare time, part of a small collection of tools and experiments I call [**R-Lab**](https://ryu.clinic/lab/), under [Ryu Clinic Inc.](https://ryu.clinic).
-
 Ask five runners how they set their easy-day pace and you'll get two very different answers: some run by pace, some run by heart rate. I hear both camps in clinic, usually mid-argument with themselves about why a run that was "supposed to be easy" left them wrecked. Both are legitimate — they're just measuring different things, and each one breaks down under different conditions. Understanding what each method actually tracks makes it obvious which one to trust on any given day.
 
 ## What VDOT pace zones actually measure
@@ -48,5 +46,3 @@ Heart rate is the better guide whenever effort control matters more than a speci
 The most reliable approach isn't picking one system — it's using pace as the primary target for controlled, structured sessions, and using heart rate as a guardrail everywhere else. A simple rule that works well in practice: if your heart rate is running 10+ bpm above what you'd expect for a given pace on a normal day, back off the pace regardless of what the zone chart says. Fitness didn't disappear — conditions or fatigue changed, and heart rate is telling you before your legs do.
 
 Calculate your [VDOT training paces](/run/) from a recent race, then set your [heart rate zones](/hr-zones/) alongside them so you have both numbers on hand for every run.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

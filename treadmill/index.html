@@ -17,7 +17,7 @@ last_modified_at: 2026-10-28
     <div class="field">
       <label for="speed">Treadmill speed</label>
       <div class="time-inputs">
-        <input type="number" id="speed" min="0" step="0.1" placeholder="10.0" aria-label="Speed">
+        <input type="number" id="speed" min="0" step="0.1" value="10.0" placeholder="10.0" aria-label="Speed">
         <span class="radio-group">
           <label><input type="radio" name="speed-unit" value="kmh" checked><span>km/h</span></label>
           <label><input type="radio" name="speed-unit" value="mph"><span>mph</span></label>
@@ -35,6 +35,11 @@ last_modified_at: 2026-10-28
     <div class="result-card"><span class="label">Belt pace / mile</span><span class="value" id="out-pace-mi">–</span></div>
     <div class="result-card"><span class="label">Equivalent flat pace / km</span><span class="value" id="out-flat-km">–</span><span class="sub" id="out-flat-mi"></span></div>
   </section>
+
+  <div class="share-row" id="share-row" hidden>
+    <button type="button" id="copy-link" class="share-btn">Copy share link</button>
+    <span id="copy-status" class="share-status" aria-live="polite"></span>
+  </div>
 
   <section aria-live="polite">
     <h2 style="font-size:14px;font-weight:700;margin:8px 0">Conversion chart at your incline</h2>
@@ -135,7 +140,7 @@ function render() {
   const incline = parseFloat($('incline').value) || 0
   renderChart(incline)
 
-  if (isNaN(raw) || raw <= 0) { $('results').hidden = true; return }
+  if (isNaN(raw) || raw <= 0) { $('results').hidden = true; $('share-row').hidden = true; return }
   const kmh = unit === 'mph' ? mphToKmh(raw) : raw
   const pace = kmhToSecPerKm(kmh)
   const flatPace = kmhToSecPerKm(equivalentFlatKmh(kmh, incline))
@@ -144,9 +149,38 @@ function render() {
   $('out-flat-km').textContent = `${secToPace(flatPace)} /km`
   $('out-flat-mi').textContent = `${secToPace(kmToMile(flatPace))} /mi`
   $('results').hidden = false
+  $('share-row').hidden = false
 }
 
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.has('speed')) $('speed').value = params.get('speed')
+  const unit = params.get('unit')
+  if (unit === 'kmh' || unit === 'mph') {
+    const radio = document.querySelector(`input[name="speed-unit"][value="${unit}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('incline')) $('incline').value = params.get('incline')
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    speed: $('speed').value,
+    unit: document.querySelector('input[name="speed-unit"]:checked').value,
+    incline: $('incline').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = 'Copied!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
 $('calc-form').addEventListener('input', render)
+loadFromUrl()
 render()
 </script>
 
