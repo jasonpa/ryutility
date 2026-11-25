@@ -15,6 +15,10 @@
   --font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, 'Noto Serif KR', 'Apple SD Gothic Neo', 'Malgun Gothic', serif;
   --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Segoe UI', Roboto, sans-serif;
 }
+html[lang="ko"] {
+  --font-serif: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', Roboto, sans-serif;
+}
 [data-theme="dark"] {
   --bg: #141413;
   --surface: #1e1e1c;
