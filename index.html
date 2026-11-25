@@ -7,26 +7,35 @@ updated: 2026-10-28
 last_modified_at: 2026-10-28
 ---
 <style>
-  main { max-width: 600px; margin: 40px auto; padding: 0 16px; }
-  main h1 { font-size: 22px; margin-bottom: 6px; }
-  .tagline { font-size: 14px; color: var(--text-secondary); margin-bottom: 32px; }
+  main { max-width: 740px; margin: 48px auto; padding: 0 20px; }
+  main h1 {
+    font-family: var(--font-serif); font-size: 28px; font-weight: 600;
+    letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 8px;
+  }
+  .tagline { font-size: 15px; color: var(--text-secondary); margin-bottom: 20px; }
   .tool-grid { display: grid; gap: 12px; }
+  @media (min-width: 600px) { .tool-grid { grid-template-columns: 1fr 1fr; } }
   .tool-card {
     display: block; background: var(--surface);
     border: 1px solid var(--border); border-radius: 10px;
-    padding: 16px 20px; text-decoration: none; color: inherit;
-    transition: border-color 0.15s;
+    padding: 18px 20px; text-decoration: none; color: inherit;
+    transition: border-color 0.15s, transform 0.15s;
   }
-  .tool-card:hover { border-color: var(--accent); }
-  .tool-card h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-  .tool-card p { font-size: 13px; color: var(--text-secondary); }
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .tool-card h2 {
+    font-family: var(--font-serif); font-size: 17px; font-weight: 600;
+    margin-bottom: 5px; transition: color 0.15s;
+  }
+  .tool-card:hover h2 { color: var(--accent); }
+  .tool-card p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; }
   .tool-badge {
     display: inline-block; font-size: 11px; font-weight: 600;
-    color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent);
-    border-radius: 4px; padding: 2px 6px; margin-bottom: 8px;
+    letter-spacing: 0.03em;
+    color: var(--accent); background: var(--accent-tint);
+    border-radius: 4px; padding: 2px 7px; margin-bottom: 10px;
   }
-  .home-intro { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 32px; }
-  .home-intro a { color: var(--accent); }
+  .home-intro { font-size: 14px; color: var(--text-secondary); line-height: 1.72; margin-bottom: 28px; }
+  .home-intro a { color: var(--accent); text-underline-offset: 2px; }
 </style>
 <main>
   <h1>Free running calculators</h1>
