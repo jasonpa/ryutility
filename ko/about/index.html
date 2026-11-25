@@ -1,0 +1,34 @@
+---
+layout: default
+lang: ko
+title: Ryutility 소개
+description: Ryutility 운영자 소개, 무료 러닝 계산기의 제작 배경, 그리고 각 도구가 사용하는 공식(Daniels VDOT, Riegel, Karvonen, Tanaka, ACSM)과 한계를 안내합니다.
+permalink: /ko/about/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<main class="content-page">
+  <h1>Ryutility 소개</h1>
+  {% include page-updated.html %}
+
+  <h2>이 사이트는</h2>
+  <p>Ryutility는 로그인이나 불필요한 장식 없이 일상적인 러닝 계산을 빠르게 해결하기 위해 만든 독립 웹 도구 모음입니다. 모바일에서도 깨지지 않고, 즉시 결과를 확인할 수 있도록 가볍게 설계했습니다.</p>
+  <p>처음에는 Jack Daniels의 VDOT 방식에 기반한 <a href="{{ '/ko/run/' | relative_url }}">훈련 존 계산기</a>로 시작해, 현재 페이스, 기록 예측, 심박수 존, 구간 스플릿, 트레드밀 속도·경사도 환산, 더위·습도 보정까지 총 7가지 계산기를 제공하고 있습니다.</p>
+
+  <h2>운영자</h2>
+  <p>Ryutility는 밴쿠버에서 14년 이상 러너들을 진료해 온 한의사(R.Ac., R.TCM.P.)이자 소프트웨어 엔지니어, 그리고 장거리 러너인 <strong>Jiman Ryu</strong>가 개발하고 유지보수합니다. <a href="https://ryu.clinic" target="_blank" rel="noopener">Ryu Clinic Inc.</a>의 독립 소프트웨어·리서치 스튜디오인 <a href="https://ryu.clinic/lab/" target="_blank" rel="noopener">R-Lab</a> 프로젝트의 일환입니다.</p>
+  <p>사용자 계정이나 서버 저장 기록은 전혀 없으며, 오류 제보나 개선 제안은 <a href="{{ '/contact/' | relative_url }}">문의</a> 페이지를 통해 전달하실 수 있습니다.</p>
+
+  <h2>계산 원칙과 출처</h2>
+  <ul>
+    <li><strong>훈련 존 (VDOT)</strong> — Jack Daniels의 <em>Daniels' Running Formula</em> 기반 VDOT 산출. 역치 페이스를 기준으로 5단계 훈련 구간(Easy ~ VO2max)을 제시하며, VDOT 30~85 범위 밖의 입력은 제외합니다. (<a href="{{ '/ko/run/' | relative_url }}">훈련 존 계산기</a>)</li>
+    <li><strong>레이스 기록 예측</strong> — Pete Riegel(1981) 공식: T2 = T1 × (D2 / D1)<sup>1.06</sup>. (<a href="{{ '/ko/predict/' | relative_url }}">레이스 기록 예측기</a>)</li>
+    <li><strong>심박수 존</strong> — Karvonen 예비심박수 방식(1957). 나이로 최대심박수를 추정할 때는 "220 − 나이" 대신 Tanaka 등(2001)의 <code>208 − 0.7 × 나이</code>를 사용합니다. (<a href="{{ '/ko/hr-zones/' | relative_url }}">심박수 존 계산기</a>)</li>
+    <li><strong>페이스 · 시간 · 거리</strong> — 1마일 = 1.60934 km 및 공식 도로 거리(5 km, 10 km, 21.0975 km, 42.195 km) 기준. (<a href="{{ '/ko/pace/' | relative_url }}">러닝 페이스 계산기</a>)</li>
+    <li><strong>스플릿</strong> — 목표 완주 시간을 공식 거리로 배분하며, 네거티브 스플릿 비율(%) 선택 시 후반이 점진적으로 빨라지도록 선형 보정합니다. (<a href="{{ '/ko/splits/' | relative_url }}">스플릿 계산기</a>)</li>
+    <li><strong>트레드밀 경사도</strong> — ACSM 러닝 방정식을 단순화한 <code>평지 환산 속도 = 벨트 속도 × (1 + 4.5 × 경사도% / 100)</code>를 적용합니다. (<a href="{{ '/ko/treadmill/' | relative_url }}">트레드밀 페이스 변환기</a>)</li>
+  </ul>
+
+  <h2>주의사항</h2>
+  <p>모든 수치는 훈련 참고용 추정치이며, 의학적 진단이나 전문 코칭 처방을 대체하지 않습니다. 실제 레이스 기록은 기온, 지형, 컨디션, 지구력 훈련량에 따라 달라질 수 있습니다.</p>
+</main>

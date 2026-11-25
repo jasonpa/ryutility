@@ -1,0 +1,129 @@
+---
+layout: default
+lang: ko
+title: 트레드밀 페이스 변환기 — km/h · mph 속도 & 경사도 환산
+description: 트레드밀 벨트 속도(km/h 또는 mph)를 러닝 페이스(분/km, 분/마일)로 즉시 변환하고, 경사도(%)에 따른 야외 평지 환산 페이스를 계산합니다.
+permalink: /ko/treadmill/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>트레드밀 페이스 변환기</h1>
+    <p>트레드밀 속도를 러닝 페이스로 바꾸고, 경사도(%)가 실제로 몇 분 페이스에 해당하는지 확인합니다.</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <label for="speed">트레드밀 속도</label>
+      <div class="time-inputs">
+        <input type="number" id="speed" min="0" step="0.1" value="10.0" placeholder="10.0" aria-label="속도">
+        <span class="radio-group">
+          <label><input type="radio" name="speed-unit" value="kmh" checked><span>km/h</span></label>
+          <label><input type="radio" name="speed-unit" value="mph"><span>mph</span></label>
+        </span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="incline">경사도 (%)</label>
+      <input type="number" id="incline" min="0" max="15" step="0.5" value="1">
+    </div>
+  </form>
+
+  <section id="results" class="result-cards" aria-live="polite" hidden>
+    <div class="result-card"><span class="label">벨트 페이스 / km</span><span class="value" id="out-pace-km">–</span></div>
+    <div class="result-card"><span class="label">벨트 페이스 / 마일</span><span class="value" id="out-pace-mi">–</span></div>
+    <div class="result-card"><span class="label">평지 환산 페이스 / km</span><span class="value" id="out-flat-km">–</span><span class="sub" id="out-flat-mi"></span></div>
+  </section>
+
+  <div class="share-row" id="share-row" hidden>
+    <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
+    <span id="copy-status" class="share-status" aria-live="polite"></span>
+  </div>
+
+  <section aria-live="polite">
+    <h2 style="font-size:15px;font-weight:600;margin:10px 0">설정 경사도 기준 속도–페이스 환산표</h2>
+    <table class="result-table">
+      <thead><tr><th>km/h</th><th>mph</th><th>페이스 /km</th><th>페이스 /mi</th><th>평지 환산 /km</th></tr></thead>
+      <tbody id="chart-body"></tbody>
+    </table>
+  </section>
+
+  <section class="tool-content">
+    <h2>경사도 보정 원리</h2>
+    <p>벨트 페이스는 <code>3600 ÷ 속도(km/h)</code>로 계산합니다. 예를 들어 12.0 km/h는 <strong>5:00/km</strong>입니다. 여기에 경사도를 올리면 산소 섭취량이 증가하는데, ACSM 러닝 방정식에 따라 <code>평지 환산 속도 = 벨트 속도 × (1 + 4.5 × 경사도% / 100)</code>으로 계산합니다.</p>
+    <p>트레드밀에서 <strong>경사도 1%</strong>를 흔히 권장하는 이유는 실내에서 공기 저항이 없는 만큼의 부하를 보정해 야외 평지 러닝과 유사한 운동 강도를 맞추기 위함입니다.</p>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+const CHART_KMH = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+function renderChart(incline) {
+  $('chart-body').innerHTML = CHART_KMH.map(kmh => {
+    const pace = kmhToSecPerKm(kmh)
+    const flat = kmhToSecPerKm(equivalentFlatKmh(kmh, incline))
+    return `<tr>
+      <td>${kmh.toFixed(1)}</td>
+      <td>${(kmh / 1.60934).toFixed(1)}</td>
+      <td>${secToPace(pace)}</td>
+      <td>${secToPace(kmToMile(pace))}</td>
+      <td>${secToPace(flat)}</td>
+    </tr>`
+  }).join('')
+}
+
+function render() {
+  const raw = parseFloat($('speed').value)
+  const unit = document.querySelector('input[name="speed-unit"]:checked').value
+  const incline = parseFloat($('incline').value) || 0
+  renderChart(incline)
+
+  if (isNaN(raw) || raw <= 0) { $('results').hidden = true; $('share-row').hidden = true; return }
+  const kmh = unit === 'mph' ? mphToKmh(raw) : raw
+  const pace = kmhToSecPerKm(kmh)
+  const flatPace = kmhToSecPerKm(equivalentFlatKmh(kmh, incline))
+  $('out-pace-km').textContent = `${secToPace(pace)} /km`
+  $('out-pace-mi').textContent = `${secToPace(kmToMile(pace))} /mi`
+  $('out-flat-km').textContent = `${secToPace(flatPace)} /km`
+  $('out-flat-mi').textContent = `${secToPace(kmToMile(flatPace))} /mi`
+  $('results').hidden = false
+  $('share-row').hidden = false
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.has('speed')) $('speed').value = params.get('speed')
+  const unit = params.get('unit')
+  if (unit === 'kmh' || unit === 'mph') {
+    const radio = document.querySelector(`input[name="speed-unit"][value="${unit}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('incline')) $('incline').value = params.get('incline')
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    speed: $('speed').value,
+    unit: document.querySelector('input[name="speed-unit"]:checked').value,
+    incline: $('incline').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = '복사됨!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+$('calc-form').addEventListener('input', render)
+loadFromUrl()
+render()
+</script>

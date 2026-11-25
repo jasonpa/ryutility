@@ -12,8 +12,8 @@
   --accent: #1B365D;
   --accent-tint: #E4ECF5;
   --accent-tint-soft: #EEF2F7;
-  --font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, 'Noto Serif KR', 'Apple SD Gothic Neo', 'Malgun Gothic', serif;
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Segoe UI', Roboto, sans-serif;
 }
 [data-theme="dark"] {
   --bg: #141413;
@@ -60,13 +60,14 @@ header {
   color: var(--text-secondary); transition: color 0.15s;
 }
 .site-nav a:hover { color: var(--accent); }
-#theme-toggle {
+#theme-toggle, .lang-switch {
   background: var(--bg); border: 1px solid var(--border-strong); border-radius: 6px;
   padding: 4px 10px; cursor: pointer; color: var(--text-secondary);
   font-size: 12px; font-weight: 500; font-family: var(--font-sans);
+  text-decoration: none; line-height: 1.4;
   transition: border-color 0.15s, color 0.15s;
 }
-#theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+#theme-toggle:hover, .lang-switch:hover { border-color: var(--accent); color: var(--accent); }
 
 /* FOOTER */
 .site-footer {

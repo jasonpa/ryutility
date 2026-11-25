@@ -1,0 +1,35 @@
+- name: 훈련 존 계산기 (VDOT)
+  url: /ko/run/
+  badge: 러닝
+  short: 최근 기록으로 VDOT 훈련 페이스 계산
+  description: 최근 대회 기록을 바탕으로 다니엘스(Jack Daniels) VDOT 방식의 5가지 맞춤형 훈련 존을 계산합니다.
+- name: 러닝 페이스 계산기
+  url: /ko/pace/
+  badge: 러닝
+  short: 페이스 · 시간 · 거리 상호 계산
+  description: 페이스, 완주 시간, 거리 중 두 가지를 입력하면 나머지 하나와 시속(km/h, mph)을 바로 계산합니다.
+- name: 레이스 기록 예측기
+  url: /ko/predict/
+  badge: 러닝
+  short: 5K~마라톤 예상 완주 기록
+  description: 최근 대회 기록 하나로 리겔(Riegel) 공식을 이용해 5K, 10K, 하프, 풀코스 예상 기록을 계산합니다.
+- name: 심박수 존 계산기
+  url: /ko/hr-zones/
+  badge: 피트니스
+  short: 카르보넨(Karvonen) 5단계 심박수 존
+  description: 최대·안정시 심박수 또는 나이를 입력해 카르보넨 공식 기반 5단계 훈련 심박수(bpm)를 계산합니다.
+- name: 스플릿 계산기
+  url: /ko/splits/
+  badge: 러닝
+  short: 이븐 · 네거티브 구간 기록표
+  description: 목표 완주 시간에 맞춰 5K부터 마라톤까지 km/마일 단위 이븐·네거티브 스플릿 표를 만듭니다.
+- name: 트레드밀 페이스 변환기
+  url: /ko/treadmill/
+  badge: 러닝
+  short: km/h · mph 속도 변환 및 경사도 보정
+  description: 트레드밀 벨트 속도를 러닝 페이스로 변환하고, 경사도(%)에 따른 야외 평지 환산 페이스를 확인합니다.
+- name: 더위 · 습도 페이스 계산기
+  url: /ko/heat-pace/
+  badge: 러닝
+  short: 기온 · 습도 · 이슬점 기반 페이스 보정
+  description: 기온(°C/°F)과 상대습도를 바탕으로 더운 날 목표 페이스를 얼마나 늦춰야 하는지 계산합니다.

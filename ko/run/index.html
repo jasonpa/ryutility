@@ -1,0 +1,526 @@
+---
+layout: default
+lang: ko
+title: 훈련 존 계산기 — VDOT 기반 5단계 러닝 페이스 & 심박수
+description: 최근 5K 또는 10K 대회 기록을 바탕으로 Jack Daniels VDOT 방식의 5단계 맞춤형 훈련 페이스, 트랙 랩타임, 심박수 존을 계산합니다.
+permalink: /ko/run/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<style>
+  .tool-heading { max-width: 1200px; margin: 0 auto; padding: 20px 20px 0; }
+  .tool-heading h1 {
+    font-family: var(--font-serif); font-size: 24px; font-weight: 600; letter-spacing: -0.02em;
+  }
+  .tool-heading p { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+
+  main {
+    display: flex; flex-direction: column; gap: 0;
+    max-width: 1200px; margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    main { flex-direction: row; align-items: flex-start; }
+  }
+
+  .input-panel {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+  @media (min-width: 768px) {
+    .input-panel {
+      width: 290px; flex-shrink: 0;
+      border-bottom: none; border-right: 1px solid var(--border);
+      align-self: stretch; position: sticky; top: 0;
+    }
+  }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11px; font-weight: 600;
+    color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 4px; }
+  .pace-inputs { display: flex; align-items: center; gap: 6px; }
+  .pace-inputs input {
+    width: 54px; padding: 6px 8px; border: 1px solid var(--border-strong);
+    border-radius: 6px; background: var(--bg); color: var(--text-primary);
+    text-align: center; font-size: 16px; font-variant-numeric: tabular-nums;
+  }
+  .pace-inputs span { color: var(--text-muted); font-size: 13px; }
+  input[type="number"] {
+    width: 84px; padding: 6px 8px; border: 1px solid var(--border-strong);
+    border-radius: 6px; background: var(--bg); color: var(--text-primary);
+    font-size: 16px; font-variant-numeric: tabular-nums;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+  fieldset { border: none; }
+  legend { font-size: 11px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .radio-group label {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    text-transform: none; letter-spacing: normal;
+    padding: 4px 10px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: var(--bg); cursor: pointer;
+  }
+  .radio-group input[type="radio"] { display: none; }
+  .radio-group input[type="radio"]:checked + span {
+    font-weight: 600; color: var(--accent);
+  }
+  .radio-group label:has(input:checked) {
+    border-color: var(--accent); background: var(--accent-tint);
+  }
+
+  .output-panel { flex: 1; padding: 20px; }
+
+  .summary-cards {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 16px;
+  }
+  @media (min-width: 768px) {
+    .summary-cards { grid-template-columns: repeat(4, 1fr); }
+  }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .summary-card .zone-label {
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; display: block;
+  }
+  .summary-card .pace-range {
+    font-size: clamp(13px, 3.5vw, 17px); font-weight: 700; display: block; margin-top: 2px;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .zone-cards { display: grid; gap: 10px; }
+  @media (min-width: 900px) {
+    .zone-cards { grid-template-columns: 1fr 1fr; }
+  }
+  .zone-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    border-left: 3px solid var(--zone-color, var(--border));
+    min-width: 0; overflow: hidden;
+  }
+  .zone-card[data-zone="jog"]       { --zone-color: #22c55e; }
+  .zone-card[data-zone="zone2"]     { --zone-color: #06b6d4; }
+  .zone-card[data-zone="tempo"]     { --zone-color: #f59e0b; }
+  .zone-card[data-zone="threshold"] { --zone-color: #ef4444; }
+  .zone-card[data-zone="vo2max"]    { --zone-color: #8b5cf6; }
+
+  .zone-header { display: flex; justify-content: space-between;
+    align-items: baseline; margin-bottom: 6px; }
+  .zone-header h2 { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+  .hr-pct { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  .pace-km  { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .pace-mi  { font-size: 14px; color: var(--text-secondary); margin-top: 1px; font-variant-numeric: tabular-nums; }
+  .zone-meta {
+    display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;
+    font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums;
+  }
+  .zone-meta span { word-break: break-word; min-width: 0; }
+
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-secondary); font-size: 14px;
+  }
+
+  .section-header {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--accent); margin-bottom: 8px; margin-top: 4px;
+  }
+  .section-divider {
+    border: none; border-top: 1px solid var(--border); margin: 14px 0;
+  }
+
+  .input-warning {
+    font-size: 11px; color: #b91c1c; margin-top: 4px; display: none;
+  }
+  .input-warning.visible { display: block; }
+
+  .compare-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-muted);
+    margin-right: 6px; vertical-align: middle;
+  }
+  .pace-target {
+    font-size: 14px; color: var(--text-secondary); margin-top: 3px;
+    display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .delta { font-size: 12px; font-weight: 600; }
+  .delta-faster { color: #16a34a; }
+  .delta-slower { color: #d97706; }
+
+  .tool-content {
+    max-width: 740px; margin: 24px auto; padding: 24px 20px 40px;
+  }
+</style>
+<a href="#zone-cards" class="skip-link">결과로 바로가기</a>
+<div class="tool-heading">
+  <h1>훈련 존 계산기 (VDOT)</h1>
+  <p>최근 5K 또는 10K 기록으로 나만의 5단계 훈련 페이스와 심박수 존을 계산합니다.</p>
+  {% include page-updated.html %}
+</div>
+
+<main>
+  <aside class="input-panel" aria-label="계산기 입력">
+    <form id="calc-form" autocomplete="off" novalidate>
+
+<p class="section-header">현재 체력 기준</p>
+
+<div class="field">
+  <fieldset>
+    <legend>최근 기록 거리</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="cur-dist" value="5k" checked><span>5K</span></label>
+      <label><input type="radio" name="cur-dist" value="10k"><span>10K</span></label>
+    </div>
+  </fieldset>
+</div>
+
+<div class="field">
+  <label>최근 완주 시간</label>
+  <div class="pace-inputs">
+    <input type="number" id="cur-mm" min="0" max="99" value="25" placeholder="25" aria-label="분">
+    <span>:</span>
+    <input type="number" id="cur-ss" min="0" max="59" value="00" placeholder="00" aria-label="초">
+    <span>분:초</span>
+  </div>
+  <div id="cur-warning" class="input-warning">VDOT 30–85 범위를 벗어난 기록입니다</div>
+</div>
+
+<hr class="section-divider">
+<p class="section-header">목표 대회 <span style="font-weight:400;text-transform:none;letter-spacing:0">(선택)</span></p>
+
+<div class="field">
+  <fieldset>
+    <legend>목표 거리</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="tgt-dist" value="5k" checked><span>5K</span></label>
+      <label><input type="radio" name="tgt-dist" value="10k"><span>10K</span></label>
+      <label><input type="radio" name="tgt-dist" value="half"><span>하프</span></label>
+      <label><input type="radio" name="tgt-dist" value="full"><span>풀코스</span></label>
+    </div>
+  </fieldset>
+</div>
+
+<div class="field">
+  <label>목표 완주 시간</label>
+  <div class="pace-inputs" id="tgt-time-inputs">
+    <span id="tgt-hh-wrap" style="display:none;align-items:center;gap:6px">
+      <input type="number" id="tgt-hh" min="0" max="9" placeholder="1" aria-label="시간" style="width:52px">
+      <span>:</span>
+    </span>
+    <input type="number" id="tgt-mm" min="0" max="59" placeholder="22" aria-label="분">
+    <span>:</span>
+    <input type="number" id="tgt-ss" min="0" max="59" placeholder="00" aria-label="초">
+    <span id="tgt-time-label">분:초</span>
+  </div>
+  <div id="tgt-warning" class="input-warning">VDOT 30–85 범위를 벗어난 기록입니다</div>
+</div>
+
+<hr class="section-divider">
+
+<div class="field">
+  <label for="hr-max">최대 심박수 <span style="font-weight:400">(bpm)</span></label>
+  <input type="number" id="hr-max" min="100" max="250" value="185" placeholder="185">
+</div>
+
+<div class="field">
+  <label for="hr-rest">안정시 심박수 <span style="font-weight:400">(bpm)</span></label>
+  <input type="number" id="hr-rest" min="30" max="120" value="50" placeholder="50">
+</div>
+
+<div class="field">
+  <fieldset>
+    <legend>트랙 랩 거리</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="lap-dist" value="100"><span>100m</span></label>
+      <label><input type="radio" name="lap-dist" value="200"><span>200m</span></label>
+      <label><input type="radio" name="lap-dist" value="400" checked><span>400m</span></label>
+      <label><input type="radio" name="lap-dist" value="800"><span>800m</span></label>
+    </div>
+  </fieldset>
+</div>
+
+<div class="field">
+  <fieldset>
+    <legend>표시 단위</legend>
+    <div class="radio-group">
+      <label><input type="radio" name="disp-unit" value="km" checked><span>km</span></label>
+      <label><input type="radio" name="disp-unit" value="mile"><span>mile</span></label>
+      <label><input type="radio" name="disp-unit" value="both"><span>함께 보기</span></label>
+    </div>
+  </fieldset>
+</div>
+
+    </form>
+  </aside>
+
+  <section class="output-panel" aria-label="훈련 존 결과" aria-live="polite">
+
+    <div class="summary-cards">
+      <article class="summary-card" id="sum-zone2">
+        <span class="zone-label">존 2 (기반)</span>
+        <span class="pace-range">–</span>
+      </article>
+      <article class="summary-card" id="sum-tempo">
+        <span class="zone-label">템포 (Tempo)</span>
+        <span class="pace-range">–</span>
+      </article>
+      <article class="summary-card" id="sum-threshold">
+        <span class="zone-label">역치 (Threshold)</span>
+        <span class="pace-range">–</span>
+      </article>
+      <article class="summary-card" id="sum-vo2max">
+        <span class="zone-label">VO2max</span>
+        <span class="pace-range">–</span>
+      </article>
+    </div>
+
+    <div class="zone-cards" id="zone-cards">
+      <div class="empty-state">왼쪽에 최근 기록을 입력하면 훈련 존이 표시됩니다.</div>
+    </div>
+
+    <div class="share-row" id="share-row" style="margin-top:16px" hidden>
+      <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
+  </section>
+</main>
+
+<section class="tool-content">
+  <h2>VDOT 훈련 존 계산 원리</h2>
+  <p>운동생리학자 Jack Daniels의 <em>Daniels' Running Formula</em> 방정식을 바탕으로, 최근 5K 또는 10K 완주 기록을 산소소비량 지표(VDOT)로 환산한 뒤 역치(Threshold) 페이스를 기준으로 5단계 훈련 페이스를 산출합니다.</p>
+  <ul>
+    <li><strong>조깅 / 이지 (Easy)</strong> — 역치 페이스의 1.25–1.35배 (회복, 워밍업)</li>
+    <li><strong>존 2 (Zone 2)</strong> — 역치 페이스의 1.15–1.25배 (유산소 기반 주행)</li>
+    <li><strong>템포 (Tempo)</strong> — 역치 페이스의 1.05–1.10배 (지속주)</li>
+    <li><strong>역치 (Threshold)</strong> — 역치 페이스의 1.00–1.04배 (약 1시간 레이스 강도)</li>
+    <li><strong>VO2max</strong> — 역치 페이스의 0.90–0.95배 (3–5분 고강도 인터벌)</li>
+  </ul>
+  <p>목표 대회 거리와 목표 기록을 함께 입력하면, 현재 체력 기준 페이스와 목표 기준 페이스의 차이(초/km)를 나란히 비교할 수 있습니다.</p>
+</section>
+
+<div class="tool-wrap">
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const KO_ZONE_LABELS = {
+  jog: '조깅 / 이지 (Easy)',
+  zone2: '존 2 (유산소 기반)',
+  tempo: '템포 (Tempo)',
+  threshold: '역치 (Threshold)',
+  vo2max: '최대산소섭취량 (VO2max)'
+}
+
+function readRaceInput(distRadioName, mmId, ssId, hhId, warningId) {
+  const dist = document.querySelector(`input[name="${distRadioName}"]:checked`)?.value
+  const mm = parseInt(document.getElementById(mmId).value, 10)
+  const ss = parseInt(document.getElementById(ssId).value, 10)
+  const warning = document.getElementById(warningId)
+  warning.classList.remove('visible')
+  if (!dist || isNaN(mm) || mm < 0) return null
+  const hh = hhId ? (parseInt(document.getElementById(hhId).value, 10) || 0) : 0
+  const totalSec = hh * 3600 + mm * 60 + (isNaN(ss) ? 0 : ss)
+  if (totalSec <= 0) return null
+  const refPaceSec = raceTimeToThresholdPace(dist, totalSec)
+  if (refPaceSec === null) { warning.classList.add('visible'); return null }
+  return { refPaceSec }
+}
+
+function readInputs() {
+  const hrMax  = parseInt(document.getElementById('hr-max').value, 10)
+  const hrRest = parseInt(document.getElementById('hr-rest').value, 10)
+  const lapDist  = parseInt(document.querySelector('input[name="lap-dist"]:checked').value, 10)
+  const dispUnit = document.querySelector('input[name="disp-unit"]:checked').value
+  return {
+    current: readRaceInput('cur-dist', 'cur-mm', 'cur-ss', null,      'cur-warning'),
+    target:  readRaceInput('tgt-dist', 'tgt-mm', 'tgt-ss', 'tgt-hh', 'tgt-warning'),
+    hrMax:  isNaN(hrMax)  ? null : hrMax,
+    hrRest: isNaN(hrRest) ? null : hrRest,
+    lapDist,
+    dispUnit,
+  }
+}
+
+function renderSummaryCards(zones, dispUnit) {
+  const keys = ['zone2', 'tempo', 'threshold', 'vo2max']
+  keys.forEach(key => {
+    const z = zones.find(z => z.key === key)
+    const el = document.querySelector(`#sum-${key} .pace-range`)
+    if (!z || !el) return
+    const pace = dispUnit === 'mile'
+      ? `${z.paceMi.lo}–${z.paceMi.hi}`
+      : `${z.paceKm.lo}–${z.paceKm.hi}`
+    el.textContent = pace
+  })
+}
+
+function buildTargetRow(currentZone, targetZone, dispUnit) {
+  const paceStr = (dispUnit === 'mile')
+    ? `${targetZone.paceMi.lo} – ${targetZone.paceMi.hi} <span>/mi</span>`
+    : `${targetZone.paceKm.lo} – ${targetZone.paceKm.hi} <span>/km</span>`
+  const deltaStr = formatDelta(currentZone, targetZone)
+  const isFaster = currentZone.paceKmSec.hi > targetZone.paceKmSec.hi
+  const deltaHtml = deltaStr
+    ? `<span class="delta ${isFaster ? 'delta-faster' : 'delta-slower'}">${deltaStr}</span>`
+    : ''
+  return `<div class="pace-target"><span class="compare-label">목표</span>${paceStr}${deltaHtml}</div>`
+}
+
+function renderZoneCards(currentZones, targetZones, lapDist, dispUnit, hasHr) {
+  const container = document.getElementById('zone-cards')
+  const showKm = dispUnit === 'km' || dispUnit === 'both'
+  const showMi = dispUnit === 'mile' || dispUnit === 'both'
+
+  container.innerHTML = currentZones.map((z, i) => {
+    const t = targetZones ? targetZones[i] : null
+    const hasTarget = !!t
+    const curLabel = hasTarget ? `<span class="compare-label">현재</span>` : ''
+    const paceKmHtml = `${z.paceKm.lo} – ${z.paceKm.hi} <span>/km</span>`
+    const paceMiHtml = `${z.paceMi.lo} – ${z.paceMi.hi} <span>/mi</span>`
+    const hrLine    = hasHr ? `<span>${z.hr.low}–${z.hr.high} bpm</span>` : ''
+    const lapLine   = `<span>${lapDist}m&nbsp;${z.lap.fast.display}–${z.lap.slow.display} (${z.lap.fast.totalSec}초–${z.lap.slow.totalSec}초)</span>`
+    const speedLine = `<span>${z.speedKmh.lo}–${z.speedKmh.hi} km/h</span>`
+
+    return `
+      <article class="zone-card" data-zone="${z.key}">
+        <div class="zone-header">
+          <h2>${KO_ZONE_LABELS[z.key] || z.label}</h2>
+          <span class="hr-pct">${z.hrPct[0]}–${z.hrPct[1]}%</span>
+        </div>
+        ${showKm ? `<div class="pace-km">${curLabel}${paceKmHtml}</div>` : ''}
+        ${showMi && !showKm ? `<div class="pace-mi">${curLabel}${paceMiHtml}</div>` : ''}
+        ${showMi && showKm  ? `<div class="pace-mi">${paceMiHtml}</div>` : ''}
+        ${hasTarget ? buildTargetRow(z, t, dispUnit) : ''}
+        <div class="zone-meta">${hrLine}${lapLine}${speedLine}</div>
+      </article>`
+  }).join('')
+}
+
+function render() {
+  const input = readInputs()
+  const container = document.getElementById('zone-cards')
+
+  if (!input.current) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <strong>최근 대회 또는 타임트라이얼 기록을 입력하세요.</strong><br>
+        예: 5K 25:00 입력 시 5단계 훈련 존이 표시됩니다.<br>
+        목표 대회 기록을 함께 입력하면 현재와 목표 페이스를 나란히 비교할 수 있습니다.
+      </div>`
+    ;['zone2','tempo','threshold','vo2max'].forEach(k => {
+      const el = document.querySelector(`#sum-${k} .pace-range`)
+      if (el) el.textContent = '–'
+    })
+    document.getElementById('share-row').hidden = true
+    return
+  }
+
+  const hasHr = input.hrMax !== null && input.hrRest !== null && input.hrMax > input.hrRest
+  const currentZones = calcZones({
+    refPaceSec: input.current.refPaceSec,
+    refType: 'threshold',
+    hrMax: input.hrMax, hrRest: input.hrRest, lapDist: input.lapDist,
+  })
+  const targetZones = input.target ? calcZones({
+    refPaceSec: input.target.refPaceSec,
+    refType: 'threshold',
+    hrMax: input.hrMax, hrRest: input.hrRest, lapDist: input.lapDist,
+  }) : null
+
+  renderSummaryCards(currentZones, input.dispUnit)
+  renderZoneCards(currentZones, targetZones, input.lapDist, input.dispUnit, hasHr)
+  document.getElementById('share-row').hidden = false
+}
+
+function updateTargetHoursToggle(val) {
+  const needsHours = val === 'half' || val === 'full'
+  const wrap  = document.getElementById('tgt-hh-wrap')
+  const label = document.getElementById('tgt-time-label')
+  wrap.style.display  = needsHours ? 'inline-flex' : 'none'
+  if (!needsHours) document.getElementById('tgt-hh').value = ''
+  label.textContent   = needsHours ? '시:분:초' : '분:초'
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const cdist = params.get('cdist')
+  if (cdist === '5k' || cdist === '10k') {
+    const r = document.querySelector(`input[name="cur-dist"][value="${cdist}"]`)
+    if (r) r.checked = true
+  }
+  if (params.has('cmm')) document.getElementById('cur-mm').value = params.get('cmm')
+  if (params.has('css')) document.getElementById('cur-ss').value = params.get('css')
+
+  const tdist = params.get('tdist')
+  if (tdist === '5k' || tdist === '10k' || tdist === 'half' || tdist === 'full') {
+    const r = document.querySelector(`input[name="tgt-dist"][value="${tdist}"]`)
+    if (r) r.checked = true
+    updateTargetHoursToggle(tdist)
+  }
+  if (params.has('thh')) document.getElementById('tgt-hh').value = params.get('thh')
+  if (params.has('tmm')) document.getElementById('tgt-mm').value = params.get('tmm')
+  if (params.has('tss')) document.getElementById('tgt-ss').value = params.get('tss')
+
+  if (params.has('hrmax')) document.getElementById('hr-max').value = params.get('hrmax')
+  if (params.has('hrrest')) document.getElementById('hr-rest').value = params.get('hrrest')
+
+  const lap = params.get('lap')
+  if (lap === '100' || lap === '200' || lap === '400' || lap === '800') {
+    const r = document.querySelector(`input[name="lap-dist"][value="${lap}"]`)
+    if (r) r.checked = true
+  }
+  const unit = params.get('unit')
+  if (unit === 'km' || unit === 'mile' || unit === 'both') {
+    const r = document.querySelector(`input[name="disp-unit"][value="${unit}"]`)
+    if (r) r.checked = true
+  }
+}
+
+document.getElementById('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    cdist: document.querySelector('input[name="cur-dist"]:checked').value,
+    cmm: document.getElementById('cur-mm').value,
+    css: document.getElementById('cur-ss').value,
+    hrmax: document.getElementById('hr-max').value,
+    hrrest: document.getElementById('hr-rest').value,
+    lap: document.querySelector('input[name="lap-dist"]:checked').value,
+    unit: document.querySelector('input[name="disp-unit"]:checked').value,
+  })
+  const tmm = document.getElementById('tgt-mm').value
+  const tss = document.getElementById('tgt-ss').value
+  const thh = document.getElementById('tgt-hh').value
+  if (tmm !== '' || tss !== '' || thh !== '') {
+    params.set('tdist', document.querySelector('input[name="tgt-dist"]:checked').value)
+    if (thh !== '') params.set('thh', thh)
+    if (tmm !== '') params.set('tmm', tmm)
+    if (tss !== '') params.set('tss', tss)
+  }
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  const status = document.getElementById('copy-status')
+  try {
+    await navigator.clipboard.writeText(url)
+    status.textContent = '복사됨!'
+  } catch {
+    status.textContent = url
+  }
+  setTimeout(() => { status.textContent = '' }, 3000)
+})
+
+document.getElementById('calc-form').addEventListener('input', render)
+loadFromUrl()
+render()
+
+document.querySelectorAll('input[name="tgt-dist"]').forEach(radio => {
+  radio.addEventListener('change', () => updateTargetHoursToggle(radio.value))
+})
+</script>
