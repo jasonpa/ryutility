@@ -1,0 +1,28 @@
+---
+layout: default
+lang: ko
+title: 리겔(Riegel) 공식의 한계와 현실적인 마라톤 기록 예측
+description: 5K나 10K 기록으로 풀코스 마라톤을 예측할 때 왜 실제보다 빠르게 나오는지, Riegel과 VDOT을 함께 비교하는 방법을 설명합니다.
+permalink: /ko/guides/riegel-formula-race-prediction/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<main class="guide-page">
+  <p class="guide-meta">2026-11-25 · 기록 예측</p>
+  <h1>리겔(Riegel) 공식의 한계와 현실적인 마라톤 기록 예측</h1>
+  <div class="guide-callout">
+    <p>연결된 계산기</p>
+    <p><a href="{{ '/ko/predict/' | relative_url }}">레이스 기록 예측기</a>에서 Riegel과 VDOT 예측치를 나란히 비교해 보세요.</p>
+  </div>
+
+  <p>Pete Riegel이 1981년 발표한 공식 <em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>은 거리가 두 배 늘 때마다 페이스가 약 6% 느려진다고 가정합니다. 5K 25:00 기록을 넣으면 10K 52:07, 하프 1:55:00, 풀코스 3:59:47이 나옵니다.</p>
+
+  <h2>왜 5K → 마라톤 예측은 종종 너무 빠를까?</h2>
+  <ul>
+    <li><strong>지구력 전제 조건</strong>: 1.06 지수는 목표 거리에 맞는 충분한 주간 누적 거리와 장거리주(LSD)를 소화한 러너를 기준으로 합니다. 주간 30~40km 수준으로 훈련한 러너는 마라톤 후반 30km 이후 글리코겐 고갈과 근피로로 예측치보다 10~20분 이상 늦어질 수 있습니다.</li>
+    <li><strong>인접 거리일수록 정확함</strong>: 5K → 10K, 10K → 하프처럼 거리 차이가 2배 이내일 때는 오차가 보통 1~2% 내외로 매우 정확합니다.</li>
+  </ul>
+
+  <h2>Riegel과 VDOT을 함께 보는 법</h2>
+  <p><a href="{{ '/ko/predict/' | relative_url }}">레이스 기록 예측기</a>에서는 Riegel과 Daniels VDOT 예측치를 동시에 보여줍니다. 두 모델 중 <strong>더 보수적인(느린) 기록</strong>을 현실적인 목표 상한선으로 잡고, <a href="{{ '/ko/brief/' | relative_url }}">훈련 브리프</a>에서 현재 VDOT 대비 목표 VDOT 상승폭을 점검한 뒤 스플릿 계획을 세우는 것을 권장합니다.</p>
+</main>

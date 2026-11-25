@@ -40,9 +40,10 @@ last_modified_at: 2026-11-25
   </form>
 
   <section aria-live="polite">
+    <p id="vdot-summary" class="tool-content" style="margin:0 0 8px;padding:0;font-size:13px;color:var(--text-secondary)" hidden></p>
     <table class="result-table" id="predict-table" hidden>
       <thead>
-        <tr><th>거리</th><th>예상 기록</th><th>페이스 /km</th><th>페이스 /mi</th></tr>
+        <tr><th>거리</th><th>Riegel</th><th>VDOT</th><th>페이스 /km</th><th>스플릿</th></tr>
       </thead>
       <tbody id="predict-body"></tbody>
     </table>
@@ -50,13 +51,17 @@ last_modified_at: 2026-11-25
       <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
       <span id="copy-status" class="share-status" aria-live="polite"></span>
     </div>
+    <details class="embed-box">
+      <summary>블로그·웹사이트에 임베드하기</summary>
+      <textarea class="embed-code" rows="2" readonly onclick="this.select()">&lt;iframe src="https://ryutility.com/ko/predict/?embed=1" width="100%" height="520" style="border:1px solid #e5e7eb;border-radius:10px" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
+    </details>
     <p class="tool-content" id="empty-msg" style="color:var(--text-secondary);font-size:13px">예상 기록을 보려면 위에서 최근 완주 시간을 입력하세요.</p>
   </section>
 
   <section class="tool-content">
-    <h2>예측 공식 (Riegel Formula)</h2>
-    <p>이 계산기는 1981년 엔지니어 Pete Riegel이 발표한 공식 <em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>을 사용합니다. 지수 1.06은 거리가 2배로 늘어날 때 단순 비례보다 약 6%가량 페이스가 느려지는 피로도를 반영합니다.</p>
-    <p>예를 들어 5K를 25:00(5:00/km)에 달렸다면 10K는 50:00이 아니라 약 <strong>52:07(5:13/km)</strong>, 하프는 <strong>1:55:00(5:27/km)</strong>으로 예측됩니다.</p>
+    <h2>예측 공식: Riegel vs VDOT</h2>
+    <p>이 계산기는 1981년 엔지니어 Pete Riegel의 공식(<em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>)과 Jack Daniels의 <strong>VDOT</strong> 산소소비량 곡선을 나란히 비교합니다. Riegel은 거리가 2배 늘 때마다 약 6% 감속하는 고정 지수를 쓰고, VDOT은 유산소 능력(VO2)을 기준으로 거리별 등가 기록을 역산합니다.</p>
+    <p>예를 들어 5K 25:00(5:00/km) 기준 Riegel은 10K <strong>52:07</strong>, 하프 <strong>1:55:00</strong>을 제시하며, VDOT 곡선과 비교해 어느 쪽이 더 보수적인지 바로 확인할 수 있습니다.</p>
 
     <h2>한계 및 주의사항</h2>
     <ul>
@@ -83,19 +88,40 @@ function render() {
   const table = $('predict-table')
   const empty = $('empty-msg')
 
-  if (t1 <= 0) { table.hidden = true; $('share-row').hidden = true; empty.hidden = false; return }
+  if (t1 <= 0) {
+    table.hidden = true
+    $('vdot-summary').hidden = true
+    $('share-row').hidden = true
+    empty.hidden = false
+    return
+  }
 
   const d1 = DIST_KM[distKey]
+  const vdot = calcVDOT(d1 * 1000, t1)
+  const validVdot = Number.isFinite(vdot) && vdot >= 30 && vdot <= 85
+  const summaryEl = $('vdot-summary')
+  summaryEl.textContent = validVdot
+    ? `추정 VDOT: ${vdot.toFixed(1)} · Riegel(1.06) 및 Daniels VDOT 병렬 비교`
+    : 'VDOT 비교는 VDOT 30~85 범위의 기록에서 제공됩니다.'
+  summaryEl.hidden = false
+
   $('predict-body').innerHTML = Object.keys(DIST_KM).map(key => {
     const d2 = DIST_KM[key]
-    const t2 = riegelPredict(t1, d1, d2)
-    const pace = t2 / d2
+    const tRiegel = riegelPredict(t1, d1, d2)
+    const tVdot = vdotPredict(t1, d1, d2)
+    const pace = tRiegel / d2
     const isInput = key === distKey
+    const refSec = Math.round(tVdot ? Math.max(tRiegel, tVdot) : tRiegel)
+    const sh = Math.floor(refSec / 3600)
+    const sm = Math.floor((refSec % 3600) / 60)
+    const ss = refSec % 60
+    const splitHref = `{{ '/ko/splits/' | relative_url }}?dist=${key}&hh=${sh}&mm=${sm}&ss=${ss}`
     return `<tr${isInput ? ' style="font-weight:700"' : ''}>
-      <td>${LABELS[key]}${isInput ? ' (입력 기록)' : ''}</td>
-      <td>${secToHms(t2)}</td>
-      <td>${secToPace(pace)}</td>
-      <td>${secToPace(kmToMile(pace))}</td>
+      <td>${LABELS[key]}${isInput ? ' (입력)' : ''}</td>
+      <td>${secToHms(tRiegel)}</td>
+      <td>${tVdot ? secToHms(tVdot) : '–'}</td>
+      <td>${secToPace(pace)} <span style="color:var(--text-secondary);font-weight:400;font-size:11px">(${secToPace(kmToMile(pace))}/mi)</span></td>
+      <td><a href="${splitHref}">스플릿 →</a></td>
     </tr>`
   }).join('')
   table.hidden = false

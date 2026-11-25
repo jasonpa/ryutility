@@ -179,6 +179,8 @@ last_modified_at: 2026-11-25
     <div class="radio-group">
       <label><input type="radio" name="cur-dist" value="5k" checked><span>5K</span></label>
       <label><input type="radio" name="cur-dist" value="10k"><span>10K</span></label>
+      <label><input type="radio" name="cur-dist" value="half"><span>하프</span></label>
+      <label><input type="radio" name="cur-dist" value="full"><span>풀코스</span></label>
     </div>
   </fieldset>
 </div>
@@ -186,10 +188,14 @@ last_modified_at: 2026-11-25
 <div class="field">
   <label>최근 완주 시간</label>
   <div class="pace-inputs">
-    <input type="number" id="cur-mm" min="0" max="99" value="25" placeholder="25" aria-label="분">
+    <span id="cur-hh-wrap" style="display:none;align-items:center;gap:6px">
+      <input type="number" id="cur-hh" min="0" max="9" placeholder="1" aria-label="시간" style="width:52px">
+      <span>:</span>
+    </span>
+    <input type="number" id="cur-mm" min="0" max="59" value="25" placeholder="25" aria-label="분">
     <span>:</span>
     <input type="number" id="cur-ss" min="0" max="59" value="00" placeholder="00" aria-label="초">
-    <span>분:초</span>
+    <span id="cur-time-label">분:초</span>
   </div>
   <div id="cur-warning" class="input-warning">VDOT 30–85 범위를 벗어난 기록입니다</div>
 </div>
@@ -263,6 +269,7 @@ last_modified_at: 2026-11-25
   </aside>
 
   <section class="output-panel" aria-label="훈련 존 결과" aria-live="polite">
+    <div id="vdot-banner" class="summary-card" style="margin-bottom:12px;display:none"></div>
 
     <div class="summary-cards">
       <article class="summary-card" id="sum-zone2">
@@ -291,6 +298,10 @@ last_modified_at: 2026-11-25
       <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
       <span id="copy-status" class="share-status" aria-live="polite"></span>
     </div>
+    <details class="embed-box">
+      <summary>블로그·웹사이트에 임베드하기</summary>
+      <textarea class="embed-code" rows="2" readonly onclick="this.select()">&lt;iframe src="https://ryutility.com/ko/run/?embed=1" width="100%" height="640" style="border:1px solid #e5e7eb;border-radius:10px" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
+    </details>
   </section>
 </main>
 
@@ -333,7 +344,8 @@ function readRaceInput(distRadioName, mmId, ssId, hhId, warningId) {
   if (totalSec <= 0) return null
   const refPaceSec = raceTimeToThresholdPace(dist, totalSec)
   if (refPaceSec === null) { warning.classList.add('visible'); return null }
-  return { refPaceSec }
+  const vdot = calcVDOT(DIST_KM[dist] * 1000, totalSec)
+  return { refPaceSec, vdot }
 }
 
 function readInputs() {
@@ -342,7 +354,7 @@ function readInputs() {
   const lapDist  = parseInt(document.querySelector('input[name="lap-dist"]:checked').value, 10)
   const dispUnit = document.querySelector('input[name="disp-unit"]:checked').value
   return {
-    current: readRaceInput('cur-dist', 'cur-mm', 'cur-ss', null,      'cur-warning'),
+    current: readRaceInput('cur-dist', 'cur-mm', 'cur-ss', 'cur-hh', 'cur-warning'),
     target:  readRaceInput('tgt-dist', 'tgt-mm', 'tgt-ss', 'tgt-hh', 'tgt-warning'),
     hrMax:  isNaN(hrMax)  ? null : hrMax,
     hrRest: isNaN(hrRest) ? null : hrRest,
@@ -406,11 +418,32 @@ function renderZoneCards(currentZones, targetZones, lapDist, dispUnit, hasHr) {
   }).join('')
 }
 
+const GAP_HINTS = {
+  maintain: '현재 VDOT과 같거나 낮은 목표입니다. 페이스 분배와 레이스 운영 완성도에 집중하세요.',
+  realistic: '단기 적정 목표(+0~2 VDOT)입니다. 6~10주 훈련 블록으로 충분히 도달 가능한 범위입니다.',
+  ambitious: '도전적인 목표(+2~4 VDOT)입니다. 최소 10~16주의 체계적인 빌드업 기간을 잡는 것을 권장합니다.',
+  stretch: '큰 폭의 도약(>4 VDOT)입니다. 먼저 현재 존 기준으로 훈련한 뒤 중간 점검 대회를 거치는 것이 안전합니다.',
+}
+
+function renderVdotBanner(current, target) {
+  const banner = document.getElementById('vdot-banner')
+  if (!current) { banner.style.display = 'none'; return }
+  let html = `<strong>현재 VDOT: ${current.vdot.toFixed(1)}</strong>`
+  if (target) {
+    const gap = assessVdotGap(current.vdot, target.vdot)
+    const sign = gap.delta > 0 ? '+' : ''
+    html += ` &rarr; <strong>목표 VDOT: ${target.vdot.toFixed(1)}</strong> <span class="delta ${gap.delta > 0 ? 'delta-faster' : 'delta-slower'}">(${sign}${gap.delta.toFixed(1)})</span><div style="font-size:12px;color:var(--text-secondary);margin-top:4px">${GAP_HINTS[gap.level]}</div>`
+  }
+  banner.innerHTML = html
+  banner.style.display = 'block'
+}
+
 function render() {
   const input = readInputs()
   const container = document.getElementById('zone-cards')
 
   if (!input.current) {
+    renderVdotBanner(null, null)
     container.innerHTML = `
       <div class="empty-state">
         <strong>최근 대회 또는 타임트라이얼 기록을 입력하세요.</strong><br>
@@ -437,27 +470,30 @@ function render() {
     hrMax: input.hrMax, hrRest: input.hrRest, lapDist: input.lapDist,
   }) : null
 
+  renderVdotBanner(input.current, input.target)
   renderSummaryCards(currentZones, input.dispUnit)
   renderZoneCards(currentZones, targetZones, input.lapDist, input.dispUnit, hasHr)
   document.getElementById('share-row').hidden = false
 }
 
-function updateTargetHoursToggle(val) {
+function updateHoursToggle(prefix, val) {
   const needsHours = val === 'half' || val === 'full'
-  const wrap  = document.getElementById('tgt-hh-wrap')
-  const label = document.getElementById('tgt-time-label')
+  const wrap  = document.getElementById(`${prefix}-hh-wrap`)
+  const label = document.getElementById(`${prefix}-time-label`)
   wrap.style.display  = needsHours ? 'inline-flex' : 'none'
-  if (!needsHours) document.getElementById('tgt-hh').value = ''
+  if (!needsHours) document.getElementById(`${prefix}-hh`).value = ''
   label.textContent   = needsHours ? '시:분:초' : '분:초'
 }
 
 function loadFromUrl() {
   const params = new URLSearchParams(window.location.search)
   const cdist = params.get('cdist')
-  if (cdist === '5k' || cdist === '10k') {
+  if (cdist === '5k' || cdist === '10k' || cdist === 'half' || cdist === 'full') {
     const r = document.querySelector(`input[name="cur-dist"][value="${cdist}"]`)
     if (r) r.checked = true
+    updateHoursToggle('cur', cdist)
   }
+  if (params.has('chh')) document.getElementById('cur-hh').value = params.get('chh')
   if (params.has('cmm')) document.getElementById('cur-mm').value = params.get('cmm')
   if (params.has('css')) document.getElementById('cur-ss').value = params.get('css')
 
@@ -465,7 +501,7 @@ function loadFromUrl() {
   if (tdist === '5k' || tdist === '10k' || tdist === 'half' || tdist === 'full') {
     const r = document.querySelector(`input[name="tgt-dist"][value="${tdist}"]`)
     if (r) r.checked = true
-    updateTargetHoursToggle(tdist)
+    updateHoursToggle('tgt', tdist)
   }
   if (params.has('thh')) document.getElementById('tgt-hh').value = params.get('thh')
   if (params.has('tmm')) document.getElementById('tgt-mm').value = params.get('tmm')
@@ -496,6 +532,8 @@ document.getElementById('copy-link').addEventListener('click', async () => {
     lap: document.querySelector('input[name="lap-dist"]:checked').value,
     unit: document.querySelector('input[name="disp-unit"]:checked').value,
   })
+  const chh = document.getElementById('cur-hh').value
+  if (chh !== '') params.set('chh', chh)
   const tmm = document.getElementById('tgt-mm').value
   const tss = document.getElementById('tgt-ss').value
   const thh = document.getElementById('tgt-hh').value
@@ -520,7 +558,10 @@ document.getElementById('calc-form').addEventListener('input', render)
 loadFromUrl()
 render()
 
+document.querySelectorAll('input[name="cur-dist"]').forEach(radio => {
+  radio.addEventListener('change', () => updateHoursToggle('cur', radio.value))
+})
 document.querySelectorAll('input[name="tgt-dist"]').forEach(radio => {
-  radio.addEventListener('change', () => updateTargetHoursToggle(radio.value))
+  radio.addEventListener('change', () => updateHoursToggle('tgt', radio.value))
 })
 </script>

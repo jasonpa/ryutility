@@ -39,9 +39,10 @@ last_modified_at: 2026-10-28
   </form>
 
   <section aria-live="polite">
+    <p id="vdot-summary" class="tool-content" style="margin:0 0 8px;padding:0;font-size:13px;color:var(--text-secondary)" hidden></p>
     <table class="result-table" id="predict-table" hidden>
       <thead>
-        <tr><th>Distance</th><th>Predicted time</th><th>Pace /km</th><th>Pace /mi</th></tr>
+        <tr><th>Distance</th><th>Riegel</th><th>VDOT</th><th>Pace /km</th><th>Plan</th></tr>
       </thead>
       <tbody id="predict-body"></tbody>
     </table>
@@ -49,15 +50,19 @@ last_modified_at: 2026-10-28
       <button type="button" id="copy-link" class="share-btn">Copy share link</button>
       <span id="copy-status" class="share-status" aria-live="polite"></span>
     </div>
+    <details class="embed-box">
+      <summary>Embed this calculator</summary>
+      <textarea class="embed-code" rows="2" readonly onclick="this.select()">&lt;iframe src="https://ryutility.com/predict/?embed=1" width="100%" height="520" style="border:1px solid #e5e7eb;border-radius:10px" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
+    </details>
     <p class="tool-content" id="empty-msg" style="color:var(--text-secondary);font-size:13px">Enter a recent finish time above to see predictions.</p>
   </section>
 
   <section class="tool-content">
     <h2>How race time prediction works</h2>
-    <p>This predictor uses the Riegel formula, published by engineer Pete Riegel in 1981 and still the most widely used race prediction model: <em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>. The exponent 1.06 captures how much runners slow down as the distance grows — roughly 6% more time per doubling of distance beyond simple proportionality. It has held up remarkably well across four decades of race data for distances from 1500 m to the marathon.</p>
+    <p>This predictor shows two established models side by side: Pete Riegel's 1981 power-law formula (<em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>) and Jack Daniels' <strong>VDOT</strong> oxygen-cost curve. Comparing both helps you spot where distance scaling and aerobic physiology agree — and where one is more conservative.</p>
 
     <h2>Formula and sources</h2>
-    <p>The page implements that equation and no other adjustment for age, sex, or mileage. Distances are the standard road lengths: 5 km, 10 km, 21.0975 km, and 42.195 km. The source is Pete Riegel, "Athletic Records and Human Endurance," <em>American Scientist</em> 69 (1981). The same exponent is used for every distance pair, including a 5K-to-marathon jump — the formula does not steepen itself when the gap gets large.</p>
+    <p>Riegel's exponent 1.06 adds roughly 6% more time per doubling of distance beyond simple proportionality (<em>American Scientist</em> 69, 1981). VDOT converts your race into an estimated VO2 value (<em>Daniels' Running Formula</em>, valid for VDOT 30–85) and solves for the equivalent finish time at each distance. Distances are standard road lengths: 5 km, 10 km, 21.0975 km, and 42.195 km.</p>
 
     <h2>A worked example</h2>
     <p>A 25:00 5K is 1,500 seconds. The function on this page returns:</p>
@@ -132,19 +137,40 @@ function render() {
   const table = $('predict-table')
   const empty = $('empty-msg')
 
-  if (t1 <= 0) { table.hidden = true; $('share-row').hidden = true; empty.hidden = false; return }
+  if (t1 <= 0) {
+    table.hidden = true
+    $('vdot-summary').hidden = true
+    $('share-row').hidden = true
+    empty.hidden = false
+    return
+  }
 
   const d1 = DIST_KM[distKey]
+  const vdot = calcVDOT(d1 * 1000, t1)
+  const validVdot = Number.isFinite(vdot) && vdot >= 30 && vdot <= 85
+  const summaryEl = $('vdot-summary')
+  summaryEl.textContent = validVdot
+    ? `Estimated VDOT: ${vdot.toFixed(1)} · Comparing Riegel (1.06) and Daniels VDOT`
+    : 'VDOT comparison is available for performances between VDOT 30 and 85.'
+  summaryEl.hidden = false
+
   $('predict-body').innerHTML = Object.keys(DIST_KM).map(key => {
     const d2 = DIST_KM[key]
-    const t2 = riegelPredict(t1, d1, d2)
-    const pace = t2 / d2
+    const tRiegel = riegelPredict(t1, d1, d2)
+    const tVdot = vdotPredict(t1, d1, d2)
+    const pace = tRiegel / d2
     const isInput = key === distKey
+    const refSec = Math.round(tVdot ? Math.max(tRiegel, tVdot) : tRiegel)
+    const sh = Math.floor(refSec / 3600)
+    const sm = Math.floor((refSec % 3600) / 60)
+    const ss = refSec % 60
+    const splitHref = `{{ '/splits/' | relative_url }}?dist=${key}&hh=${sh}&mm=${sm}&ss=${ss}`
     return `<tr${isInput ? ' style="font-weight:700"' : ''}>
-      <td>${LABELS[key]}${isInput ? ' (your result)' : ''}</td>
-      <td>${secToHms(t2)}</td>
-      <td>${secToPace(pace)}</td>
-      <td>${secToPace(kmToMile(pace))}</td>
+      <td>${LABELS[key]}${isInput ? ' (input)' : ''}</td>
+      <td>${secToHms(tRiegel)}</td>
+      <td>${tVdot ? secToHms(tVdot) : '–'}</td>
+      <td>${secToPace(pace)} <span style="color:var(--text-secondary);font-weight:400;font-size:11px">(${secToPace(kmToMile(pace))}/mi)</span></td>
+      <td><a href="${splitHref}">Splits →</a></td>
     </tr>`
   }).join('')
   table.hidden = false

@@ -385,3 +385,39 @@ main p.page-updated {
 .home-method h2 {
   font-family: var(--font-serif); font-size: 18px; font-weight: 600; margin-bottom: 10px;
 }
+
+/* === EMBED MODE === */
+body.embed-mode header,
+body.embed-mode .site-footer,
+body.embed-mode #cookie-banner,
+body.embed-mode .tool-content,
+body.embed-mode .related-tools,
+body.embed-mode .embed-box {
+  display: none !important;
+}
+body.embed-mode .tool-wrap { margin: 12px auto 16px; }
+.embed-credit {
+  text-align: center; font-size: 11.5px; color: var(--text-muted);
+  padding: 6px 0 14px;
+}
+.embed-credit a { color: var(--accent); text-decoration: none; }
+.embed-box {
+  margin-top: 12px; font-size: 12.5px; color: var(--text-secondary);
+}
+.embed-box summary { cursor: pointer; font-weight: 600; color: var(--text-primary); }
+.embed-code {
+  width: 100%; margin-top: 8px; padding: 8px; font-family: monospace; font-size: 11.5px;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-primary);
+}
+
+/* === PRINT OPTIMIZATION === */
+@media print {
+  header, .site-footer, #cookie-banner,
+  .input-panel, .tool-form, .share-row, .brief-actions,
+  .embed-box, .tool-content, .related-tools, .skip-link {
+    display: none !important;
+  }
+  body { background: #fff !important; color: #000 !important; }
+  .tool-wrap, main { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  .brief-card, .zone-card, .summary-card { break-inside: avoid; }
+}

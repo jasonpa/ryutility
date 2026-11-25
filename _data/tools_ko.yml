@@ -1,3 +1,8 @@
+- name: 러닝 훈련 브리프
+  url: /ko/brief/
+  badge: 통합
+  short: 훈련 존 · 기록 예측 · 스플릿 한 번에 보기
+  description: 최근 대회 기록 하나만 입력하면 VDOT 훈련 존, Riegel·VDOT 예상 기록, 목표 스플릿을 한 화면에 정리합니다.
 - name: 훈련 존 계산기 (VDOT)
   url: /ko/run/
   badge: 러닝

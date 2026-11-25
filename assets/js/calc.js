@@ -104,6 +104,35 @@ function raceTimeToThresholdPace(distKey, totalSec) {
   return thresholdPaceFromVDOT(vdot)
 }
 
+function timeFromVDOT(vdot, distKm) {
+  const distM = distKm * 1000
+  let lo = 60
+  let hi = 43200
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2
+    if (calcVDOT(distM, mid) > vdot) lo = mid
+    else hi = mid
+  }
+  return (lo + hi) / 2
+}
+
+function vdotPredict(t1Sec, d1Km, d2Km) {
+  if (t1Sec <= 0 || d1Km <= 0 || d2Km <= 0) return null
+  if (Math.abs(d1Km - d2Km) < 1e-9) return t1Sec
+  const vdot = calcVDOT(d1Km * 1000, t1Sec)
+  if (!Number.isFinite(vdot) || vdot < 30 || vdot > 85) return null
+  return timeFromVDOT(vdot, d2Km)
+}
+
+function assessVdotGap(currentVdot, targetVdot) {
+  const delta = Math.round((targetVdot - currentVdot) * 10) / 10
+  let level = 'maintain'
+  if (delta > 4) level = 'stretch'
+  else if (delta > 2) level = 'ambitious'
+  else if (delta > 0) level = 'realistic'
+  return { delta, level }
+}
+
 function formatDelta(currentZone, targetZone) {
   const delta = Math.round(currentZone.paceKmSec.hi - targetZone.paceKmSec.hi)
   if (Math.abs(delta) < 1) return ''
@@ -274,6 +303,7 @@ if (typeof module !== 'undefined' && module.exports) {
     paceToSec, secToPace, kmToMile, lapSplit, toKmh, toMph,
     MULTIPLIERS, HR_PCTS, ZONE_LABELS, DIST_KM,
     calcKarvonen, calcVDOT, thresholdPaceFromVDOT, raceTimeToThresholdPace,
+    timeFromVDOT, vdotPredict, assessVdotGap,
     formatDelta, calcZones,
     paceFromTimeDistance, timeFromPaceDistance, distanceFromTimePace, secToHms,
     riegelPredict, estimateMaxHr, hrZones, splitPlan,
