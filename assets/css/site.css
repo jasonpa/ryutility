@@ -101,14 +101,6 @@ input:focus-visible, select:focus-visible {
 main p.page-updated {
   font-size: 12px; color: var(--text-secondary); margin: 0 0 14px;
 }
-.owner-todo {
-  background: color-mix(in srgb, #f59e0b 14%, var(--surface));
-  border: 1px solid #f59e0b; border-radius: 8px;
-  padding: 12px 14px; margin: 0 0 16px;
-}
-.content-page .owner-todo p {
-  color: var(--text-primary); margin-bottom: 0; font-size: 13px; line-height: 1.6;
-}
 
 /* === SHARED TOOL PAGE STYLES === */
 .tool-wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
@@ -188,6 +180,14 @@ main p.page-updated {
   text-transform: uppercase; letter-spacing: 0.5px;
 }
 
+.share-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.share-btn {
+  font-size: 12px; padding: 6px 12px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--surface); color: var(--text-primary); cursor: pointer;
+}
+.share-btn:hover { border-color: var(--accent); }
+.share-status { font-size: 12px; color: var(--text-secondary); }
+
 .tool-content { margin-top: 24px; }
 .tool-content h2 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; }
 .tool-content p, .tool-content li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
@@ -232,6 +232,25 @@ main p.page-updated {
 }
 .guide-callout p { margin-bottom: 0; color: var(--text-primary); font-size: 13px; }
 .guide-callout p:first-child { font-weight: 700; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); }
+
+.guide-author-bio {
+  margin: 32px 0 24px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.guide-author-bio h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+.guide-author-bio p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 0;
+}
 
 .guide-hub { max-width: 720px; margin: 40px auto; padding: 0 16px 60px; }
 .guide-hub h1 { font-size: 22px; margin-bottom: 6px; }

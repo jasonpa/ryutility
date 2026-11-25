@@ -9,7 +9,7 @@ last_modified_at: 2026-10-28
 <style>
   @media print {
     header, footer, .tool-form, .tool-content, .related-tools,
-    .cookie-banner, #print-btn, .page-updated { display: none !important; }
+    .cookie-banner, #print-btn, .share-row, .page-updated { display: none !important; }
     .tool-wrap { padding: 0; }
   }
 </style>
@@ -25,8 +25,8 @@ last_modified_at: 2026-10-28
       <fieldset>
         <legend>Race distance</legend>
         <div class="radio-group">
-          <label><input type="radio" name="race-dist" value="5k" checked><span>5K</span></label>
-          <label><input type="radio" name="race-dist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="race-dist" value="5k"><span>5K</span></label>
+          <label><input type="radio" name="race-dist" value="10k" checked><span>10K</span></label>
           <label><input type="radio" name="race-dist" value="half"><span>Half</span></label>
           <label><input type="radio" name="race-dist" value="full"><span>Marathon</span></label>
         </div>
@@ -35,11 +35,11 @@ last_modified_at: 2026-10-28
     <div class="field">
       <label>Goal time</label>
       <div class="time-inputs">
-        <input type="number" id="time-hh" min="0" max="9" placeholder="0" aria-label="Hours">
+        <input type="number" id="time-hh" min="0" max="9" value="0" placeholder="0" aria-label="Hours">
         <span>:</span>
-        <input type="number" id="time-mm" min="0" max="59" placeholder="50" aria-label="Minutes">
+        <input type="number" id="time-mm" min="0" max="59" value="50" placeholder="50" aria-label="Minutes">
         <span>:</span>
-        <input type="number" id="time-ss" min="0" max="59" placeholder="00" aria-label="Seconds">
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="Seconds">
         <span>h:mm:ss</span>
       </div>
     </div>
@@ -69,6 +69,10 @@ last_modified_at: 2026-10-28
       <tbody id="splits-body"></tbody>
     </table>
     <button type="button" id="print-btn" class="tool-form" style="cursor:pointer;padding:8px 16px;font-size:13px" hidden>Print pace table</button>
+    <div class="share-row" id="share-row" hidden>
+      <button type="button" id="copy-link" class="share-btn">Copy share link</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
     <p id="empty-msg" style="color:var(--text-secondary);font-size:13px">Enter a goal time above to build your split table.</p>
   </section>
 
@@ -154,7 +158,7 @@ function render() {
   const empty = $('empty-msg')
   const printBtn = $('print-btn')
 
-  if (total <= 0) { table.hidden = true; printBtn.hidden = true; empty.hidden = false; return }
+  if (total <= 0) { table.hidden = true; printBtn.hidden = true; $('share-row').hidden = true; empty.hidden = false; return }
 
   const isMile = splitKm > 1.6 && splitKm < 1.62
   const plan = splitPlan(total, DIST_KM[distKey], splitKm, strategy)
@@ -166,11 +170,51 @@ function render() {
   }).join('')
   table.hidden = false
   printBtn.hidden = false
+  $('share-row').hidden = false
   empty.hidden = true
 }
 
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const dist = params.get('dist')
+  if (dist && DIST_KM[dist]) {
+    const radio = document.querySelector(`input[name="race-dist"][value="${dist}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('hh')) $('time-hh').value = params.get('hh')
+  if (params.has('mm')) $('time-mm').value = params.get('mm')
+  if (params.has('ss')) $('time-ss').value = params.get('ss')
+  const split = params.get('split')
+  if (split === '1' || split === '1.60934' || split === '5') $('split-unit').value = split
+  const strategy = params.get('strategy')
+  if (strategy === '0' || strategy === '3' || strategy === '6') {
+    const radio = document.querySelector(`input[name="strategy"][value="${strategy}"]`)
+    if (radio) radio.checked = true
+  }
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    dist: document.querySelector('input[name="race-dist"]:checked').value,
+    hh: $('time-hh').value,
+    mm: $('time-mm').value,
+    ss: $('time-ss').value,
+    split: $('split-unit').value,
+    strategy: document.querySelector('input[name="strategy"]:checked').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = 'Copied!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
 $('print-btn').addEventListener('click', () => window.print())
 $('calc-form').addEventListener('input', render)
+loadFromUrl()
 render()
 </script>
 

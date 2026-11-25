@@ -7,7 +7,7 @@ related_tools:
   - /run/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) Vancouver winters push a lot of my running indoors for a few months a year, and the first time I tried to hold "outdoor effort" on a flat treadmill belt, my heart rate ran noticeably lower than a real run at the same pace — before I understood why, and before I started using the 1% rule properly.
+Vancouver winters push a lot of my running indoors for a few months a year, and the first time I tried to hold "outdoor effort" on a flat treadmill belt, my heart rate ran noticeably lower than a real run at the same pace — before I understood why, and before I started using the 1% rule properly.
 
 The "set the treadmill to 1% incline to simulate outdoor running" advice is genuinely grounded in exercise physiology, not just gym folklore — but it's a rule with a fairly narrow range where it's actually accurate, and knowing the underlying math tells you exactly where that range ends.
 
@@ -44,5 +44,3 @@ Push the incline higher — say 6% at the same 10 km/h — and the gap grows fas
 ## Using it in practice
 
 Set your treadmill to 1% for any session where you're trying to match outdoor training paces — an easy run, a tempo, or a time trial you want to compare against a road result. For anything steeper — hill repeats, incline-based strength work — don't try to read the display pace as your real training pace; use the [Treadmill Pace Converter](/treadmill/) to get the actual flat-ground-equivalent pace for whatever incline you're running, then cross-check that number against your real training zones with the [Training Zone Calculator](/run/).
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

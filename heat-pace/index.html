@@ -1,0 +1,302 @@
+---
+layout: default
+title: Heat & Humidity Pace Calculator — Running Pace Adjustment
+description: Adjust your running pace for heat and humidity using air temperature, relative humidity, and dew point. Free calculator with °C/°F toggle and slowdown chart.
+permalink: /heat-pace/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>Heat &amp; Humidity Pace Calculator</h1>
+    <p>Adjust your target running pace for air temperature, relative humidity, and dew point.</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <label>Base pace (cool conditions)</label>
+      <div class="time-inputs">
+        <input type="number" id="pace-mm" min="0" max="59" value="5" aria-label="Pace minutes">
+        <span>:</span>
+        <input type="number" id="pace-ss" min="0" max="59" value="00" aria-label="Pace seconds">
+        <select id="pace-unit" aria-label="Pace unit">
+          <option value="km" selected>per km</option>
+          <option value="mi">per mile</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="temp">Air temperature</label>
+      <div class="time-inputs">
+        <input type="number" id="temp" step="0.5" value="24" style="width:80px" aria-label="Air temperature">
+        <span class="radio-group">
+          <label><input type="radio" name="temp-unit" value="c" checked><span>°C</span></label>
+          <label><input type="radio" name="temp-unit" value="f"><span>°F</span></label>
+        </span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="humidity">Relative humidity (%)</label>
+      <div class="time-inputs">
+        <input type="number" id="humidity" min="0" max="100" step="1" value="70" style="width:80px" aria-label="Relative humidity percent">
+        <span>%</span>
+      </div>
+    </div>
+
+    <div class="field" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button type="button" id="copy-link" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text-primary);cursor:pointer">Copy share link</button>
+      <span id="copy-status" style="font-size:12px;color:var(--text-secondary)" aria-live="polite"></span>
+    </div>
+  </form>
+
+  <section id="results" class="result-cards" aria-live="polite">
+    <div class="result-card"><span class="label">Adjusted pace / km</span><span class="value" id="out-pace-km">–</span><span class="sub" id="out-delta-km"></span></div>
+    <div class="result-card"><span class="label">Adjusted pace / mile</span><span class="value" id="out-pace-mi">–</span><span class="sub" id="out-delta-mi"></span></div>
+    <div class="result-card"><span class="label">Expected slowdown</span><span class="value" id="out-slowdown">–</span><span class="sub" id="out-combined"></span></div>
+    <div class="result-card"><span class="label">Dew point</span><span class="value" id="out-dewpoint">–</span><span class="sub" id="out-comfort"></span></div>
+  </section>
+
+  <section aria-live="polite">
+    <h2 style="font-size:14px;font-weight:700;margin:8px 0">Slowdown thresholds at your base pace</h2>
+    <table class="result-table">
+      <thead><tr><th>Temp + Dew Point (°F)</th><th>Slowdown</th><th>Adjusted /km</th><th>Adjusted /mi</th></tr></thead>
+      <tbody id="threshold-body"></tbody>
+    </table>
+  </section>
+
+  <section class="tool-content">
+    <h2>How heat and humidity pace adjustment works</h2>
+    <p>Air temperature alone underestimates how hard summer running feels. Your body cools itself primarily by evaporating sweat, and when the air already holds a lot of moisture, evaporation slows down. <strong>Dew point</strong> captures that moisture load directly in a temperature-like number: a 24°C (75°F) morning feels manageable at a 10°C (50°F) dew point, yet noticeably oppressive at a 20°C (68°F) dew point.</p>
+    <p>This calculator converts your air temperature and relative humidity into a dew point, sums temperature and dew point in degrees Fahrenheit, and maps that combined index to an empirical pace slowdown percentage. Use the adjusted pace for easy runs, tempo blocks, and race-day pacing when conditions warm up, or pair it with the <a href="{{ '/hr-zones/' | relative_url }}">Heart Rate Zone Calculator</a> to keep effort steady by heart rate instead of forcing cool-weather splits.</p>
+
+    <h2>A worked example</h2>
+    <p>Suppose your normal easy/steady pace in cool weather is <strong>5:00/km</strong> (8:03/mi), and you head out on a humid summer morning at <strong>24°C (75.2°F)</strong> with <strong>70% relative humidity</strong>:</p>
+    <ul>
+      <li><strong>Dew point:</strong> 18.2°C (64.7°F), calculated from the Magnus formula.</li>
+      <li><strong>Combined index:</strong> 75.2°F + 64.7°F = <strong>139.9°F</strong>.</li>
+      <li><strong>Slowdown bracket:</strong> 130–140°F corresponds to a <strong>4.5%</strong> pace adjustment.</li>
+      <li><strong>Adjusted pace:</strong> 300 s/km × 1.045 = 313.5 s/km → <strong>5:14/km</strong> (8:25/mi), adding 14 seconds per kilometer to hold the same physiological effort.</li>
+    </ul>
+
+    <h2>Formula and sources</h2>
+    <ul>
+      <li><strong>Dew point (Magnus–Tetens approximation):</strong> using Alduchov &amp; Eskridge (1996) constants <code>a = 17.625</code> and <code>b = 243.04</code>, <code>γ = ln(RH / 100) + (a · T) / (b + T)</code>, and <code>T_dew = (b · γ) / (a − γ)</code> with temperature <code>T</code> in °C.</li>
+      <li><strong>Combined heat + dew point index:</strong> convert air temperature and dew point to Fahrenheit (<code>°F = °C × 9/5 + 32</code>) and sum <code>combinedF = tempF + dewPointF</code>.</li>
+      <li><strong>Empirical slowdown brackets:</strong> <code>&lt; 100°F</code> → 0%, <code>100–110</code> → 0.5%, <code>110–120</code> → 1.5%, <code>120–130</code> → 3.0%, <code>130–140</code> → 4.5%, <code>140–150</code> → 6.5%, <code>150–160</code> → 8.5%, <code>&gt; 160</code> → 10.5%. These brackets reflect coaching benchmarks widely used in distance-running literature and physiological heat-stress studies (e.g., Ely et al., <em>Medicine &amp; Science in Sports &amp; Exercise</em>, 2007).</li>
+      <li>Read the full background in our guide on <a href="{{ '/guides/running-in-heat-and-humidity/' | relative_url }}">running in heat and humidity</a>.</li>
+    </ul>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li><strong>Solar radiation and wind are not included.</strong> Direct midday sun on black asphalt adds substantial heat load compared to a shaded, breezy dawn run at the exact same air temperature and humidity.</li>
+      <li><strong>Heat acclimation matters.</strong> After 10–14 days of consistent summer training, plasma volume expands and sweat rate improves, often cutting the effective slowdown noticeably compared to the first hot week of the year.</li>
+      <li><strong>Individual variation is wide.</strong> Body size, hydration status, clothing, and fitness level all shift how much a given dew point slows you down. Treat the output as a starting pacing target and verify with heart rate and perceived effort.</li>
+    </ul>
+
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details>
+        <summary>Why use dew point instead of relative humidity?</summary>
+        <p>Relative humidity depends on air temperature: 80% humidity at 10°C (50°F) holds far less water vapor than 80% humidity at 28°C (82°F). Dew point measures the actual moisture content in the air directly, making it a much more reliable indicator of how well sweat can evaporate.</p>
+      </details>
+      <details>
+        <summary>At what dew point does running start to feel noticeably harder?</summary>
+        <p>Most runners feel comfortable below a 13°C (55°F) dew point. Between 15–18°C (60–65°F) effort rises noticeably, 18–21°C (65–70°F) feels oppressive, and above 21°C (70°F) significant pacing reductions are needed to avoid overheating.</p>
+      </details>
+      <details>
+        <summary>Should I adjust easy runs as well as workouts?</summary>
+        <p>Yes. Letting easy runs slow down by the recommended percentage keeps your aerobic effort in Zone 2 instead of drifting into tempo heart rates. For hard intervals, you can either slow the target pace or shorten the reps and extend recovery.</p>
+      </details>
+      <details>
+        <summary>Does heat acclimation reduce the slowdown?</summary>
+        <p>Yes. Over 10–14 days of training in warm conditions, your body adapts by increasing plasma volume and starting to sweat earlier. Expect the biggest slowdown on the first sudden warm days of spring or summer.</p>
+      </details>
+      <details>
+        <summary>What if I am running in direct sun with no wind?</summary>
+        <p>Add a small extra buffer — roughly 1–2% slower than the shade-neutral estimate — because radiant heat from the sun and road surface increases thermal strain even when air temperature and dew point stay the same.</p>
+      </details>
+    </div>
+  </section>
+
+  {% include related-tools.html %}
+  {% include related-guides.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+
+const THRESHOLD_ROWS = [
+  { label: '< 100°F', pct: 0 },
+  { label: '100–110°F', pct: 0.5 },
+  { label: '110–120°F', pct: 1.5 },
+  { label: '120–130°F', pct: 3.0 },
+  { label: '130–140°F', pct: 4.5 },
+  { label: '140–150°F', pct: 6.5 },
+  { label: '150–160°F', pct: 8.5 },
+  { label: '> 160°F', pct: 10.5 },
+]
+
+function comfortLabel(dewPointC) {
+  if (dewPointC < 13) return 'Comfortable'
+  if (dewPointC < 16) return 'Mildly humid'
+  if (dewPointC < 18.5) return 'Noticeable'
+  if (dewPointC < 21) return 'Oppressive'
+  return 'Severe heat stress'
+}
+
+function readBasePaceSecPerKm() {
+  const m = parseInt($('pace-mm').value, 10) || 0
+  const s = parseInt($('pace-ss').value, 10) || 0
+  const perUnit = m * 60 + s
+  if (perUnit <= 0) return null
+  return $('pace-unit').value === 'mi' ? perUnit / 1.60934 : perUnit
+}
+
+function readTempC() {
+  const raw = parseFloat($('temp').value)
+  if (isNaN(raw)) return null
+  const unit = document.querySelector('input[name="temp-unit"]:checked').value
+  return unit === 'f' ? (raw - 32) * 5 / 9 : raw
+}
+
+function renderThresholds(basePaceKm, activePct) {
+  $('threshold-body').innerHTML = THRESHOLD_ROWS.map(row => {
+    const adjKm = basePaceKm * (1 + row.pct / 100)
+    const adjMi = kmToMile(adjKm)
+    const isActive = row.pct === activePct
+    const style = isActive ? ' style="font-weight:700;color:var(--accent)"' : ''
+    return `<tr${style}>
+      <td>${row.label}</td>
+      <td>+${row.pct.toFixed(1)}%</td>
+      <td>${secToPace(adjKm)} /km</td>
+      <td>${secToPace(adjMi)} /mi</td>
+    </tr>`
+  }).join('')
+}
+
+function render() {
+  const basePaceKm = readBasePaceSecPerKm()
+  const tempC = readTempC()
+  const hum = parseFloat($('humidity').value)
+  if (!basePaceKm || tempC === null || isNaN(hum) || hum < 0 || hum > 100) {
+    $('results').hidden = true
+    return
+  }
+
+  const res = adjustPaceForHeat(basePaceKm, tempC, hum)
+  const deltaKm = Math.round(res.adjustedPaceKmSec - basePaceKm)
+  const deltaMi = Math.round(res.adjustedPaceMiSec - kmToMile(basePaceKm))
+  const unit = document.querySelector('input[name="temp-unit"]:checked').value
+  const dpDisplay = unit === 'f'
+    ? `${(res.dewPointC * 9 / 5 + 32).toFixed(1)}°F`
+    : `${res.dewPointC.toFixed(1)}°C`
+
+  $('out-pace-km').textContent = `${secToPace(res.adjustedPaceKmSec)} /km`
+  $('out-delta-km').textContent = deltaKm > 0 ? `+${deltaKm}s slower` : 'No slowdown'
+  $('out-pace-mi').textContent = `${secToPace(res.adjustedPaceMiSec)} /mi`
+  $('out-delta-mi').textContent = deltaMi > 0 ? `+${deltaMi}s slower` : 'No slowdown'
+  $('out-slowdown').textContent = `+${res.slowdownPct.toFixed(1)}%`
+  $('out-combined').textContent = `Combined ${res.combinedF.toFixed(0)}°F`
+  $('out-dewpoint').textContent = dpDisplay
+  $('out-comfort').textContent = comfortLabel(res.dewPointC)
+  $('results').hidden = false
+
+  renderThresholds(basePaceKm, res.slowdownPct)
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.has('pace')) {
+    const parts = params.get('pace').split(':')
+    if (parts.length === 2) {
+      $('pace-mm').value = parts[0]
+      $('pace-ss').value = parts[1]
+    }
+  }
+  if (params.get('punit') === 'mi' || params.get('punit') === 'km') {
+    $('pace-unit').value = params.get('punit')
+  }
+  if (params.get('tunit') === 'f' || params.get('tunit') === 'c') {
+    const radio = document.querySelector(`input[name="temp-unit"][value="${params.get('tunit')}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('temp') && !isNaN(parseFloat(params.get('temp')))) {
+    $('temp').value = params.get('temp')
+  }
+  if (params.has('hum') && !isNaN(parseFloat(params.get('hum')))) {
+    $('humidity').value = params.get('hum')
+  }
+}
+
+let lastTempUnit = 'c'
+document.querySelectorAll('input[name="temp-unit"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const nextUnit = radio.value
+    const cur = parseFloat($('temp').value)
+    if (!isNaN(cur) && nextUnit !== lastTempUnit) {
+      $('temp').value = nextUnit === 'f'
+        ? Math.round((cur * 9 / 5 + 32) * 2) / 2
+        : Math.round(((cur - 32) * 5 / 9) * 2) / 2
+    }
+    lastTempUnit = nextUnit
+    render()
+  })
+})
+
+$('copy-link').addEventListener('click', async () => {
+  const mm = parseInt($('pace-mm').value, 10) || 0
+  const ss = String(parseInt($('pace-ss').value, 10) || 0).padStart(2, '0')
+  const tunit = document.querySelector('input[name="temp-unit"]:checked').value
+  const params = new URLSearchParams({
+    pace: `${mm}:${ss}`,
+    punit: $('pace-unit').value,
+    temp: $('temp').value,
+    tunit,
+    hum: $('humidity').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = 'Link copied!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+$('calc-form').addEventListener('input', render)
+loadFromUrl()
+lastTempUnit = document.querySelector('input[name="temp-unit"]:checked').value
+render()
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Why use dew point instead of relative humidity?", "acceptedAnswer": {"@type": "Answer", "text": "Relative humidity depends on air temperature. Dew point measures the actual moisture content in the air directly, making it a more reliable indicator of how well sweat can evaporate while running."}},
+    {"@type": "Question", "name": "At what dew point does running start to feel noticeably harder?", "acceptedAnswer": {"@type": "Answer", "text": "Most runners feel comfortable below a 13°C (55°F) dew point. Between 15–18°C (60–65°F) effort rises noticeably, 18–21°C (65–70°F) feels oppressive, and above 21°C (70°F) significant pacing reductions are needed."}},
+    {"@type": "Question", "name": "Should I adjust easy runs as well as workouts?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Letting easy runs slow down keeps aerobic effort in Zone 2 instead of drifting into tempo heart rates. For hard workouts, slow the target pace or shorten intervals and extend recovery."}},
+    {"@type": "Question", "name": "Does heat acclimation reduce the slowdown?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Over 10–14 days of consistent warm-weather training, plasma volume expands and sweat rate improves, reducing the effective slowdown compared to the first hot days of the season."}},
+    {"@type": "Question", "name": "What if I am running in direct sun with no wind?", "acceptedAnswer": {"@type": "Answer", "text": "Add a small extra buffer — roughly 1–2% slower — because radiant heat from direct sun and warm pavement increases thermal strain beyond air temperature and dew point alone."}}
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Heat & Humidity Pace Calculator",
+  "url": "https://ryutility.com/heat-pace/",
+  "description": "Adjust your running pace for heat and humidity using air temperature, relative humidity, and dew point.",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+}
+</script>

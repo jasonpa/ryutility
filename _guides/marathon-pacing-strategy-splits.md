@@ -7,7 +7,7 @@ related_tools:
   - /predict/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) I've watched a lot of runners walk into my clinic the week after a marathon convinced something went wrong physically at mile 22 — and in most of those conversations, what actually went wrong was a pacing plan built for the first 20 miles with nothing built in for the last 6.2.
+I've watched a lot of runners walk into my clinic the week after a marathon convinced something went wrong physically at mile 22 — and in most of those conversations, what actually went wrong was a pacing plan built for the first 20 miles with nothing built in for the last 6.2.
 
 A marathon split table isn't just arithmetic dividing your goal time by 42.195 km. The honest version of that table has to plan for the fact that most runners — even well-trained ones — physiologically slow in the final quarter of the race, and a plan that doesn't budget for that isn't a plan, it's a best case.
 
@@ -44,5 +44,3 @@ Elite marathoners often run close to even splits or very mild negative splits (1
 ## Using it in practice
 
 Start with a realistic goal time from the [Race Time Predictor](/predict/) — don't build a split table around a time you haven't validated against a recent result. Then use the [Splits Calculator](/splits/) to generate the actual per-km or per-mile split table for that goal time, choosing a 3–5% negative split strategy unless you have specific evidence from prior marathons that even pacing works for you. Run the early splits *conservatively* on race day even if they feel too easy — that feeling is the plan working, not the plan being wrong.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

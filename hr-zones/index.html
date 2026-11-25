@@ -16,7 +16,7 @@ last_modified_at: 2026-10-28
   <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
     <div class="field">
       <label for="hr-max">Max heart rate (bpm)</label>
-      <input type="number" id="hr-max" min="120" max="230" placeholder="185">
+      <input type="number" id="hr-max" min="120" max="230" value="185" placeholder="185">
       <div class="quick-buttons" style="align-items:center">
         <span style="font-size:12px;color:var(--text-secondary)">or estimate from age:</span>
         <input type="number" id="age" min="10" max="99" placeholder="40" style="width:60px" aria-label="Age">
@@ -24,7 +24,7 @@ last_modified_at: 2026-10-28
     </div>
     <div class="field">
       <label for="hr-rest">Resting heart rate (bpm, optional)</label>
-      <input type="number" id="hr-rest" min="30" max="110" placeholder="60">
+      <input type="number" id="hr-rest" min="30" max="110" value="50" placeholder="60">
     </div>
   </form>
 
@@ -33,6 +33,10 @@ last_modified_at: 2026-10-28
       <thead><tr><th>Zone</th><th>Intensity</th><th>Heart rate</th></tr></thead>
       <tbody id="zones-body"></tbody>
     </table>
+    <div class="share-row" id="share-row" hidden>
+      <button type="button" id="copy-link" class="share-btn">Copy share link</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
     <p id="empty-msg" style="color:var(--text-secondary);font-size:13px">Enter your max heart rate (or age) to see your zones.</p>
   </section>
 
@@ -126,7 +130,7 @@ function render() {
   const table = $('zones-table')
   const empty = $('empty-msg')
 
-  if (!hrMax || hrMax <= hrRest) { table.hidden = true; empty.hidden = false; return }
+  if (!hrMax || hrMax <= hrRest) { table.hidden = true; $('share-row').hidden = true; empty.hidden = false; return }
 
   $('zones-body').innerHTML = hrZones(hrMax, hrRest).map(z => `
     <tr>
@@ -135,10 +139,38 @@ function render() {
       <td><strong>${z.low}–${z.high} bpm</strong></td>
     </tr>`).join('')
   table.hidden = false
+  $('share-row').hidden = false
   empty.hidden = true
 }
 
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.has('hrmax')) {
+    $('hr-max').value = params.get('hrmax')
+  } else if (params.has('age')) {
+    $('hr-max').value = ''
+    $('age').value = params.get('age')
+  }
+  if (params.has('hrrest')) $('hr-rest').value = params.get('hrrest')
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams()
+  if ($('hr-max').value !== '') params.set('hrmax', $('hr-max').value)
+  else if ($('age').value !== '') params.set('age', $('age').value)
+  if ($('hr-rest').value !== '') params.set('hrrest', $('hr-rest').value)
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = 'Copied!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
 $('calc-form').addEventListener('input', render)
+loadFromUrl()
 render()
 </script>
 

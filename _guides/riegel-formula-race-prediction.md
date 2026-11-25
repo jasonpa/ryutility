@@ -7,7 +7,7 @@ related_tools:
   - /pace/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) I made this exact mistake myself years ago: I plugged a strong 5K time into a race predictor, got a marathon number that looked achievable on paper, and found out on the course that a 5K doesn't tell you anything about mile 30.
+I made this exact mistake myself years ago: I plugged a strong 5K time into a race predictor, got a marathon number that looked achievable on paper, and found out on the course that a 5K doesn't tell you anything about mile 30.
 
 Race time prediction formulas get treated as more precise than they are. The most common one — the Riegel formula — is genuinely useful, but only within a range it was designed for. Outside that range, it quietly stops being a prediction and starts being a guess with decimal places.
 
@@ -52,5 +52,3 @@ For the half-to-marathon jump specifically, many coaches use a steeper exponent 
 ## Using it in practice
 
 Treat the [Race Time Predictor](/predict/) as a starting estimate, not a target time — especially for a distance jump larger than 2x. Once you've settled on a realistic goal by combining the prediction with your own training-specific judgment, use the [Running Pace Calculator](/pace/) to convert that goal time into an exact per-km or per-mile pace you can actually train and race by.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

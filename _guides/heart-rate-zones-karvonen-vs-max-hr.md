@@ -7,7 +7,7 @@ related_tools:
   - /run/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) I see resting heart rate data constantly in clinic, and it's the single number two runners' heart rate zone charts most often get wrong by ignoring — a well-trained runner with a 42 bpm resting heart rate and a deconditioned one at 75 bpm can share the same max HR and still need meaningfully different training zones.
+I see resting heart rate data constantly in clinic, and it's the single number two runners' heart rate zone charts most often get wrong by ignoring — a well-trained runner with a 42 bpm resting heart rate and a deconditioned one at 75 bpm can share the same max HR and still need meaningfully different training zones.
 
 There are two common ways to calculate heart rate training zones, and they don't agree with each other, because they're built on different assumptions about what your heart rate range actually represents.
 
@@ -46,5 +46,3 @@ Neither formula is a substitute for a lab test. Max HR is almost always estimate
 ## Using it in practice
 
 The [Heart Rate Zone Calculator](/hr-zones/) on this site uses the Karvonen method, so it needs your resting heart rate as an input, not just your max — that resting number is doing real work in the calculation, not just sitting there for completeness. If you're comparing your zones against a plan or coach that uses plain %max HR, expect the ranges to differ, especially in Zone 2, and use your [training pace zones](/run/) as a second reference point rather than trusting either heart-rate method alone.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

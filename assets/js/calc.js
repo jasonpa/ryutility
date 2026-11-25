@@ -234,6 +234,40 @@ function equivalentFlatKmh(kmh, gradePct) {
   return kmh * (1 + 4.5 * gradePct / 100)
 }
 
+// === HEAT & HUMIDITY PACE ADJUSTMENT ===
+// Magnus-Tetens dew point approximation (Alduchov & Eskridge, 1996 coefficients)
+function calcDewPointC(tempC, humidityPct) {
+  const rh = Math.max(0.1, Math.min(100, humidityPct))
+  const a = 17.625
+  const b = 243.04
+  const gamma = Math.log(rh / 100) + (a * tempC) / (b + tempC)
+  return (b * gamma) / (a - gamma)
+}
+
+// Empirical running slowdown (%) based on combined Temperature (°F) + Dew Point (°F)
+function heatPaceAdjustmentPct(tempC, dewPointC) {
+  const tempF = tempC * 9 / 5 + 32
+  const dewPointF = dewPointC * 9 / 5 + 32
+  const combinedF = tempF + dewPointF
+  if (combinedF < 100) return 0
+  if (combinedF < 110) return 0.5
+  if (combinedF < 120) return 1.5
+  if (combinedF < 130) return 3.0
+  if (combinedF < 140) return 4.5
+  if (combinedF < 150) return 6.5
+  if (combinedF < 160) return 8.5
+  return 10.5
+}
+
+function adjustPaceForHeat(paceSecPerKm, tempC, humidityPct) {
+  const dewPointC = calcDewPointC(tempC, humidityPct)
+  const combinedF = (tempC * 9 / 5 + 32) + (dewPointC * 9 / 5 + 32)
+  const slowdownPct = heatPaceAdjustmentPct(tempC, dewPointC)
+  const adjustedPaceKmSec = paceSecPerKm * (1 + slowdownPct / 100)
+  const adjustedPaceMiSec = kmToMile(adjustedPaceKmSec)
+  return { dewPointC, combinedF, slowdownPct, adjustedPaceKmSec, adjustedPaceMiSec }
+}
+
 // === NODE EXPORT (no-op in browser) ===
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -244,5 +278,6 @@ if (typeof module !== 'undefined' && module.exports) {
     paceFromTimeDistance, timeFromPaceDistance, distanceFromTimePace, secToHms,
     riegelPredict, estimateMaxHr, hrZones, splitPlan,
     kmhToSecPerKm, mphToKmh, equivalentFlatKmh,
+    calcDewPointC, heatPaceAdjustmentPct, adjustPaceForHeat,
   }
 }

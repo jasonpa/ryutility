@@ -7,7 +7,7 @@ related_tools:
   - /hr-zones/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) Rain drives a good chunk of my training indoors for months at a time, and every fall I go through the same recalibration: the same pace that felt like tempo effort outdoors in September feels noticeably easier on a treadmill in November, and it takes a week or two of heart rate data before I trust that it's the environment, not my fitness, that changed.
+Rain drives a good chunk of my training indoors for months at a time, and every fall I go through the same recalibration: the same pace that felt like tempo effort outdoors in September feels noticeably easier on a treadmill in November, and it takes a week or two of heart rate data before I trust that it's the environment, not my fitness, that changed.
 
 Runners often treat treadmill pace and outdoor pace as directly interchangeable — "I ran 5:00/km on the treadmill, so I should be able to run 5:00/km outside." Physiologically, that's usually not true, and understanding why prevents you from misreading a treadmill session as either better or worse fitness than it actually reflects.
 
@@ -38,5 +38,3 @@ At faster paces (tempo and above), the heart rate gap tends to widen again even 
 ## Using it in practice
 
 Don't compare treadmill and outdoor performances by pace alone — use heart rate as the equalizer. If you're training seriously across both environments, run your outdoor heart rate zones from the [Heart Rate Zone Calculator](/hr-zones/) and treat those bpm ranges, not the pace numbers, as your real target when you move indoors. For pace-specific comparisons (matching a specific outdoor race pace on the treadmill for track-style intervals), add roughly 1% incline and use the [Treadmill Pace Converter](/treadmill/) to get the corrected equivalent speed before you start the session.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

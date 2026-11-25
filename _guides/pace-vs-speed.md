@@ -7,7 +7,7 @@ related_tools:
   - /run/
 ---
 
-I'm a Korean medicine doctor in Vancouver by day, a software engineer the rest of the time, and a runner in whatever hours are left over — Ryutility is a small side project I build under [R-Lab](https://ryu.clinic/lab/), part of [Ryu Clinic Inc.](https://ryu.clinic) A patient once told me they'd "sped up" from 10 min/mi to 5:30/km and were confused why their watch didn't seem to agree. It wasn't their watch — 10 min/mi and 5:30/km are almost the same pace. They hadn't sped up at all.
+A patient once told me they'd "sped up" from 10 min/mi to 5:30/km and were confused why their watch didn't seem to agree. It wasn't their watch — 10 min/mi and 5:30/km are almost the same pace. They hadn't sped up at all.
 
 Pace and speed carry the same information — how fast you're covering ground — but they're built for different jobs, and converting between them by memory is where most of these mix-ups happen.
 
@@ -48,5 +48,3 @@ So the same effort reads as any of: **5:30/km, 8:51/mi, 10.9 km/h, or 6.8 mph** 
 ## Using it in practice
 
 If your training plan is written in pace but your treadmill only shows speed (or the reverse), don't convert by hand mid-workout — that's exactly where the rounding and unit-direction mistakes above creep in. Use the [Running Pace Calculator](/pace/) to get an exact pace, time, or distance from any two known values, in both km and miles, and cross-check it against the training zones from the [Training Zone Calculator](/run/) so you know which pace band you're actually supposed to be running in before you start the watch.
-
-*This guide is part of [R-Lab](https://ryu.clinic/lab/), the side-project arm of Ryu Clinic Inc. — I write these between clinic hours and code commits, from what I've seen work (and not work) in 14 years of treating runners and a lot longer than that of being one.*

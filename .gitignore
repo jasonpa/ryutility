@@ -6,6 +6,7 @@
 
 # Screenshot artifacts
 *.png
+!assets/og-image.png
 *.jpg
 *.jpeg
 
