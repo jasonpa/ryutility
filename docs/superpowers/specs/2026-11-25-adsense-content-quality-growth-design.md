@@ -29,7 +29,7 @@ An audit of the repository on 2026-11-25 identified four key areas for improveme
   - Update `updated` / `last_modified_at` front matter to `2026-11-25`.
 - **`contact/index.html`**:
   - Remove `<aside class="owner-todo">`.
-  - State clearly that `contact@ryutility.com` is maintained by Jiman Ryu / R-Lab and monitored for bug reports, formula questions, corrections, and privacy requests.
+  - State clearly that `info@ryu.clinic` is maintained by Jiman Ryu / R-Lab and monitored for bug reports, formula questions, corrections, and privacy requests.
   - Update `updated` / `last_modified_at` front matter to `2026-11-25`.
 - **`assets/css/site.css`**:
   - Remove unused `.owner-todo` rules (L104–111) once no pages use them.

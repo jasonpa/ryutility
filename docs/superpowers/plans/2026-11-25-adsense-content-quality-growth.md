@@ -25,7 +25,7 @@
 - Modify: `assets/css/site.css`
 
 - [x] **Step 1:** Update `about/index.html` to remove `<aside class="owner-todo">` and add the real operator bio (Jiman Ryu, R.Ac., R.TCM.P. in Vancouver, software engineer, distance runner, R-Lab / Ryu Clinic Inc.), updating `updated` and `last_modified_at` to `2026-11-25`.
-- [x] **Step 2:** Update `contact/index.html` to remove `<aside class="owner-todo">` and confirm `contact@ryutility.com` operator details, updating `updated` and `last_modified_at` to `2026-11-25`.
+- [x] **Step 2:** Update `contact/index.html` to remove `<aside class="owner-todo">` and confirm `info@ryu.clinic` operator details, updating `updated` and `last_modified_at` to `2026-11-25`.
 - [x] **Step 3:** Remove `.owner-todo` CSS rules from `assets/css/site.css`.
 
 ### Task 2: Guide E-E-A-T Layout, JSON-LD & Boilerplate Cleanup (Phase 2)
