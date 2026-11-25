@@ -25,18 +25,18 @@ An audit of the repository on 2026-11-25 identified four key areas for improveme
 ### Phase 1: AdSense & Trust Signals (Blocker Removal)
 - **`about/index.html`**:
   - Remove `<aside class="owner-todo">`.
-  - Replace with a clear, authentic "Who runs it" section identifying **Jiman Ryu** (Dr.TCM in Vancouver with 14+ years of clinical experience treating runners, software engineer, and recreational distance runner), building Ryutility under **R-Lab** (`https://ryu.clinic/lab/`) at **Ryu Clinic Inc.** (`https://ryu.clinic`).
+  - Replace with a clear, authentic "Who runs it" section identifying **Jiman Ryu** (R.Ac., R.TCM.P. in Vancouver with 14+ years of clinical experience treating runners, software engineer, and recreational distance runner), building Ryutility under **R-Lab** (`https://ryu.clinic/lab/`) at **Ryu Clinic Inc.** (`https://ryu.clinic`).
   - Update `updated` / `last_modified_at` front matter to `2026-11-25`.
 - **`contact/index.html`**:
   - Remove `<aside class="owner-todo">`.
-  - State clearly that `contact@ryutility.com` is maintained by Jiman Ryu / R-Lab and monitored for bug reports, formula questions, corrections, and privacy requests.
+  - State clearly that `info@ryu.clinic` is maintained by Jiman Ryu / R-Lab and monitored for bug reports, formula questions, corrections, and privacy requests.
   - Update `updated` / `last_modified_at` front matter to `2026-11-25`.
 - **`assets/css/site.css`**:
   - Remove unused `.owner-todo` rules (L104–111) once no pages use them.
 
 ### Phase 2: Guide E-E-A-T, Boilerplate Reduction & SEO
 - **`_layouts/guide.html`**:
-  - Add an **Author Bio** section at the bottom of `<main class="guide-page">` (before `tool-links.html`) attributing the guide to Jiman Ryu (Dr.TCM, software engineer, runner; R-Lab / Ryu Clinic Inc.).
+  - Add an **Author Bio** section at the bottom of `<main class="guide-page">` (before `tool-links.html`) attributing the guide to Jiman Ryu (R.Ac., R.TCM.P., software engineer, runner; R-Lab / Ryu Clinic Inc.).
   - Add **Related Guides** section showing up to 3 other guides that share at least one `related_tools` entry (excluding `page.url`).
   - Add `<script type="application/ld+json">` for `@type: "Article"` including `headline`, `description`, `datePublished`, `author` (`Person`: Jiman Ryu), and `publisher` (`Organization`: Ryutility).
 - **`_guides/*.md` (all 10 existing guides)**:
