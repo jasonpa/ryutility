@@ -1,0 +1,421 @@
+---
+layout: default
+title: Running Training Brief — VDOT Zones, Race Predictions & Splits in One View
+description: Enter one recent race result to get your VDOT training zones, Riegel vs. VDOT race predictions, and goal race splits on a single shareable page.
+permalink: /brief/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<style>
+  .brief-grid { display: grid; gap: 16px; margin-top: 16px; }
+  .brief-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .brief-card-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .brief-card-head h2 {
+    font-family: var(--font-serif); font-size: 17px; font-weight: 600; margin: 0;
+  }
+  .brief-card-head a { font-size: 12.5px; color: var(--accent); text-decoration: none; }
+  .brief-card-head a:hover { text-decoration: underline; }
+  .brief-banner {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 14px; font-size: 14px;
+  }
+  .brief-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  .brief-subgrid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .brief-zone-item {
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+    background: var(--bg);
+  }
+  .brief-zone-item strong { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+  .brief-zone-item .pace-val { font-size: 16px; font-weight: 700; margin-top: 2px; }
+  .brief-zone-item .hr-val { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .delta-faster { color: #22c55e; font-weight: 600; }
+  .delta-slower { color: #f59e0b; font-weight: 600; }
+</style>
+
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>Training Brief</h1>
+    <p>One recent race result → VDOT training zones, race predictions, and goal splits in one view.</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="brief-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>Recent race distance</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="dist" value="5k" checked><span>5K</span></label>
+          <label><input type="radio" name="dist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="dist" value="half"><span>Half</span></label>
+          <label><input type="radio" name="dist" value="full"><span>Marathon</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="field">
+      <label>Recent finish time</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="9" value="0" placeholder="0" aria-label="Hours">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" value="25" placeholder="25" aria-label="Minutes">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="Seconds">
+        <span>h:mm:ss</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <fieldset>
+        <legend>Target race <span style="font-weight:400;text-transform:none">(optional)</span></legend>
+        <div class="radio-group">
+          <label><input type="radio" name="tdist" value="" checked><span>None</span></label>
+          <label><input type="radio" name="tdist" value="5k"><span>5K</span></label>
+          <label><input type="radio" name="tdist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="tdist" value="half"><span>Half</span></label>
+          <label><input type="radio" name="tdist" value="full"><span>Marathon</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="field" id="target-time-field" hidden>
+      <label>Goal finish time</label>
+      <div class="time-inputs">
+        <input type="number" id="tgt-hh" min="0" max="9" placeholder="1" aria-label="Target hours">
+        <span>:</span>
+        <input type="number" id="tgt-mm" min="0" max="59" placeholder="50" aria-label="Target minutes">
+        <span>:</span>
+        <input type="number" id="tgt-ss" min="0" max="59" placeholder="00" aria-label="Target seconds">
+        <span>h:mm:ss</span>
+      </div>
+      <div style="margin-top:10px">
+        <label for="target-date">Target race date (optional)</label>
+        <input type="date" id="target-date" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg);color:var(--text-primary);font-size:14px">
+      </div>
+    </div>
+
+    <div class="field" style="display:flex;gap:14px;flex-wrap:wrap">
+      <div>
+        <label for="hr-max">Max HR (optional)</label>
+        <input type="number" id="hr-max" min="100" max="250" value="185" style="width:90px">
+      </div>
+      <div>
+        <label for="hr-rest">Resting HR (optional)</label>
+        <input type="number" id="hr-rest" min="30" max="120" value="50" style="width:90px">
+      </div>
+      <div>
+        <fieldset>
+          <legend>Unit</legend>
+          <div class="radio-group">
+            <label><input type="radio" name="unit" value="km" checked><span>km</span></label>
+            <label><input type="radio" name="unit" value="mile"><span>mile</span></label>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </form>
+
+  <section id="brief-output" aria-live="polite" hidden>
+    <div id="brief-banner" class="brief-banner"></div>
+
+    <div class="brief-grid">
+      <article class="brief-card">
+        <div class="brief-card-head">
+          <h2>1. Training Zones</h2>
+          <a id="link-run" href="{{ '/run/' | relative_url }}">Open full zone table →</a>
+        </div>
+        <div id="brief-zones" class="brief-subgrid"></div>
+      </article>
+
+      <article class="brief-card">
+        <div class="brief-card-head">
+          <h2>2. Race Predictions (Riegel vs. VDOT)</h2>
+          <a id="link-predict" href="{{ '/predict/' | relative_url }}">Open predictor →</a>
+        </div>
+        <table class="result-table">
+          <thead>
+            <tr><th>Distance</th><th>Riegel</th><th>VDOT</th><th>Pace</th></tr>
+          </thead>
+          <tbody id="brief-predict-body"></tbody>
+        </table>
+      </article>
+
+      <article class="brief-card">
+        <div class="brief-card-head">
+          <h2>3. Race Split Preview</h2>
+          <a id="link-splits" href="{{ '/splits/' | relative_url }}">Open full split table →</a>
+        </div>
+        <p id="brief-split-note" style="font-size:13px;color:var(--text-secondary);margin-bottom:8px"></p>
+        <table class="result-table">
+          <thead>
+            <tr><th>Checkpoint</th><th>Segment</th><th>Cumulative</th></tr>
+          </thead>
+          <tbody id="brief-splits-body"></tbody>
+        </table>
+        <p style="font-size:12.5px;color:var(--text-secondary);margin-top:10px">
+          Racing in warm weather? <a id="link-heat" href="{{ '/heat-pace/' | relative_url }}">Adjust target pace for heat &amp; humidity →</a>
+        </p>
+      </article>
+    </div>
+
+    <div class="brief-actions">
+      <button type="button" id="copy-link" class="share-btn">Copy brief link</button>
+      <button type="button" id="print-btn" class="share-btn">Print brief</button>
+      <button type="button" id="save-baseline" class="share-btn">Save as my baseline</button>
+      <button type="button" id="clear-baseline" class="share-btn" hidden>Clear saved</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
+    <details class="embed-box">
+      <summary>Embed this calculator</summary>
+      <textarea class="embed-code" rows="2" readonly onclick="this.select()">&lt;iframe src="https://ryutility.com/brief/?embed=1" width="100%" height="680" style="border:1px solid #e5e7eb;border-radius:10px" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
+    </details>
+  </section>
+
+  <p id="brief-empty" class="tool-content" style="color:var(--text-secondary);font-size:13px">Enter a valid recent race time (VDOT 30–85) to generate your training brief.</p>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+const LABELS = { '5k': '5K', '10k': '10K', half: 'Half marathon', full: 'Marathon' }
+const GAP_HINTS = {
+  maintain: 'Target matches or sits below your current VDOT — focus on pacing execution.',
+  realistic: 'Realistic near-term step (+0–2 VDOT). Achievable in a 6–10 week block.',
+  ambitious: 'Ambitious jump (+2–4 VDOT). Plan a 10–16 week build.',
+  stretch: 'Large jump (>4 VDOT). Train at current zones first and schedule a tune-up race.',
+}
+
+function splitHms(totalSec) {
+  const s = Math.round(totalSec)
+  return {
+    hh: Math.floor(s / 3600),
+    mm: Math.floor((s % 3600) / 60),
+    ss: s % 60,
+  }
+}
+
+function render() {
+  const dist = document.querySelector('input[name="dist"]:checked').value
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const t1 = h * 3600 + m * 60 + s
+
+  const tdist = document.querySelector('input[name="tdist"]:checked').value
+  $('target-time-field').hidden = !tdist
+
+  const unit = document.querySelector('input[name="unit"]:checked').value
+  const hrMax = parseInt($('hr-max').value, 10)
+  const hrRest = parseInt($('hr-rest').value, 10)
+  const hasHr = !isNaN(hrMax) && !isNaN(hrRest) && hrMax > hrRest
+
+  const threshPace = t1 > 0 ? raceTimeToThresholdPace(dist, t1) : null
+  if (!threshPace) {
+    $('brief-output').hidden = true
+    $('brief-empty').hidden = false
+    return
+  }
+
+  const d1 = DIST_KM[dist]
+  const curVdot = calcVDOT(d1 * 1000, t1)
+
+  // Target check
+  let targetSec = 0
+  let tgtVdot = null
+  if (tdist) {
+    const th = parseInt($('tgt-hh').value, 10) || 0
+    const tm = parseInt($('tgt-mm').value, 10) || 0
+    const ts = parseInt($('tgt-ss').value, 10) || 0
+    targetSec = th * 3600 + tm * 60 + ts
+    if (targetSec > 0 && raceTimeToThresholdPace(tdist, targetSec) !== null) {
+      tgtVdot = calcVDOT(DIST_KM[tdist] * 1000, targetSec)
+    }
+  }
+
+  // Banner
+  let bannerHtml = `<strong>Current VDOT: ${curVdot.toFixed(1)}</strong> · Threshold: <strong>${secToPace(unit === 'mile' ? kmToMile(threshPace) : threshPace)}/${unit === 'mile' ? 'mi' : 'km'}</strong>`
+  const tDate = $('target-date').value
+  const days = window.ryProfile ? window.ryProfile.calcDaysUntil(tDate) : null
+  const dBadge = days !== null ? ` · <strong>${days === 0 ? 'Race Day!' : days > 0 ? `D-${days}` : `D+${Math.abs(days)}`}</strong>` : ''
+  if (tgtVdot !== null) {
+    const gap = assessVdotGap(curVdot, tgtVdot)
+    const sign = gap.delta > 0 ? '+' : ''
+    bannerHtml += `<br>Goal (${LABELS[tdist]} ${secToHms(targetSec)}${dBadge}) → <strong>Target VDOT: ${tgtVdot.toFixed(1)}</strong> <span class="${gap.delta > 0 ? 'delta-faster' : 'delta-slower'}">(${sign}${gap.delta.toFixed(1)})</span><div style="font-size:12.5px;color:var(--text-secondary);margin-top:4px">${GAP_HINTS[gap.level]}</div>`
+  } else if (dBadge) {
+    bannerHtml += dBadge
+  }
+  $('brief-banner').innerHTML = bannerHtml
+
+  // 1. Zones
+  const zones = calcZones({
+    refPaceSec: threshPace, refType: 'threshold',
+    hrMax: hasHr ? hrMax : 185, hrRest: hasHr ? hrRest : 50, lapDist: 400,
+  })
+  $('brief-zones').innerHTML = zones.map(z => {
+    const p = unit === 'mile' ? `${z.paceMi.lo}–${z.paceMi.hi} /mi` : `${z.paceKm.lo}–${z.paceKm.hi} /km`
+    const hr = hasHr ? `<div class="hr-val">${z.hr.low}–${z.hr.high} bpm (${z.hrPct[0]}–${z.hrPct[1]}%)</div>` : ''
+    return `<div class="brief-zone-item"><strong>${z.label}</strong><div class="pace-val">${p}</div>${hr}</div>`
+  }).join('')
+
+  // 2. Predictions
+  $('brief-predict-body').innerHTML = Object.keys(DIST_KM).map(key => {
+    const d2 = DIST_KM[key]
+    const tR = riegelPredict(t1, d1, d2)
+    const tV = vdotPredict(t1, d1, d2)
+    const pace = tR / d2
+    const paceStr = unit === 'mile' ? `${secToPace(kmToMile(pace))}/mi` : `${secToPace(pace)}/km`
+    return `<tr${key === dist ? ' style="font-weight:700"' : ''}><td>${LABELS[key]}</td><td>${secToHms(tR)}</td><td>${tV ? secToHms(tV) : '–'}</td><td>${paceStr}</td></tr>`
+  }).join('')
+
+  // 3. Split preview
+  const splitDistKey = (tdist && targetSec > 0) ? tdist : dist
+  const splitTotalSec = (tdist && targetSec > 0) ? targetSec : t1
+  const splitStepKm = unit === 'mile' ? 1.60934 : (DIST_KM[splitDistKey] >= 20 ? 5 : 1)
+  const plan = splitPlan(splitTotalSec, DIST_KM[splitDistKey], splitStepKm, 0)
+  $('brief-split-note').textContent = `${LABELS[splitDistKey]} (${secToHms(splitTotalSec)}) — even split preview every ${unit === 'mile' ? '1 mi' : splitStepKm + ' km'}`
+  $('brief-splits-body').innerHTML = plan.map(row => {
+    const label = unit === 'mile'
+      ? `${(row.dist / 1.60934).toFixed(row.dist % 1.60934 < 0.01 ? 0 : 2)} mi`
+      : `${row.dist} km`
+    return `<tr><td>${label}</td><td>${secToPace(row.splitSec)}</td><td><strong>${secToHms(row.cumSec)}</strong></td></tr>`
+  }).join('')
+
+  // Cross-links
+  const runParams = new URLSearchParams({ cdist: dist, chh: h, cmm: m, css: s, unit })
+  if (hasHr) { runParams.set('hrmax', hrMax); runParams.set('hrrest', hrRest) }
+  if (tdist && targetSec > 0) {
+    const ts = splitHms(targetSec)
+    runParams.set('tdist', tdist); runParams.set('thh', ts.hh); runParams.set('tmm', ts.mm); runParams.set('tss', ts.ss)
+  }
+  $('link-run').href = `{{ '/run/' | relative_url }}?${runParams.toString()}`
+  $('link-predict').href = `{{ '/predict/' | relative_url }}?${new URLSearchParams({ dist, hh: h, mm: m, ss: s }).toString()}`
+  const sp = splitHms(splitTotalSec)
+  $('link-splits').href = `{{ '/splits/' | relative_url }}?${new URLSearchParams({ dist: splitDistKey, hh: sp.hh, mm: sp.mm, ss: sp.ss }).toString()}`
+
+  $('brief-output').hidden = false
+  $('brief-empty').hidden = true
+}
+
+function loadFromUrl() {
+  const p = new URLSearchParams(window.location.search)
+  const dist = p.get('dist')
+  if (dist && DIST_KM[dist]) {
+    const r = document.querySelector(`input[name="dist"][value="${dist}"]`)
+    if (r) r.checked = true
+  }
+  if (p.has('hh')) $('time-hh').value = p.get('hh')
+  if (p.has('mm')) $('time-mm').value = p.get('mm')
+  if (p.has('ss')) $('time-ss').value = p.get('ss')
+  const tdist = p.get('tdist')
+  if (tdist && DIST_KM[tdist]) {
+    const r = document.querySelector(`input[name="tdist"][value="${tdist}"]`)
+    if (r) r.checked = true
+  }
+  if (p.has('thh')) $('tgt-hh').value = p.get('thh')
+  if (p.has('tmm')) $('tgt-mm').value = p.get('tmm')
+  if (p.has('tss')) $('tgt-ss').value = p.get('tss')
+  if (p.has('hrmax')) $('hr-max').value = p.get('hrmax')
+  if (p.has('hrrest')) $('hr-rest').value = p.get('hrrest')
+  const unit = p.get('unit')
+  if (unit === 'km' || unit === 'mile') {
+    const r = document.querySelector(`input[name="unit"][value="${unit}"]`)
+    if (r) r.checked = true
+  }
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const p = new URLSearchParams({
+    dist: document.querySelector('input[name="dist"]:checked').value,
+    hh: $('time-hh').value, mm: $('time-mm').value, ss: $('time-ss').value,
+    unit: document.querySelector('input[name="unit"]:checked').value,
+    hrmax: $('hr-max').value, hrrest: $('hr-rest').value,
+  })
+  const tdist = document.querySelector('input[name="tdist"]:checked').value
+  if (tdist) {
+    p.set('tdist', tdist)
+    if ($('tgt-hh').value !== '') p.set('thh', $('tgt-hh').value)
+    if ($('tgt-mm').value !== '') p.set('tmm', $('tgt-mm').value)
+    if ($('tgt-ss').value !== '') p.set('tss', $('tgt-ss').value)
+  }
+  const url = `${window.location.origin}${window.location.pathname}?${p.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = 'Copied!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+function applyProfile(prof) {
+  if (!prof) return
+  if (prof.dist && DIST_KM[prof.dist]) {
+    const r = document.querySelector(`input[name="dist"][value="${prof.dist}"]`)
+    if (r) r.checked = true
+  }
+  if (prof.hh !== undefined && prof.hh !== '') $('time-hh').value = prof.hh
+  if (prof.mm !== undefined && prof.mm !== '') $('time-mm').value = prof.mm
+  if (prof.ss !== undefined && prof.ss !== '') $('time-ss').value = prof.ss
+  if (prof.targetDist && DIST_KM[prof.targetDist]) {
+    const r = document.querySelector(`input[name="tdist"][value="${prof.targetDist}"]`)
+    if (r) r.checked = true
+  }
+  if (prof.targetHh !== undefined) $('tgt-hh').value = prof.targetHh
+  if (prof.targetMm !== undefined) $('tgt-mm').value = prof.targetMm
+  if (prof.targetSs !== undefined) $('tgt-ss').value = prof.targetSs
+  if (prof.targetDate) $('target-date').value = prof.targetDate
+  if (prof.hrMax) $('hr-max').value = prof.hrMax
+  if (prof.hrRest) $('hr-rest').value = prof.hrRest
+  if (prof.unit === 'km' || prof.unit === 'mile') {
+    const r = document.querySelector(`input[name="unit"][value="${prof.unit}"]`)
+    if (r) r.checked = true
+  }
+}
+
+$('print-btn').addEventListener('click', () => window.print())
+$('brief-form').addEventListener('input', render)
+document.addEventListener('DOMContentLoaded', () => {
+  const hasUrl = window.location.search.length > 1
+  if (!hasUrl && window.ryProfile) {
+    const saved = window.ryProfile.loadSavedProfile()
+    if (saved) { applyProfile(saved); $('clear-baseline').hidden = false }
+  } else if (window.ryProfile && window.ryProfile.loadSavedProfile()) {
+    $('clear-baseline').hidden = false
+  }
+  render()
+
+  $('save-baseline').addEventListener('click', () => {
+    if (!window.ryProfile) return
+    window.ryProfile.saveProfile({
+      dist: document.querySelector('input[name="dist"]:checked').value,
+      hh: $('time-hh').value, mm: $('time-mm').value, ss: $('time-ss').value,
+      hrMax: $('hr-max').value, hrRest: $('hr-rest').value,
+      unit: document.querySelector('input[name="unit"]:checked').value,
+      targetDist: document.querySelector('input[name="tdist"]:checked').value,
+      targetHh: $('tgt-hh').value, targetMm: $('tgt-mm').value, targetSs: $('tgt-ss').value,
+      targetDate: $('target-date').value,
+    })
+    $('clear-baseline').hidden = false
+    $('copy-status').textContent = 'Saved on this device!'
+    setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+  })
+
+  $('clear-baseline').addEventListener('click', () => {
+    if (!window.ryProfile) return
+    window.ryProfile.clearSavedProfile()
+    $('clear-baseline').hidden = true
+    $('copy-status').textContent = 'Cleared saved baseline'
+    setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+  })
+})
+loadFromUrl()
+render()
+</script>

@@ -1,0 +1,416 @@
+---
+layout: default
+lang: ko
+title: 러닝 훈련 브리프 — VDOT 훈련 존 · 기록 예측 · 스플릿 한 번에 보기
+description: 최근 대회 기록 하나를 입력하면 VDOT 훈련 존, Riegel·VDOT 기록 예측, 목표 레이스 스플릿을 한 화면에 요약하고 각 도구로 바로 연결합니다.
+permalink: /ko/brief/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<style>
+  .brief-grid { display: grid; gap: 16px; margin-top: 16px; }
+  .brief-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .brief-card-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .brief-card-head h2 {
+    font-family: var(--font-serif); font-size: 17px; font-weight: 600; margin: 0;
+  }
+  .brief-card-head a { font-size: 12.5px; color: var(--accent); text-decoration: none; }
+  .brief-card-head a:hover { text-decoration: underline; }
+  .brief-banner {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 14px; font-size: 14px;
+  }
+  .brief-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  .brief-subgrid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .brief-zone-item {
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+    background: var(--bg);
+  }
+  .brief-zone-item strong { display: block; font-size: 12px; color: var(--text-secondary); }
+  .brief-zone-item .pace-val { font-size: 16px; font-weight: 700; margin-top: 2px; }
+  .brief-zone-item .hr-val { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .delta-faster { color: #16a34a; font-weight: 600; }
+  .delta-slower { color: #d97706; font-weight: 600; }
+</style>
+
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>훈련 브리프</h1>
+    <p>최근 기록 1회 입력으로 VDOT 훈련 존, 예상 기록, 목표 스플릿을 한 번에 확인합니다.</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="brief-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>최근 완주 거리</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="dist" value="5k" checked><span>5K</span></label>
+          <label><input type="radio" name="dist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="dist" value="half"><span>하프</span></label>
+          <label><input type="radio" name="dist" value="full"><span>풀코스</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="field">
+      <label>최근 완주 시간</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="9" value="0" placeholder="0" aria-label="시간">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" value="25" placeholder="25" aria-label="분">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="초">
+        <span>시:분:초</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <fieldset>
+        <legend>목표 대회 <span style="font-weight:400;text-transform:none">(선택)</span></legend>
+        <div class="radio-group">
+          <label><input type="radio" name="tdist" value="" checked><span>없음</span></label>
+          <label><input type="radio" name="tdist" value="5k"><span>5K</span></label>
+          <label><input type="radio" name="tdist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="tdist" value="half"><span>하프</span></label>
+          <label><input type="radio" name="tdist" value="full"><span>풀코스</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="field" id="target-time-field" hidden>
+      <label>목표 완주 시간</label>
+      <div class="time-inputs">
+        <input type="number" id="tgt-hh" min="0" max="9" placeholder="1" aria-label="목표 시간">
+        <span>:</span>
+        <input type="number" id="tgt-mm" min="0" max="59" placeholder="50" aria-label="목표 분">
+        <span>:</span>
+        <input type="number" id="tgt-ss" min="0" max="59" placeholder="00" aria-label="목표 초">
+        <span>시:분:초</span>
+      </div>
+      <div style="margin-top:10px">
+        <label for="target-date">목표 대회 날짜 (선택)</label>
+        <input type="date" id="target-date" style="padding:6px 8px;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg);color:var(--text-primary);font-size:14px">
+      </div>
+    </div>
+
+    <div class="field" style="display:flex;gap:14px;flex-wrap:wrap">
+      <div>
+        <label for="hr-max">최대 심박수 (선택)</label>
+        <input type="number" id="hr-max" min="100" max="250" value="185" style="width:90px">
+      </div>
+      <div>
+        <label for="hr-rest">안정시 심박수 (선택)</label>
+        <input type="number" id="hr-rest" min="30" max="120" value="50" style="width:90px">
+      </div>
+      <div>
+        <fieldset>
+          <legend>단위</legend>
+          <div class="radio-group">
+            <label><input type="radio" name="unit" value="km" checked><span>km</span></label>
+            <label><input type="radio" name="unit" value="mile"><span>mile</span></label>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </form>
+
+  <section id="brief-output" aria-live="polite" hidden>
+    <div id="brief-banner" class="brief-banner"></div>
+
+    <div class="brief-grid">
+      <article class="brief-card">
+        <div class="brief-card-head">
+          <h2>1. 훈련 존 (VDOT)</h2>
+          <a id="link-run" href="{{ '/ko/run/' | relative_url }}">상세 존 비교 열기 →</a>
+        </div>
+        <div id="brief-zones" class="brief-subgrid"></div>
+      </article>
+
+      <article class="brief-card">
+        <div class="brief-card-head">
+          <h2>2. 예상 완주 기록 (Riegel vs VDOT)</h2>
+          <a id="link-predict" href="{{ '/ko/predict/' | relative_url }}">기록 예측기 열기 →</a>
+        </div>
+        <table class="result-table">
+          <thead>
+            <tr><th>거리</th><th>Riegel</th><th>VDOT</th><th>페이스</th></tr>
+          </thead>
+          <tbody id="brief-predict-body"></tbody>
+        </table>
+      </article>
+
+      <article class="brief-card">
+        <div class="brief-card-head">
+          <h2>3. 레이스 스플릿 미리보기</h2>
+          <a id="link-splits" href="{{ '/ko/splits/' | relative_url }}">전체 스플릿 표 만들기 →</a>
+        </div>
+        <p id="brief-split-note" style="font-size:13px;color:var(--text-secondary);margin-bottom:8px"></p>
+        <table class="result-table">
+          <thead>
+            <tr><th>구간</th><th>구간 페이스</th><th>누적 시간</th></tr>
+          </thead>
+          <tbody id="brief-splits-body"></tbody>
+        </table>
+        <p style="font-size:12.5px;color:var(--text-secondary);margin-top:10px">
+          더운 날 레이스인가요? <a id="link-heat" href="{{ '/ko/heat-pace/' | relative_url }}">기온·습도 페이스 보정 계산하기 →</a>
+        </p>
+      </article>
+    </div>
+
+    <div class="brief-actions">
+      <button type="button" id="copy-link" class="share-btn">브리프 링크 복사</button>
+      <button type="button" id="print-btn" class="share-btn">인쇄하기</button>
+      <button type="button" id="save-baseline" class="share-btn">내 기준값으로 저장</button>
+      <button type="button" id="clear-baseline" class="share-btn" hidden>저장 초기화</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
+    <details class="embed-box">
+      <summary>블로그·웹사이트에 임베드하기</summary>
+      <textarea class="embed-code" rows="2" readonly onclick="this.select()">&lt;iframe src="https://ryutility.com/ko/brief/?embed=1" width="100%" height="680" style="border:1px solid #e5e7eb;border-radius:10px" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
+    </details>
+  </section>
+
+  <p id="brief-empty" class="tool-content" style="color:var(--text-secondary);font-size:13px">VDOT 30–85 범위의 최근 완주 기록을 입력하면 훈련 브리프가 생성됩니다.</p>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+const LABELS = { '5k': '5K', '10k': '10K', half: '하프', full: '풀코스' }
+const KO_ZONE_LABELS = {
+  jog: '조깅 / 이지', zone2: '존 2 (기반)', tempo: '템포',
+  threshold: '역치 (Threshold)', vo2max: 'VO2max',
+}
+const GAP_HINTS = {
+  maintain: '현재 VDOT과 같거나 낮은 목표입니다. 페이스 분배와 레이스 운영에 집중하세요.',
+  realistic: '단기 적정 목표(+0~2 VDOT)입니다. 6~10주 훈련 블록으로 도달 가능한 범위입니다.',
+  ambitious: '도전적인 목표(+2~4 VDOT)입니다. 10~16주의 체계적인 빌드업을 권장합니다.',
+  stretch: '큰 폭의 도약(>4 VDOT)입니다. 현재 존 훈련 후 중간 점검 대회를 거치는 것이 안전합니다.',
+}
+
+function splitHms(totalSec) {
+  const s = Math.round(totalSec)
+  return { hh: Math.floor(s / 3600), mm: Math.floor((s % 3600) / 60), ss: s % 60 }
+}
+
+function render() {
+  const dist = document.querySelector('input[name="dist"]:checked').value
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const t1 = h * 3600 + m * 60 + s
+
+  const tdist = document.querySelector('input[name="tdist"]:checked').value
+  $('target-time-field').hidden = !tdist
+
+  const unit = document.querySelector('input[name="unit"]:checked').value
+  const hrMax = parseInt($('hr-max').value, 10)
+  const hrRest = parseInt($('hr-rest').value, 10)
+  const hasHr = !isNaN(hrMax) && !isNaN(hrRest) && hrMax > hrRest
+
+  const threshPace = t1 > 0 ? raceTimeToThresholdPace(dist, t1) : null
+  if (!threshPace) {
+    $('brief-output').hidden = true
+    $('brief-empty').hidden = false
+    return
+  }
+
+  const d1 = DIST_KM[dist]
+  const curVdot = calcVDOT(d1 * 1000, t1)
+
+  let targetSec = 0
+  let tgtVdot = null
+  if (tdist) {
+    const th = parseInt($('tgt-hh').value, 10) || 0
+    const tm = parseInt($('tgt-mm').value, 10) || 0
+    const ts = parseInt($('tgt-ss').value, 10) || 0
+    targetSec = th * 3600 + tm * 60 + ts
+    if (targetSec > 0 && raceTimeToThresholdPace(tdist, targetSec) !== null) {
+      tgtVdot = calcVDOT(DIST_KM[tdist] * 1000, targetSec)
+    }
+  }
+
+  let bannerHtml = `<strong>현재 VDOT: ${curVdot.toFixed(1)}</strong> · 역치 페이스: <strong>${secToPace(unit === 'mile' ? kmToMile(threshPace) : threshPace)}/${unit === 'mile' ? 'mi' : 'km'}</strong>`
+  const tDate = $('target-date').value
+  const days = window.ryProfile ? window.ryProfile.calcDaysUntil(tDate) : null
+  const dBadge = days !== null ? ` · <strong>${days === 0 ? '대회 당일!' : days > 0 ? `D-${days}` : `D+${Math.abs(days)}`}</strong>` : ''
+  if (tgtVdot !== null) {
+    const gap = assessVdotGap(curVdot, tgtVdot)
+    const sign = gap.delta > 0 ? '+' : ''
+    bannerHtml += `<br>목표 (${LABELS[tdist]} ${secToHms(targetSec)}${dBadge}) → <strong>목표 VDOT: ${tgtVdot.toFixed(1)}</strong> <span class="${gap.delta > 0 ? 'delta-faster' : 'delta-slower'}">(${sign}${gap.delta.toFixed(1)})</span><div style="font-size:12.5px;color:var(--text-secondary);margin-top:4px">${GAP_HINTS[gap.level]}</div>`
+  } else if (dBadge) {
+    bannerHtml += dBadge
+  }
+  $('brief-banner').innerHTML = bannerHtml
+
+  const zones = calcZones({
+    refPaceSec: threshPace, refType: 'threshold',
+    hrMax: hasHr ? hrMax : 185, hrRest: hasHr ? hrRest : 50, lapDist: 400,
+  })
+  $('brief-zones').innerHTML = zones.map(z => {
+    const p = unit === 'mile' ? `${z.paceMi.lo}–${z.paceMi.hi} /mi` : `${z.paceKm.lo}–${z.paceKm.hi} /km`
+    const hr = hasHr ? `<div class="hr-val">${z.hr.low}–${z.hr.high} bpm (${z.hrPct[0]}–${z.hrPct[1]}%)</div>` : ''
+    return `<div class="brief-zone-item"><strong>${KO_ZONE_LABELS[z.key]}</strong><div class="pace-val">${p}</div>${hr}</div>`
+  }).join('')
+
+  $('brief-predict-body').innerHTML = Object.keys(DIST_KM).map(key => {
+    const d2 = DIST_KM[key]
+    const tR = riegelPredict(t1, d1, d2)
+    const tV = vdotPredict(t1, d1, d2)
+    const pace = tR / d2
+    const paceStr = unit === 'mile' ? `${secToPace(kmToMile(pace))}/mi` : `${secToPace(pace)}/km`
+    return `<tr${key === dist ? ' style="font-weight:700"' : ''}><td>${LABELS[key]}</td><td>${secToHms(tR)}</td><td>${tV ? secToHms(tV) : '–'}</td><td>${paceStr}</td></tr>`
+  }).join('')
+
+  const splitDistKey = (tdist && targetSec > 0) ? tdist : dist
+  const splitTotalSec = (tdist && targetSec > 0) ? targetSec : t1
+  const splitStepKm = unit === 'mile' ? 1.60934 : (DIST_KM[splitDistKey] >= 20 ? 5 : 1)
+  const plan = splitPlan(splitTotalSec, DIST_KM[splitDistKey], splitStepKm, 0)
+  $('brief-split-note').textContent = `${LABELS[splitDistKey]} (${secToHms(splitTotalSec)}) — ${unit === 'mile' ? '1마일' : splitStepKm + 'km'} 단위 이븐 스플릿 미리보기`
+  $('brief-splits-body').innerHTML = plan.map(row => {
+    const label = unit === 'mile'
+      ? `${(row.dist / 1.60934).toFixed(row.dist % 1.60934 < 0.01 ? 0 : 2)} mi`
+      : `${row.dist} km`
+    return `<tr><td>${label}</td><td>${secToPace(row.splitSec)}</td><td><strong>${secToHms(row.cumSec)}</strong></td></tr>`
+  }).join('')
+
+  const runParams = new URLSearchParams({ cdist: dist, chh: h, cmm: m, css: s, unit })
+  if (hasHr) { runParams.set('hrmax', hrMax); runParams.set('hrrest', hrRest) }
+  if (tdist && targetSec > 0) {
+    const ts = splitHms(targetSec)
+    runParams.set('tdist', tdist); runParams.set('thh', ts.hh); runParams.set('tmm', ts.mm); runParams.set('tss', ts.ss)
+  }
+  $('link-run').href = `{{ '/ko/run/' | relative_url }}?${runParams.toString()}`
+  $('link-predict').href = `{{ '/ko/predict/' | relative_url }}?${new URLSearchParams({ dist, hh: h, mm: m, ss: s }).toString()}`
+  const sp = splitHms(splitTotalSec)
+  $('link-splits').href = `{{ '/ko/splits/' | relative_url }}?${new URLSearchParams({ dist: splitDistKey, hh: sp.hh, mm: sp.mm, ss: sp.ss }).toString()}`
+
+  $('brief-output').hidden = false
+  $('brief-empty').hidden = true
+}
+
+function loadFromUrl() {
+  const p = new URLSearchParams(window.location.search)
+  const dist = p.get('dist')
+  if (dist && DIST_KM[dist]) {
+    const r = document.querySelector(`input[name="dist"][value="${dist}"]`)
+    if (r) r.checked = true
+  }
+  if (p.has('hh')) $('time-hh').value = p.get('hh')
+  if (p.has('mm')) $('time-mm').value = p.get('mm')
+  if (p.has('ss')) $('time-ss').value = p.get('ss')
+  const tdist = p.get('tdist')
+  if (tdist && DIST_KM[tdist]) {
+    const r = document.querySelector(`input[name="tdist"][value="${tdist}"]`)
+    if (r) r.checked = true
+  }
+  if (p.has('thh')) $('tgt-hh').value = p.get('thh')
+  if (p.has('tmm')) $('tgt-mm').value = p.get('tmm')
+  if (p.has('tss')) $('tgt-ss').value = p.get('tss')
+  if (p.has('hrmax')) $('hr-max').value = p.get('hrmax')
+  if (p.has('hrrest')) $('hr-rest').value = p.get('hr-rest')
+  const unit = p.get('unit')
+  if (unit === 'km' || unit === 'mile') {
+    const r = document.querySelector(`input[name="unit"][value="${unit}"]`)
+    if (r) r.checked = true
+  }
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const p = new URLSearchParams({
+    dist: document.querySelector('input[name="dist"]:checked').value,
+    hh: $('time-hh').value, mm: $('time-mm').value, ss: $('time-ss').value,
+    unit: document.querySelector('input[name="unit"]:checked').value,
+    hrmax: $('hr-max').value, hrrest: $('hr-rest').value,
+  })
+  const tdist = document.querySelector('input[name="tdist"]:checked').value
+  if (tdist) {
+    p.set('tdist', tdist)
+    if ($('tgt-hh').value !== '') p.set('thh', $('tgt-hh').value)
+    if ($('tgt-mm').value !== '') p.set('tmm', $('tgt-mm').value)
+    if ($('tgt-ss').value !== '') p.set('tss', $('tgt-ss').value)
+  }
+  const url = `${window.location.origin}${window.location.pathname}?${p.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = '복사됨!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+function applyProfile(prof) {
+  if (!prof) return
+  if (prof.dist && DIST_KM[prof.dist]) {
+    const r = document.querySelector(`input[name="dist"][value="${prof.dist}"]`)
+    if (r) r.checked = true
+  }
+  if (prof.hh !== undefined && prof.hh !== '') $('time-hh').value = prof.hh
+  if (prof.mm !== undefined && prof.mm !== '') $('time-mm').value = prof.mm
+  if (prof.ss !== undefined && prof.ss !== '') $('time-ss').value = prof.ss
+  if (prof.targetDist && DIST_KM[prof.targetDist]) {
+    const r = document.querySelector(`input[name="tdist"][value="${prof.targetDist}"]`)
+    if (r) r.checked = true
+  }
+  if (prof.targetHh !== undefined) $('tgt-hh').value = prof.targetHh
+  if (prof.targetMm !== undefined) $('tgt-mm').value = prof.targetMm
+  if (prof.targetSs !== undefined) $('tgt-ss').value = prof.targetSs
+  if (prof.targetDate) $('target-date').value = prof.targetDate
+  if (prof.hrMax) $('hr-max').value = prof.hrMax
+  if (prof.hrRest) $('hr-rest').value = prof.hrRest
+  if (prof.unit === 'km' || prof.unit === 'mile') {
+    const r = document.querySelector(`input[name="unit"][value="${prof.unit}"]`)
+    if (r) r.checked = true
+  }
+}
+
+$('print-btn').addEventListener('click', () => window.print())
+$('brief-form').addEventListener('input', render)
+document.addEventListener('DOMContentLoaded', () => {
+  const hasUrl = window.location.search.length > 1
+  if (!hasUrl && window.ryProfile) {
+    const saved = window.ryProfile.loadSavedProfile()
+    if (saved) { applyProfile(saved); $('clear-baseline').hidden = false }
+  } else if (window.ryProfile && window.ryProfile.loadSavedProfile()) {
+    $('clear-baseline').hidden = false
+  }
+  render()
+
+  $('save-baseline').addEventListener('click', () => {
+    if (!window.ryProfile) return
+    window.ryProfile.saveProfile({
+      dist: document.querySelector('input[name="dist"]:checked').value,
+      hh: $('time-hh').value, mm: $('time-mm').value, ss: $('time-ss').value,
+      hrMax: $('hr-max').value, hrRest: $('hr-rest').value,
+      unit: document.querySelector('input[name="unit"]:checked').value,
+      targetDist: document.querySelector('input[name="tdist"]:checked').value,
+      targetHh: $('tgt-hh').value, targetMm: $('tgt-mm').value, targetSs: $('tgt-ss').value,
+      targetDate: $('target-date').value,
+    })
+    $('clear-baseline').hidden = false
+    $('copy-status').textContent = '이 기기에 저장되었습니다!'
+    setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+  })
+
+  $('clear-baseline').addEventListener('click', () => {
+    if (!window.ryProfile) return
+    window.ryProfile.clearSavedProfile()
+    $('clear-baseline').hidden = true
+    $('copy-status').textContent = '저장된 기준값을 초기화했습니다'
+    setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+  })
+})
+loadFromUrl()
+render()
+</script>

@@ -23,5 +23,11 @@ exclude:
   - "*.png"
   - README.md
   - CLAUDE.md
+  - LICENSE
+  - CONTENT-LICENSE.md
+  - TRADEMARKS.md
+  - NOTICE
+  - CONTRIBUTING.md
+  - SECURITY.md
   - vendor
   - .bundle

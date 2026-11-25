@@ -1,3 +1,8 @@
+- name: Training Brief
+  url: /brief/
+  badge: Workflow
+  short: Zones, predictions & splits in one view
+  description: Enter one recent race result to get your VDOT training zones, Riegel vs. VDOT race predictions, and goal splits together.
 - name: Training Zone Calculator
   url: /run/
   badge: Running

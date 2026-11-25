@@ -1,0 +1,28 @@
+---
+layout: default
+lang: ko
+title: 트레드밀 1% 인클라인과 야외 평지 페이스 환산 원리
+description: 트레드밀에서 1% 경사도를 설정하는 이유와 ACSM 러닝 방정식 기반의 야외 평지 환산 원리를 설명합니다.
+permalink: /ko/guides/treadmill-incline-pace/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<main class="guide-page">
+  <p class="guide-meta">2026-11-25 · 트레드밀</p>
+  <h1>트레드밀 1% 인클라인과 야외 평지 페이스 환산 원리</h1>
+  <div class="guide-callout">
+    <p>연결된 계산기</p>
+    <p><a href="{{ '/ko/treadmill/' | relative_url }}">트레드밀 페이스 변환기</a>에서 벨트 속도와 경사도별 야외 환산 페이스를 확인하세요.</p>
+  </div>
+
+  <p>트레드밀에는 공기 저항이 없습니다. 1996년 Jones와 Doust의 연구에 따르면, 야외 평지 주행과 비슷한 산소소비량(VO2)을 맞추려면 트레드밀 경사도를 약 <strong>1%</strong>로 설정하는 것이 근사치로 잘 맞습니다.</p>
+
+  <h2>ACSM 경사도 환산 공식</h2>
+  <p>우리 <a href="{{ '/ko/treadmill/' | relative_url }}">트레드밀 페이스 변환기</a>는 미국스포츠의학회(ACSM) 러닝 방정식(<em>VO2 = 3.5 + 0.2·v + 0.9·v·grade</em>)을 사용해 경사도별 등가 야외 평지 속도를 <em>속도 × (1 + 4.5 × 경사도% / 100)</em>로 계산합니다. 예를 들어 시속 10.0 km/h(6:00/km)에 1% 경사를 주면 산소 요구량 기준 야외 10.45 km/h(약 5:44/km)에 해당합니다.</p>
+
+  <h2>주의할 점</h2>
+  <ul>
+    <li><strong>실내 열기</strong>: 실내 환기가 부족하고 땀이 식지 않으면 같은 1% 경사에서도 심박수가 야외보다 높게 오릅니다.</li>
+    <li><strong>벨트 캘리브레이션</strong>: 체육관 트레드밀은 표시 속도와 실제 벨트 속도가 다를 수 있으므로, 심박수와 호흡 강도를 함께 참고하세요.</li>
+  </ul>
+</main>

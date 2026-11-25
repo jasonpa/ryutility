@@ -160,5 +160,14 @@ test('calcZones zone includes paceKmSec', () => {
   assert.strictEqual(thresh.paceKmSec.hi, 270)
 })
 
+const { assessVdotGap } = require('../assets/js/calc.js')
+test('assessVdotGap classifies maintain / realistic / ambitious / stretch', () => {
+  assert.strictEqual(assessVdotGap(45, 44.5).level, 'maintain')
+  assert.strictEqual(assessVdotGap(45, 46.5).level, 'realistic')
+  assert.strictEqual(assessVdotGap(45, 48.0).level, 'ambitious')
+  assert.strictEqual(assessVdotGap(45, 50.5).level, 'stretch')
+  assert.strictEqual(assessVdotGap(40, 42.3).delta, 2.3)
+})
+
 console.log(`\n${passed} passed, ${failed} failed`)
 if (failed > 0) process.exit(1)

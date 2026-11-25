@@ -1,0 +1,16 @@
+# Notices & Attributions
+
+## Published Formulas & Scientific References
+The calculators in `assets/js/calc.js` implement published, established equations from exercise physiology and sports science:
+
+- **Jack Daniels' VDOT** — *Daniels' Running Formula* (oxygen-cost and velocity equations).
+- **Pete Riegel (1981)** — "Athletic Records and Human Endurance," *American Scientist* 69 (`T2 = T1 * (D2 / D1)^1.06`).
+- **Karvonen Reserve Method (1957)** — Karvonen, Kentala, and Mustala (heart rate reserve training zones).
+- **Tanaka et al. (2001)** — "Age-predicted maximal heart rate revisited," *JACC* 37 (`208 - 0.7 * age`).
+- **ACSM Running Equation** — American College of Sports Medicine metabolic equation for flat and inclined running.
+- **Magnus-Tetens Dew Point Approximation** — Alduchov & Eskridge (1996) coefficients for vapor pressure / dew point.
+
+## Software & Hosting Dependencies
+- Built as a static site with **Jekyll** (MIT License) and `jekyll-sitemap` (MIT License).
+- Deployed via GitHub Pages.
+- Unit tests run on plain Node.js with no third-party runtime dependencies.
