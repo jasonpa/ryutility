@@ -1,0 +1,138 @@
+---
+layout: default
+lang: ko
+title: 레이스 기록 예측기 — 5K, 10K, 하프, 마라톤 완주 예상 시간
+description: 최근 대회 기록 하나로 리겔(Riegel) 공식을 이용해 5K, 10K, 하프, 풀코스 마라톤 예상 완주 기록과 페이스를 계산합니다.
+permalink: /ko/predict/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>레이스 기록 예측기</h1>
+    <p>최근 대회 기록 하나를 입력하면 다른 거리의 예상 완주 시간과 페이스를 계산합니다.</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>최근 완주 거리</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="race-dist" value="5k" checked><span>5K</span></label>
+          <label><input type="radio" name="race-dist" value="10k"><span>10K</span></label>
+          <label><input type="radio" name="race-dist" value="half"><span>하프</span></label>
+          <label><input type="radio" name="race-dist" value="full"><span>풀코스</span></label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="field">
+      <label>완주 시간</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="9" value="0" placeholder="0" aria-label="시간">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" value="25" placeholder="25" aria-label="분">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="초">
+        <span>시:분:초</span>
+      </div>
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <table class="result-table" id="predict-table" hidden>
+      <thead>
+        <tr><th>거리</th><th>예상 기록</th><th>페이스 /km</th><th>페이스 /mi</th></tr>
+      </thead>
+      <tbody id="predict-body"></tbody>
+    </table>
+    <div class="share-row" id="share-row" hidden>
+      <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
+    <p class="tool-content" id="empty-msg" style="color:var(--text-secondary);font-size:13px">예상 기록을 보려면 위에서 최근 완주 시간을 입력하세요.</p>
+  </section>
+
+  <section class="tool-content">
+    <h2>예측 공식 (Riegel Formula)</h2>
+    <p>이 계산기는 1981년 엔지니어 Pete Riegel이 발표한 공식 <em>T2 = T1 × (D2 ÷ D1)<sup>1.06</sup></em>을 사용합니다. 지수 1.06은 거리가 2배로 늘어날 때 단순 비례보다 약 6%가량 페이스가 느려지는 피로도를 반영합니다.</p>
+    <p>예를 들어 5K를 25:00(5:00/km)에 달렸다면 10K는 50:00이 아니라 약 <strong>52:07(5:13/km)</strong>, 하프는 <strong>1:55:00(5:27/km)</strong>으로 예측됩니다.</p>
+
+    <h2>한계 및 주의사항</h2>
+    <ul>
+      <li>인접 거리(5K → 10K, 10K → 하프) 예측 정확도가 가장 높습니다. 5K 기록으로 풀코스를 예측할 때는 충분한 장거리 지구력 훈련(주간 누적 거리)이 뒷받침되었다는 전제가 필요합니다.</li>
+      <li>최근 6~8주 이내의 전력 질주 기록을 입력해야 현재 체력을 정확히 반영합니다.</li>
+      <li>더위, 언덕, 바람 등 코스 조건은 공식에 포함되지 않습니다.</li>
+    </ul>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+const LABELS = { '5k': '5K', '10k': '10K', half: '하프 마라톤', full: '풀코스 마라톤' }
+
+function render() {
+  const distKey = document.querySelector('input[name="race-dist"]:checked').value
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const t1 = h * 3600 + m * 60 + s
+  const table = $('predict-table')
+  const empty = $('empty-msg')
+
+  if (t1 <= 0) { table.hidden = true; $('share-row').hidden = true; empty.hidden = false; return }
+
+  const d1 = DIST_KM[distKey]
+  $('predict-body').innerHTML = Object.keys(DIST_KM).map(key => {
+    const d2 = DIST_KM[key]
+    const t2 = riegelPredict(t1, d1, d2)
+    const pace = t2 / d2
+    const isInput = key === distKey
+    return `<tr${isInput ? ' style="font-weight:700"' : ''}>
+      <td>${LABELS[key]}${isInput ? ' (입력 기록)' : ''}</td>
+      <td>${secToHms(t2)}</td>
+      <td>${secToPace(pace)}</td>
+      <td>${secToPace(kmToMile(pace))}</td>
+    </tr>`
+  }).join('')
+  table.hidden = false
+  $('share-row').hidden = false
+  empty.hidden = true
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const dist = params.get('dist')
+  if (dist && DIST_KM[dist]) {
+    const radio = document.querySelector(`input[name="race-dist"][value="${dist}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('hh')) $('time-hh').value = params.get('hh')
+  if (params.has('mm')) $('time-mm').value = params.get('mm')
+  if (params.has('ss')) $('time-ss').value = params.get('ss')
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    dist: document.querySelector('input[name="race-dist"]:checked').value,
+    hh: $('time-hh').value,
+    mm: $('time-mm').value,
+    ss: $('time-ss').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = '복사됨!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+$('calc-form').addEventListener('input', render)
+loadFromUrl()
+render()
+</script>

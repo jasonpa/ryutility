@@ -1,0 +1,237 @@
+---
+layout: default
+lang: ko
+title: 러닝 페이스 계산기 — 페이스, 완주 시간 & 거리 계산
+description: 무료 러닝 페이스 계산기. 페이스, 완주 시간, 거리 중 두 가지를 입력하면 나머지 하나와 시속(km/h, mph)을 즉시 계산합니다.
+permalink: /ko/pace/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>러닝 페이스 계산기</h1>
+    <p>시간, 거리, 페이스 중 두 가지를 입력하면 나머지 하나를 즉시 계산합니다.</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>계산할 항목</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="solve" value="pace" checked><span>페이스</span></label>
+          <label><input type="radio" name="solve" value="time"><span>완주 시간</span></label>
+          <label><input type="radio" name="solve" value="distance"><span>거리</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="field" id="field-time">
+      <label>완주 시간</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="99" value="0" placeholder="0" aria-label="시간">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" value="50" placeholder="50" aria-label="분">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="초">
+        <span>시:분:초</span>
+      </div>
+    </div>
+
+    <div class="field" id="field-dist">
+      <label for="dist">거리</label>
+      <div class="time-inputs">
+        <input type="number" id="dist" min="0" step="0.01" value="10" placeholder="10" style="width:80px" aria-label="거리">
+        <select id="dist-unit" aria-label="거리 단위">
+          <option value="km" selected>km</option>
+          <option value="mi">마일(mi)</option>
+        </select>
+      </div>
+      <div class="quick-buttons">
+        <button type="button" data-km="5">5K</button>
+        <button type="button" data-km="10">10K</button>
+        <button type="button" data-km="21.0975">하프 (21.1km)</button>
+        <button type="button" data-km="42.195">풀코스 (42.2km)</button>
+      </div>
+    </div>
+
+    <div class="field" id="field-pace">
+      <label>페이스</label>
+      <div class="time-inputs">
+        <input type="number" id="pace-mm" min="0" max="59" value="5" placeholder="5" aria-label="페이스 분">
+        <span>:</span>
+        <input type="number" id="pace-ss" min="0" max="59" value="00" placeholder="00" aria-label="페이스 초">
+        <select id="pace-unit" aria-label="페이스 단위">
+          <option value="km" selected>분 / km</option>
+          <option value="mi">분 / 마일</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <section id="results" class="result-cards" aria-live="polite" hidden>
+    <div class="result-card"><span class="label">페이스 / km</span><span class="value" id="out-pace-km">–</span></div>
+    <div class="result-card"><span class="label">페이스 / 마일</span><span class="value" id="out-pace-mi">–</span></div>
+    <div class="result-card"><span class="label">완주 시간</span><span class="value" id="out-time">–</span></div>
+    <div class="result-card"><span class="label">거리</span><span class="value" id="out-dist">–</span><span class="sub" id="out-dist-mi"></span></div>
+    <div class="result-card"><span class="label">속도</span><span class="value" id="out-kmh">–</span><span class="sub" id="out-mph"></span></div>
+  </section>
+
+  <div class="share-row" id="share-row" hidden>
+    <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
+    <span id="copy-status" class="share-status" aria-live="polite"></span>
+  </div>
+
+  <section class="tool-content">
+    <h2>페이스 계산 원리</h2>
+    <p>러닝 페이스는 시간을 거리로 나눈 값입니다. 이 계산기는 페이스–시간–거리 삼각 관계 중 원하는 항목을 선택하고 나머지 두 값을 입력하면 즉시 결과를 보여줍니다. 결과는 항상 <code>min/km</code>, <code>min/mi</code>, 그리고 트레드밀 속도(<code>km/h</code>, <code>mph</code>)를 함께 표시합니다.</p>
+    <p>예를 들어 10 km를 50분에 완주하면 페이스는 50:00 ÷ 10 = <strong>5:00/km</strong>이며, 마일 기준 8:03/mi, 트레드밀 속도 12.0 km/h에 해당합니다. 반대로 하프 마라톤(21.0975 km)을 5:30/km로 달리면 예상 완주 시간은 1:56:02가 됩니다.</p>
+
+    <h2>사용 공식</h2>
+    <ul>
+      <li>페이스(초/km) = 총 시간(초) ÷ 거리(km)</li>
+      <li>총 시간 = 페이스 × 거리</li>
+      <li>거리 = 총 시간 ÷ 페이스</li>
+      <li>마일 페이스(초/mi) = 킬로미터 페이스(초/km) × 1.60934</li>
+      <li>시속(km/h) = 3600 ÷ 킬로미터 페이스(초/km)</li>
+    </ul>
+
+    <h2>자주 묻는 질문</h2>
+    <div class="faq">
+      <details>
+        <summary>서브4(4시간 이내) 마라톤 페이스는 얼마인가요?</summary>
+        <p>공식 마라톤 거리 42.195 km를 정확히 4:00:00에 완주하려면 <strong>5:41/km</strong> 페이스가 필요합니다. 실전에서는 급수대 시간과 후반 페이스 저하를 고려해 5:35~5:38/km 수준으로 계획하는 경우가 많습니다.</p>
+      </details>
+      <details>
+        <summary>페이스와 속도(km/h)는 어떻게 다른가요?</summary>
+        <p>페이스는 일정 거리를 달리는 데 걸리는 시간(분/km)이고, 속도는 일정 시간 동안 달린 거리(km/h)입니다. 서로 역수 관계이므로 5:00/km는 시속 12.0 km/h와 같습니다.</p>
+      </details>
+      <details>
+        <summary>풀코스를 42 km가 아닌 42.195 km로 계산하는 이유는?</summary>
+        <p>공식 마라톤 거리는 42.195 km입니다. 42 km로 어림잡아 계산하면 약 0.195 km(약 1분 이상)의 오차가 생깁니다.</p>
+      </details>
+    </div>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+
+function readTime() {
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const total = h * 3600 + m * 60 + s
+  return total > 0 ? total : null
+}
+
+function readDistKm() {
+  const v = parseFloat($('dist').value)
+  if (isNaN(v) || v <= 0) return null
+  return $('dist-unit').value === 'mi' ? v * 1.60934 : v
+}
+
+function readPaceSecPerKm() {
+  const m = parseInt($('pace-mm').value, 10) || 0
+  const s = parseInt($('pace-ss').value, 10) || 0
+  const perUnit = m * 60 + s
+  if (perUnit <= 0) return null
+  return $('pace-unit').value === 'mi' ? perUnit / 1.60934 : perUnit
+}
+
+function render() {
+  const solve = document.querySelector('input[name="solve"]:checked').value
+  let t = readTime(), d = readDistKm(), p = readPaceSecPerKm()
+
+  if (solve === 'pace' && t && d) p = paceFromTimeDistance(t, d)
+  else if (solve === 'time' && p && d) t = timeFromPaceDistance(p, d)
+  else if (solve === 'distance' && t && p) d = distanceFromTimePace(t, p)
+  else { $('results').hidden = true; $('share-row').hidden = true; return }
+
+  $('out-pace-km').textContent = `${secToPace(p)} /km`
+  $('out-pace-mi').textContent = `${secToPace(kmToMile(p))} /mi`
+  $('out-time').textContent = secToHms(t)
+  $('out-dist').textContent = `${d.toFixed(2)} km`
+  $('out-dist-mi').textContent = `${(d / 1.60934).toFixed(2)} mi`
+  $('out-kmh').textContent = `${toKmh(p).toFixed(1)} km/h`
+  $('out-mph').textContent = `${toMph(p).toFixed(1)} mph`
+  $('results').hidden = false
+  $('share-row').hidden = false
+}
+
+function markSolvedField() {
+  const solve = document.querySelector('input[name="solve"]:checked').value
+  const map = { pace: 'field-pace', time: 'field-time', distance: 'field-dist' }
+  ;['field-pace', 'field-time', 'field-dist'].forEach(id => {
+    $(id).style.opacity = id === map[solve] ? '0.45' : '1'
+  })
+}
+
+document.querySelectorAll('.quick-buttons button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('dist-unit').value = 'km'
+    $('dist').value = btn.dataset.km
+    render()
+  })
+})
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const solve = params.get('solve')
+  if (solve === 'pace' || solve === 'time' || solve === 'distance') {
+    const radio = document.querySelector(`input[name="solve"][value="${solve}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('hh')) $('time-hh').value = params.get('hh')
+  if (params.has('mm')) $('time-mm').value = params.get('mm')
+  if (params.has('ss')) $('time-ss').value = params.get('ss')
+  if (params.has('dist')) $('dist').value = params.get('dist')
+  if (params.get('dunit') === 'km' || params.get('dunit') === 'mi') $('dist-unit').value = params.get('dunit')
+  if (params.has('pmm')) $('pace-mm').value = params.get('pmm')
+  if (params.has('pss')) $('pace-ss').value = params.get('pss')
+  if (params.get('punit') === 'km' || params.get('punit') === 'mi') $('pace-unit').value = params.get('punit')
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    solve: document.querySelector('input[name="solve"]:checked').value,
+    hh: $('time-hh').value,
+    mm: $('time-mm').value,
+    ss: $('time-ss').value,
+    dist: $('dist').value,
+    dunit: $('dist-unit').value,
+    pmm: $('pace-mm').value,
+    pss: $('pace-ss').value,
+    punit: $('pace-unit').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = '복사됨!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+$('calc-form').addEventListener('input', () => { markSolvedField(); render() })
+loadFromUrl()
+markSolvedField()
+render()
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "러닝 페이스 계산기",
+  "url": "https://ryutility.com/ko/pace/",
+  "description": "페이스, 완주 시간, 거리 중 두 가지를 입력하면 나머지 하나와 시속(km/h, mph)을 즉시 계산합니다.",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+}
+</script>

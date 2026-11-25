@@ -1,7 +1,15 @@
 <div id="cookie-banner" class="cookie-banner" hidden>
+  {% if page.lang == 'ko' %}
+  <p>방문자의 도구 사용 패턴을 파악하기 위해 기본 분석 쿠키를 사용합니다. 자세한 내용은 <a href="{{ '/privacy/' | relative_url }}">개인정보처리방침</a>을 확인하세요.</p>
+  <div class="cookie-actions">
+    <button id="cookie-decline" type="button">거부</button>
+    <button id="cookie-accept" type="button">동의</button>
+  </div>
+  {% else %}
   <p>We use cookies for basic analytics to understand how visitors use these tools. See our <a href="{{ '/privacy/' | relative_url }}">Privacy Policy</a>.</p>
   <div class="cookie-actions">
     <button id="cookie-decline" type="button">Decline</button>
     <button id="cookie-accept" type="button">Accept</button>
   </div>
+  {% endif %}
 </div>

@@ -1,0 +1,163 @@
+---
+layout: default
+lang: ko
+title: 스플릿 계산기 — 이븐 & 네거티브 스플릿
+description: 목표 완주 시간에 맞춰 5K, 10K, 하프, 마라톤 구간별 스플릿(km/마일)을 계산하는 무료 러닝 스플릿 플래너. 이븐 페이스와 네거티브 스플릿을 지원하며 인쇄도 가능합니다.
+permalink: /ko/splits/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<style>
+  @media print {
+    header, footer, .tool-form, .tool-content, .related-tools,
+    .cookie-banner, #print-btn, .share-row, .page-updated { display: none !important; }
+    .tool-wrap { padding: 0; }
+  }
+</style>
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>스플릿 계산기</h1>
+    <p>목표 완주 시간을 입력하면 이븐 또는 네거티브 구간 기록표를 만들어 드립니다 (인쇄 가능).</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <fieldset>
+        <legend>대회 거리</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="race-dist" value="5k"><span>5K</span></label>
+          <label><input type="radio" name="race-dist" value="10k" checked><span>10K</span></label>
+          <label><input type="radio" name="race-dist" value="half"><span>하프</span></label>
+          <label><input type="radio" name="race-dist" value="full"><span>풀코스</span></label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="field">
+      <label>목표 완주 시간</label>
+      <div class="time-inputs">
+        <input type="number" id="time-hh" min="0" max="9" value="0" placeholder="0" aria-label="시간">
+        <span>:</span>
+        <input type="number" id="time-mm" min="0" max="59" value="50" placeholder="50" aria-label="분">
+        <span>:</span>
+        <input type="number" id="time-ss" min="0" max="59" value="00" placeholder="00" aria-label="초">
+        <span>시:분:초</span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="split-unit">구간 단위</label>
+      <select id="split-unit">
+        <option value="1" selected>1 km</option>
+        <option value="5">5 km</option>
+        <option value="1.60934">1 마일</option>
+      </select>
+    </div>
+    <div class="field">
+      <fieldset>
+        <legend>페이스 전략</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="strategy" value="0" checked><span>이븐 스플릿 (균일)</span></label>
+          <label><input type="radio" name="strategy" value="3"><span>완만한 네거티브 (3%)</span></label>
+          <label><input type="radio" name="strategy" value="6"><span>적극적 네거티브 (6%)</span></label>
+        </div>
+      </fieldset>
+    </div>
+  </form>
+
+  <section aria-live="polite">
+    <div class="share-row" id="share-row" hidden>
+      <button type="button" id="print-btn" class="share-btn" hidden>스플릿 표 인쇄</button>
+      <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
+    <table class="result-table" id="splits-table" hidden>
+      <thead><tr><th>#</th><th>거리</th><th>구간 기록</th><th>누적 시간</th></tr></thead>
+      <tbody id="splits-body"></tbody>
+    </table>
+    <p id="empty-msg" style="color:var(--text-secondary);font-size:13px">스플릿 표를 생성하려면 목표 완주 시간을 입력하세요.</p>
+  </section>
+
+  <section class="tool-content">
+    <h2>이븐 스플릿 vs 네거티브 스플릿</h2>
+    <p><strong>이븐 스플릿(Even Split)</strong>은 처음부터 끝까지 일정한 페이스로 달리는 전략입니다. 평탄한 코스의 5K·10K에서 에너지 소모가 가장 효율적입니다.</p>
+    <p><strong>네거티브 스플릿(Negative Split)</strong>은 전반부를 약간 여유 있게 시작해 후반부를 더 빠르게 달리는 전략입니다. 하프나 풀코스 마라톤에서 후반 체력 고갈을 막고 강하게 마무리하는 데 유리합니다. 예를 들어 3% 네거티브 스플릿은 첫 구간이 평균보다 약 1.5% 느리게 시작해 마지막 구간이 약 1.5% 빨라지도록 선형 배분하며, 전체 합산 시간은 목표 완주 시간과 정확히 일치합니다.</p>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+
+function render() {
+  const distKey = document.querySelector('input[name="race-dist"]:checked').value
+  const h = parseInt($('time-hh').value, 10) || 0
+  const m = parseInt($('time-mm').value, 10) || 0
+  const s = parseInt($('time-ss').value, 10) || 0
+  const total = h * 3600 + m * 60 + s
+  const splitKm = parseFloat($('split-unit').value)
+  const strategy = parseInt(document.querySelector('input[name="strategy"]:checked').value, 10)
+  const table = $('splits-table')
+  const empty = $('empty-msg')
+  const printBtn = $('print-btn')
+
+  if (total <= 0) { table.hidden = true; printBtn.hidden = true; $('share-row').hidden = true; empty.hidden = false; return }
+
+  const isMile = splitKm > 1.6 && splitKm < 1.62
+  const plan = splitPlan(total, DIST_KM[distKey], splitKm, strategy)
+  $('splits-body').innerHTML = plan.map(row => {
+    const distLabel = isMile
+      ? `${(row.dist / 1.60934).toFixed(row.dist % 1.60934 < 0.01 ? 0 : 2)} mi`
+      : `${row.dist} km`
+    return `<tr><td>${row.n}</td><td>${distLabel}</td><td>${secToPace(row.splitSec)}</td><td><strong>${secToHms(row.cumSec)}</strong></td></tr>`
+  }).join('')
+  table.hidden = false
+  printBtn.hidden = false
+  $('share-row').hidden = false
+  empty.hidden = true
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  const dist = params.get('dist')
+  if (dist && DIST_KM[dist]) {
+    const radio = document.querySelector(`input[name="race-dist"][value="${dist}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('hh')) $('time-hh').value = params.get('hh')
+  if (params.has('mm')) $('time-mm').value = params.get('mm')
+  if (params.has('ss')) $('time-ss').value = params.get('ss')
+  const split = params.get('split')
+  if (split === '1' || split === '1.60934' || split === '5') $('split-unit').value = split
+  const strategy = params.get('strategy')
+  if (strategy === '0' || strategy === '3' || strategy === '6') {
+    const radio = document.querySelector(`input[name="strategy"][value="${strategy}"]`)
+    if (radio) radio.checked = true
+  }
+}
+
+$('copy-link').addEventListener('click', async () => {
+  const params = new URLSearchParams({
+    dist: document.querySelector('input[name="race-dist"]:checked').value,
+    hh: $('time-hh').value,
+    mm: $('time-mm').value,
+    ss: $('time-ss').value,
+    split: $('split-unit').value,
+    strategy: document.querySelector('input[name="strategy"]:checked').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = '복사됨!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+$('print-btn').addEventListener('click', () => window.print())
+$('calc-form').addEventListener('input', render)
+loadFromUrl()
+render()
+</script>

@@ -1,7 +1,12 @@
-<section class="related-tools" aria-label="Related tools">
-  <h2>Related tools</h2>
+<section class="related-tools" aria-label="{% if page.lang == 'ko' %}다른 계산기{% else %}Related tools{% endif %}">
+  <h2>{% if page.lang == 'ko' %}다른 계산기{% else %}Related tools{% endif %}</h2>
   <div class="related-grid">
-    {% for tool in site.data.tools %}
+    {% if page.lang == 'ko' %}
+      {% assign tools_list = site.data.tools_ko %}
+    {% else %}
+      {% assign tools_list = site.data.tools %}
+    {% endif %}
+    {% for tool in tools_list %}
     {% unless tool.url == page.permalink %}
     <a href="{{ tool.url | relative_url }}" class="related-card">
       <strong>{{ tool.name }}</strong>

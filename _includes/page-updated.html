@@ -1,3 +1,7 @@
 {% if page.updated %}
+  {% if page.lang == 'ko' %}
+<p class="page-updated">최근 업데이트 <time datetime="{{ page.updated | date: '%Y-%m-%d' }}">{{ page.updated | date: '%Y년 %-m월 %-d일' }}</time></p>
+  {% else %}
 <p class="page-updated">Last updated <time datetime="{{ page.updated | date: '%Y-%m-%d' }}">{{ page.updated | date: '%B %-d, %Y' }}</time></p>
+  {% endif %}
 {% endif %}

@@ -1,0 +1,233 @@
+---
+layout: default
+lang: ko
+title: 더위 · 습도 페이스 계산기 — 기온 · 이슬점 보정
+description: 기온(°C/°F)과 상대습도(%), 이슬점을 바탕으로 더운 날씨에 러닝 목표 페이스를 얼마나 늦춰야 하는지 계산합니다.
+permalink: /ko/heat-pace/
+updated: 2026-11-25
+last_modified_at: 2026-11-25
+---
+<div class="tool-wrap">
+  <div class="tool-heading">
+    <h1>더위 · 습도 페이스 계산기</h1>
+    <p>기온과 상대습도, 이슬점을 반영해 더운 날 목표 페이스를 안전하게 조정합니다.</p>
+    {% include page-updated.html %}
+  </div>
+
+  <form id="calc-form" class="tool-form" autocomplete="off" novalidate>
+    <div class="field">
+      <label>기준 페이스 (선선한 날씨 기준)</label>
+      <div class="time-inputs">
+        <input type="number" id="pace-mm" min="0" max="59" value="5" aria-label="페이스 분">
+        <span>:</span>
+        <input type="number" id="pace-ss" min="0" max="59" value="00" aria-label="페이스 초">
+        <select id="pace-unit" aria-label="페이스 단위">
+          <option value="km" selected>분 / km</option>
+          <option value="mi">분 / 마일</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="temp">기온</label>
+      <div class="time-inputs">
+        <input type="number" id="temp" step="0.5" value="24" style="width:80px" aria-label="기온">
+        <span class="radio-group">
+          <label><input type="radio" name="temp-unit" value="c" checked><span>°C</span></label>
+          <label><input type="radio" name="temp-unit" value="f"><span>°F</span></label>
+        </span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="humidity">상대습도 (%)</label>
+      <div class="time-inputs">
+        <input type="number" id="humidity" min="0" max="100" step="1" value="70" style="width:80px" aria-label="상대습도">
+        <span>%</span>
+      </div>
+    </div>
+
+    <div class="field" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button type="button" id="copy-link" class="share-btn">공유 링크 복사</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
+  </form>
+
+  <section id="results" class="result-cards" aria-live="polite">
+    <div class="result-card"><span class="label">보정 페이스 / km</span><span class="value" id="out-pace-km">–</span><span class="sub" id="out-delta-km"></span></div>
+    <div class="result-card"><span class="label">보정 페이스 / 마일</span><span class="value" id="out-pace-mi">–</span><span class="sub" id="out-delta-mi"></span></div>
+    <div class="result-card"><span class="label">예상 지연율</span><span class="value" id="out-slowdown">–</span><span class="sub" id="out-combined"></span></div>
+    <div class="result-card"><span class="label">이슬점 (Dew Point)</span><span class="value" id="out-dewpoint">–</span><span class="sub" id="out-comfort"></span></div>
+  </section>
+
+  <section aria-live="polite">
+    <h2 style="font-size:15px;font-weight:600;margin:10px 0">기온 + 이슬점(°F 합산) 구간별 페이스 지연표</h2>
+    <table class="result-table">
+      <thead>
+        <tr><th>기온 + 이슬점 (°F)</th><th>지연율</th><th>보정 페이스 /km</th><th>보정 페이스 /mi</th></tr>
+      </thead>
+      <tbody id="threshold-body"></tbody>
+    </table>
+  </section>
+
+  <section class="tool-content">
+    <h2>더위 보정 원리</h2>
+    <p>상대습도(%)는 기온에 따라 체감이 크게 달라지기 때문에, 공기 중 실제 수증기량을 나타내는 <strong>이슬점(Dew Point)</strong>을 Magnus-Tetens 공식으로 계산한 뒤 <code>기온(°F) + 이슬점(°F)</code> 합산 구간에 따라 러닝 페이스 지연율을 산출합니다.</p>
+    <ul>
+      <li>이슬점 13°C 미만: 쾌적하며 땀 증발이 원활합니다.</li>
+      <li>이슬점 16~18.5°C: 습기가 느껴지고 심박수가 평소보다 빠르게 올라갑니다.</li>
+      <li>이슬점 21°C 이상: 열 스트레스가 크므로 목표 페이스를 충분히 늦추고 수분 보충을 우선해야 합니다.</li>
+    </ul>
+  </section>
+
+  {% include related-tools.html %}
+</div>
+
+<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script>
+const $ = id => document.getElementById(id)
+
+const THRESHOLD_ROWS = [
+  { label: '< 100°F', pct: 0 },
+  { label: '100–110°F', pct: 0.5 },
+  { label: '110–120°F', pct: 1.5 },
+  { label: '120–130°F', pct: 3.0 },
+  { label: '130–140°F', pct: 4.5 },
+  { label: '140–150°F', pct: 6.5 },
+  { label: '150–160°F', pct: 8.5 },
+  { label: '> 160°F', pct: 10.5 },
+]
+
+function comfortLabel(dewPointC) {
+  if (dewPointC < 13) return '쾌적함'
+  if (dewPointC < 16) return '약간 습함'
+  if (dewPointC < 18.5) return '체감 부담 시작'
+  if (dewPointC < 21) return '무덥고 답답함'
+  return '심한 열 스트레스'
+}
+
+function readBasePaceSecPerKm() {
+  const m = parseInt($('pace-mm').value, 10) || 0
+  const s = parseInt($('pace-ss').value, 10) || 0
+  const perUnit = m * 60 + s
+  if (perUnit <= 0) return null
+  return $('pace-unit').value === 'mi' ? perUnit / 1.60934 : perUnit
+}
+
+function readTempC() {
+  const raw = parseFloat($('temp').value)
+  if (isNaN(raw)) return null
+  const unit = document.querySelector('input[name="temp-unit"]:checked').value
+  return unit === 'f' ? (raw - 32) * 5 / 9 : raw
+}
+
+function renderThresholds(basePaceKm, activePct) {
+  $('threshold-body').innerHTML = THRESHOLD_ROWS.map(row => {
+    const adjKm = basePaceKm * (1 + row.pct / 100)
+    const adjMi = kmToMile(adjKm)
+    const isActive = row.pct === activePct
+    const style = isActive ? ' style="font-weight:700;color:var(--accent)"' : ''
+    return `<tr${style}>
+      <td>${row.label}</td>
+      <td>+${row.pct.toFixed(1)}%</td>
+      <td>${secToPace(adjKm)} /km</td>
+      <td>${secToPace(adjMi)} /mi</td>
+    </tr>`
+  }).join('')
+}
+
+function render() {
+  const basePaceKm = readBasePaceSecPerKm()
+  const tempC = readTempC()
+  const hum = parseFloat($('humidity').value)
+  if (!basePaceKm || tempC === null || isNaN(hum) || hum < 0 || hum > 100) {
+    $('results').hidden = true
+    return
+  }
+
+  const res = adjustPaceForHeat(basePaceKm, tempC, hum)
+  const deltaKm = Math.round(res.adjustedPaceKmSec - basePaceKm)
+  const deltaMi = Math.round(res.adjustedPaceMiSec - kmToMile(basePaceKm))
+  const unit = document.querySelector('input[name="temp-unit"]:checked').value
+  const dpDisplay = unit === 'f'
+    ? `${(res.dewPointC * 9 / 5 + 32).toFixed(1)}°F`
+    : `${res.dewPointC.toFixed(1)}°C`
+
+  $('out-pace-km').textContent = `${secToPace(res.adjustedPaceKmSec)} /km`
+  $('out-delta-km').textContent = deltaKm > 0 ? `+${deltaKm}초 느리게` : '감속 불필요'
+  $('out-pace-mi').textContent = `${secToPace(res.adjustedPaceMiSec)} /mi`
+  $('out-delta-mi').textContent = deltaMi > 0 ? `+${deltaMi}초 느리게` : '감속 불필요'
+  $('out-slowdown').textContent = `+${res.slowdownPct.toFixed(1)}%`
+  $('out-combined').textContent = `합산 ${res.combinedF.toFixed(0)}°F`
+  $('out-dewpoint').textContent = dpDisplay
+  $('out-comfort').textContent = comfortLabel(res.dewPointC)
+  $('results').hidden = false
+
+  renderThresholds(basePaceKm, res.slowdownPct)
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.has('pace')) {
+    const parts = params.get('pace').split(':')
+    if (parts.length === 2) {
+      $('pace-mm').value = parts[0]
+      $('pace-ss').value = parts[1]
+    }
+  }
+  if (params.get('punit') === 'mi' || params.get('punit') === 'km') {
+    $('pace-unit').value = params.get('punit')
+  }
+  if (params.get('tunit') === 'f' || params.get('tunit') === 'c') {
+    const radio = document.querySelector(`input[name="temp-unit"][value="${params.get('tunit')}"]`)
+    if (radio) radio.checked = true
+  }
+  if (params.has('temp') && !isNaN(parseFloat(params.get('temp')))) {
+    $('temp').value = params.get('temp')
+  }
+  if (params.has('hum') && !isNaN(parseFloat(params.get('hum')))) {
+    $('humidity').value = params.get('hum')
+  }
+}
+
+let lastTempUnit = 'c'
+document.querySelectorAll('input[name="temp-unit"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const nextUnit = radio.value
+    const cur = parseFloat($('temp').value)
+    if (!isNaN(cur) && nextUnit !== lastTempUnit) {
+      $('temp').value = nextUnit === 'f'
+        ? Math.round((cur * 9 / 5 + 32) * 2) / 2
+        : Math.round(((cur - 32) * 5 / 9) * 2) / 2
+    }
+    lastTempUnit = nextUnit
+    render()
+  })
+})
+
+$('copy-link').addEventListener('click', async () => {
+  const mm = parseInt($('pace-mm').value, 10) || 0
+  const ss = String(parseInt($('pace-ss').value, 10) || 0).padStart(2, '0')
+  const tunit = document.querySelector('input[name="temp-unit"]:checked').value
+  const params = new URLSearchParams({
+    pace: `${mm}:${ss}`,
+    punit: $('pace-unit').value,
+    temp: $('temp').value,
+    tunit,
+    hum: $('humidity').value,
+  })
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  try {
+    await navigator.clipboard.writeText(url)
+    $('copy-status').textContent = '복사됨!'
+  } catch {
+    $('copy-status').textContent = url
+  }
+  setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+})
+
+$('calc-form').addEventListener('input', render)
+loadFromUrl()
+lastTempUnit = document.querySelector('input[name="temp-unit"]:checked').value
+render()
+</script>

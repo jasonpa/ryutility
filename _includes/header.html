@@ -1,4 +1,15 @@
 <header>
+  {% if page.lang == 'ko' %}
+  <a href="{{ '/ko/' | relative_url }}" class="site-title">Ryutility</a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="{{ '/ko/' | relative_url }}">계산기</a>
+    <a href="{{ '/guides/' | relative_url }}">가이드(EN)</a>
+    <a href="{{ '/ko/about/' | relative_url }}">소개</a>
+    <a href="{{ '/contact/' | relative_url }}">문의</a>
+  </nav>
+  {% assign en_url = page.url | remove_first: '/ko' %}
+  <a href="{{ en_url | relative_url }}" class="lang-switch" hreflang="en" aria-label="Switch to English">EN</a>
+  {% else %}
   <a href="{{ '/' | relative_url }}" class="site-title">Ryutility</a>
   <nav class="site-nav" aria-label="Primary">
     <a href="{{ '/' | relative_url }}">Calculators</a>
@@ -6,5 +17,12 @@
     <a href="{{ '/about/' | relative_url }}">About</a>
     <a href="{{ '/contact/' | relative_url }}">Contact</a>
   </nav>
+  {% if page.url == '/' or page.url == '/pace/' or page.url == '/run/' or page.url == '/predict/' or page.url == '/hr-zones/' or page.url == '/splits/' or page.url == '/treadmill/' or page.url == '/heat-pace/' or page.url == '/about/' %}
+    {% assign ko_url = '/ko' | append: page.url %}
+  {% else %}
+    {% assign ko_url = '/ko/' %}
+  {% endif %}
+  <a href="{{ ko_url | relative_url }}" class="lang-switch" hreflang="ko" aria-label="한국어 버전으로 전환">한국어</a>
+  {% endif %}
   <button id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
 </header>
