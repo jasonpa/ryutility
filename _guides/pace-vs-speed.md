@@ -1,6 +1,6 @@
 ---
-title: "Pace vs Speed: Reading min/km, min/mi, and mph Together"
-description: "Pace and speed are the same information in two different shapes — one built for planning a run, the other for glancing at a treadmill. Here's how to convert between them without losing accuracy."
+title: "Pace vs. Speed: Is Pace the Same as Speed? (With Conversion Chart)"
+description: "No — pace (min/km or min/mi) and speed (km/h or mph) are reciprocals, not the same. See the quick conversion chart and how to convert between them accurately."
 date: 2026-07-20
 related_tools:
   - /pace/
@@ -8,6 +8,21 @@ related_tools:
 ---
 
 A patient once told me they'd "sped up" from 10 min/mi to 5:30/km and were confused why their watch didn't seem to agree. It wasn't their watch — 10 min/mi and 5:30/km are almost the same pace. They hadn't sped up at all.
+
+## Is pace the same as speed?
+
+**No — pace and speed are reciprocals, not the same:** pace measures time per unit distance (minutes per kilometer or mile), while speed measures distance per unit time (km/h or mph), so a faster run means a *smaller* pace number and a *larger* speed number.
+
+| Pace (min/km) | Pace (min/mi) | Speed (km/h) | Speed (mph) |
+| --- | --- | --- | --- |
+| 4:00 | 6:26 | 15.0 | 9.3 |
+| 4:30 | 7:15 | 13.3 | 8.3 |
+| 5:00 | 8:03 | 12.0 | 7.5 |
+| 5:30 | 8:51 | 10.9 | 6.8 |
+| 6:00 | 9:39 | 10.0 | 6.2 |
+| 6:13 | 10:00 | 9.7 | 6.0 |
+| 6:30 | 10:28 | 9.2 | 5.7 |
+| 7:00 | 11:16 | 8.6 | 5.3 |
 
 Pace and speed carry the same information — how fast you're covering ground — but they're built for different jobs, and converting between them by memory is where most of these mix-ups happen.
 

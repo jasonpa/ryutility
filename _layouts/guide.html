@@ -29,6 +29,13 @@
   <main class="guide-page">
     <p class="guide-meta">{{ page.date | date: "%B %-d, %Y" }}</p>
     <h1>{{ page.title }}</h1>
+    {% if page.related_tools and page.related_tools.size > 0 %}
+      {% assign primary_tool_url = page.related_tools | first %}
+      {% assign primary_tool = site.data.tools | where: "url", primary_tool_url | first %}
+      {% if primary_tool %}
+      <div class="guide-callout">Try the interactive tool: <a href="{{ primary_tool.url | relative_url }}">{{ primary_tool.name }}</a> — {{ primary_tool.short }}.</div>
+      {% endif %}
+    {% endif %}
     {{ content }}
     <aside class="guide-author-bio" aria-label="About the author">
       <h2>About the author</h2>
