@@ -5,6 +5,9 @@ const {
   clearSavedProfile,
   calcDaysUntil,
   isEmbedMode,
+  sanitizeNumericInput,
+  shouldAutoAdvance,
+  stepNumericValue,
 } = require('../assets/js/site.js')
 
 function createMockStorage(initial = {}) {
@@ -101,6 +104,17 @@ test('clearSavedProfile removes saved profile', () => {
   clearSavedProfile(null) // should not throw
 })
 
+test('storage errors in saveProfile, loadSavedProfile, clearSavedProfile do not throw', () => {
+  const throwingStorage = {
+    getItem() { throw new Error('SecurityError') },
+    setItem() { throw new Error('QuotaExceededError') },
+    removeItem() { throw new Error('SecurityError') },
+  }
+  assert.strictEqual(saveProfile({ dist: '5k', mm: 25 }, throwingStorage), false)
+  assert.strictEqual(loadSavedProfile(throwingStorage), null)
+  clearSavedProfile(throwingStorage)
+})
+
 // calcDaysUntil
 test('calcDaysUntil returns 0 on D-day', () => {
   const now = new Date(Date.UTC(2026, 4, 10, 15, 30, 0))
@@ -142,6 +156,38 @@ test('isEmbedMode("?foo=bar&embed=1") = true', () => {
 test('isEmbedMode("") and other values = false', () => {
   assert.strictEqual(isEmbedMode(''), false)
   assert.strictEqual(isEmbedMode('?embed=true'), false)
+})
+
+// sanitizeNumericInput
+test('sanitizeNumericInput strips non-digits for integer fields', () => {
+  assert.strictEqual(sanitizeNumericInput('25a', false, false), '25')
+  assert.strictEqual(sanitizeNumericInput('12.34', false, false), '1234')
+  assert.strictEqual(sanitizeNumericInput('-5', false, false), '5')
+})
+
+test('sanitizeNumericInput handles decimals, commas, and negative temp', () => {
+  assert.strictEqual(sanitizeNumericInput('10.5.2', true, false), '10.52')
+  assert.strictEqual(sanitizeNumericInput('10,5', true, false), '10.5')
+  assert.strictEqual(sanitizeNumericInput('-4.5', true, true), '-4.5')
+  assert.strictEqual(sanitizeNumericInput('4-5', true, true), '45')
+})
+
+// shouldAutoAdvance
+test('shouldAutoAdvance advances when maxDigits reached at end on insertion', () => {
+  assert.strictEqual(shouldAutoAdvance('25', 2, 2, 'insertText'), true)
+  assert.strictEqual(shouldAutoAdvance('1', 1, 1, 'insertText'), true)
+  assert.strictEqual(shouldAutoAdvance('2', 2, 1, 'insertText'), false)
+  assert.strictEqual(shouldAutoAdvance('25', 2, 1, 'insertText'), false)
+  assert.strictEqual(shouldAutoAdvance('25', 2, 2, 'deleteContentBackward'), false)
+})
+
+// stepNumericValue
+test('stepNumericValue steps with min/max clamping and decimal precision', () => {
+  assert.strictEqual(stepNumericValue('25', 1, '0', '59', ''), '26')
+  assert.strictEqual(stepNumericValue('59', 1, '0', '59', ''), '59')
+  assert.strictEqual(stepNumericValue('0', -1, '0', '59', ''), '0')
+  assert.strictEqual(stepNumericValue('10.0', 1, '0', '25', '0.1'), '10.1')
+  assert.strictEqual(stepNumericValue('1.0', -1, '0', '15', '0.5'), '0.5')
 })
 
 console.log(`\n${passed} passed, ${failed} failed`)

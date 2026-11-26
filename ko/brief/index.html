@@ -25,9 +25,10 @@ last_modified_at: 2026-11-25
   .brief-banner {
     background: var(--surface); border: 1px solid var(--border);
     border-left: 3px solid var(--accent); border-radius: 8px;
-    padding: 12px 14px; margin-bottom: 14px; font-size: 14px;
+    padding: 12px 14px; margin-bottom: 10px; font-size: 14px;
   }
-  .brief-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  .brief-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0 0 14px; }
+  .brief-btn-primary { border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .brief-subgrid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
   .brief-zone-item {
     border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
@@ -125,6 +126,14 @@ last_modified_at: 2026-11-25
   <section id="brief-output" aria-live="polite" hidden>
     <div id="brief-banner" class="brief-banner"></div>
 
+    <div class="brief-actions">
+      <button type="button" id="save-baseline" class="share-btn brief-btn-primary">내 기준값으로 저장</button>
+      <button type="button" id="copy-link" class="share-btn">브리프 링크 복사</button>
+      <button type="button" id="print-btn" class="share-btn">인쇄하기</button>
+      <button type="button" id="clear-baseline" class="share-btn" hidden>저장 초기화</button>
+      <span id="copy-status" class="share-status" aria-live="polite"></span>
+    </div>
+
     <div class="brief-grid">
       <article class="brief-card">
         <div class="brief-card-head">
@@ -165,13 +174,6 @@ last_modified_at: 2026-11-25
       </article>
     </div>
 
-    <div class="brief-actions">
-      <button type="button" id="copy-link" class="share-btn">브리프 링크 복사</button>
-      <button type="button" id="print-btn" class="share-btn">인쇄하기</button>
-      <button type="button" id="save-baseline" class="share-btn">내 기준값으로 저장</button>
-      <button type="button" id="clear-baseline" class="share-btn" hidden>저장 초기화</button>
-      <span id="copy-status" class="share-status" aria-live="polite"></span>
-    </div>
     <details class="embed-box">
       <summary>블로그·웹사이트에 임베드하기</summary>
       <textarea class="embed-code" rows="2" readonly onclick="this.select()">&lt;iframe src="https://ryutility.com/ko/brief/?embed=1" width="100%" height="680" style="border:1px solid #e5e7eb;border-radius:10px" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
@@ -183,10 +185,15 @@ last_modified_at: 2026-11-25
   {% include related-tools.html %}
 </div>
 
-<script src="{{ '/assets/js/calc.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/calc.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
 <script>
 const $ = id => document.getElementById(id)
 const LABELS = { '5k': '5K', '10k': '10K', half: '하프', full: '풀코스' }
+const BRIEF_URL_KEYS = ['dist', 'hh', 'mm', 'ss', 'tdist', 'thh', 'tmm', 'tss', 'hrmax', 'hrrest', 'unit']
+function hasBriefUrlParams() {
+  const p = new URLSearchParams(window.location.search)
+  return BRIEF_URL_KEYS.some(k => p.has(k))
+}
 const KO_ZONE_LABELS = {
   jog: '조깅 / 이지', zone2: '존 2 (기반)', tempo: '템포',
   threshold: '역치 (Threshold)', vo2max: 'VO2max',
@@ -378,7 +385,7 @@ function applyProfile(prof) {
 $('print-btn').addEventListener('click', () => window.print())
 $('brief-form').addEventListener('input', render)
 document.addEventListener('DOMContentLoaded', () => {
-  const hasUrl = window.location.search.length > 1
+  const hasUrl = hasBriefUrlParams()
   if (!hasUrl && window.ryProfile) {
     const saved = window.ryProfile.loadSavedProfile()
     if (saved) { applyProfile(saved); $('clear-baseline').hidden = false }
@@ -388,8 +395,12 @@ document.addEventListener('DOMContentLoaded', () => {
   render()
 
   $('save-baseline').addEventListener('click', () => {
-    if (!window.ryProfile) return
-    window.ryProfile.saveProfile({
+    if (!window.ryProfile) {
+      $('copy-status').textContent = '저장 기능을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.'
+      setTimeout(() => { $('copy-status').textContent = '' }, 3000)
+      return
+    }
+    const ok = window.ryProfile.saveProfile({
       dist: document.querySelector('input[name="dist"]:checked').value,
       hh: $('time-hh').value, mm: $('time-mm').value, ss: $('time-ss').value,
       hrMax: $('hr-max').value, hrRest: $('hr-rest').value,
@@ -398,8 +409,12 @@ document.addEventListener('DOMContentLoaded', () => {
       targetHh: $('tgt-hh').value, targetMm: $('tgt-mm').value, targetSs: $('tgt-ss').value,
       targetDate: $('target-date').value,
     })
-    $('clear-baseline').hidden = false
-    $('copy-status').textContent = '이 기기에 저장되었습니다!'
+    if (ok) {
+      $('clear-baseline').hidden = false
+      $('copy-status').textContent = '이 기기에 저장되었습니다!'
+    } else {
+      $('copy-status').textContent = '저장할 수 없습니다 (브라우저 저장소 차단 또는 시크릿 모드).'
+    }
     setTimeout(() => { $('copy-status').textContent = '' }, 3000)
   })
 
