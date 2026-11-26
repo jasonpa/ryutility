@@ -169,7 +169,8 @@ main p.page-updated {
   letter-spacing: 0.06em; margin-bottom: 6px;
 }
 .tool-form fieldset { border: none; }
-.tool-form input[type="number"] {
+.tool-form input[type="number"],
+.tool-form input[data-num-input] {
   width: 84px; padding: 7px 9px; border: 1px solid var(--border-strong);
   border-radius: 6px; background: var(--bg); color: var(--text-primary);
   font-size: 16px; font-variant-numeric: tabular-nums;
