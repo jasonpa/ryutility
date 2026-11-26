@@ -78,6 +78,14 @@
 - [x] `CONTENT-LICENSE.md`: 가이드·해설·FAQ 문구용 **CC BY-NC 4.0** (상업적 복제 제한)
 - [x] `TRADEMARKS.md`: `Ryutility` 이름·도메인(`ryutility.com`)·로고·디자인 사용 제한
 - [x] `NOTICE`, `CONTRIBUTING.md`, `SECURITY.md`, `README.md` 작성 및 `_config.yml` `exclude:` 반영
+
+## 배포 및 운영 체크리스트
+- [x] PR #9 머지 및 `ryutility.com` 라이브 스모크 테스트 확인 (2026-11-25)
+- [x] Google Search Console 사이트맵 및 신규 URL 색인 재제출 완료 (2026-11-25)
+- [ ] (선택) GA4 핵심 행동 이벤트(`save_baseline`, `copy_share_link`, `embed_copy`) 계측 추가
+- [ ] (선택) 차기 고도화: 모바일 공유 이미지 카드 / 마라톤 페이드(Fade) 보정 옵션
+
+## 작업 규칙 (매 Phase 완료 시 체크)
 1. `for f in tests/*.test.js; do node "$f"; done` 전체 통과 확인
 2. 영문(`/`) 및 국문(`/ko/`) 페이지 동시 동기화 확인
 3. 이 문서(`docs/superpowers/plans/2026-11-25-growth-roadmap.md`) 진척 상태 업데이트
