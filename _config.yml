@@ -20,7 +20,6 @@ exclude:
   - tests
   - .superpowers
   - .playwright-mcp
-  - "*.png"
   - README.md
   - CLAUDE.md
   - LICENSE
